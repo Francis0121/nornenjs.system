@@ -27,11 +27,8 @@
 
 			<fieldset id="user-details">
 			
-
 				<label for="name" th:text="#{theader.name}">Name: </label> 
-				<input type="text" name="name"
-					value="" id="name" placeholder="Your Name" required="required"
-					autofocus="autofocus" th:value="*{name}" /> 
+				<input type="text" name="name" value="" id="name" placeholder="Your Name" required="required" autofocus="autofocus" th:value="*{name}" /> 
 				<label for="email" th:text="#{theader.email}">Email: </label>
 				<input type="email" name="email" value="" id="email" placeholder="mail@email.com" required="required" th:value="*{email}" /> 
 				<label for="phone" th:text="#{theader.phone}">Phone: </label> 

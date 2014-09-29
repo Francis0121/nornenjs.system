@@ -11,7 +11,7 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="mvrw.mvrw">
+	<logger name="com.secmem.mvrw">
 		<level value="info" />
 	</logger>
 	
