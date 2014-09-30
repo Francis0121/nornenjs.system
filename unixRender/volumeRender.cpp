@@ -146,7 +146,7 @@ void computeFPS()
 void render()
 {
     copyInvViewMatrix(invViewMatrix, sizeof(float4)*3);
-	printf("final exam\n");
+	printf("git environment\n");
     // map PBO to get CUDA device pointer
     uint *d_output;
     // map PBO to get CUDA device pointer
