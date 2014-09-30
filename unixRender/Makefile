@@ -171,10 +171,10 @@ all: build
 
 build: volumeRender
 
-volumeRender.o:volumeRender.cpp
+volumeRender.o:../volumeRender/volumeRender.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-volumeRender_kernel.o:volumeRender_kernel.cu
+volumeRender_kernel.o:../volumeRender/volumeRender_kernel.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
 volumeRender: volumeRender.o volumeRender_kernel.o
