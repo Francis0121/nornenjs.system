@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+var addon = require('/home/francis/git/mvrw/web/node/build/Release/hello');
+console.log(addon.hello());
+
 var app = express();
 
 // view engine setup
