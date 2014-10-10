@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
+// ~ c++ addon
 var addon = require('/home/francis/git/mvrw/web/node/build/Release/hello');
 console.log(addon.hello());
 
@@ -61,3 +62,4 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
