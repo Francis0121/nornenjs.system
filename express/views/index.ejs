@@ -4,11 +4,27 @@
         <title><%= title %></title>
         <link rel='stylesheet' href='/stylesheets/style.css' />
         <script src="/socket.io/socket.io.js"></script>
+        <script src="http://cdn.binaryjs.com/0/binary.js"></script>
         <script>
             var socket = io.connect('http://localhost:3000');
                 socket.on('news', function (data) {
                 console.log(data);
                 socket.emit('my other event', { my: 'data' });
+            });
+
+            var client = new BinaryClient('ws://localhost:9000');
+
+            client.on('stream', function(stream, meta){
+                var parts = [];
+                stream.on('data', function(data){
+                    parts.push(data);
+                });
+
+                stream.on('end', function(){
+                    var img = document.createElement("img");
+                    img.src = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
+                    document.body.appendChild(img);
+                });
             });
         </script>
     </head>

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var debug = require('debug')('express');
 var app = require('../app');
+// ~ http server
 
 app.set('port', process.env.PORT || 3000);
 
@@ -16,4 +17,18 @@ io.sockets.on('connection', function (socket) {
     socket.on('my other event', function (data) {
         console.log(data);
     });
+});
+
+
+// ~ binary js
+var BinaryServer = require('binaryjs').BinaryServer;
+var fs = require('fs');
+
+// ~ Start Binary.js server
+var binaryServer = BinaryServer({port: 9000});
+// Wait for new user connections
+binaryServer.on('connection', function(client){
+    // Stream a flower as a hello!
+    var file = fs.createReadStream(__dirname + '/flower.png');
+    client.send(file);
 });
