@@ -311,13 +311,13 @@ $(obj).$(TOOLSET)/%.o: $(obj)/%.s FORCE_DO_CMD
 
 ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
     $(findstring $(join ^,$(prefix)),\
-                 $(join ^,hello.target.mk)))),)
-  include hello.target.mk
+                 $(join ^,addon.target.mk)))),)
+  include addon.target.mk
 endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
-cmd_regen_makefile = cd $(srcdir); /usr/local/lib/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "--toplevel-dir=." -I/home/francis/git/mvrw/web/node/build/config.gypi -I/usr/local/lib/node_modules/node-gyp/addon.gypi -I/home/francis/.node-gyp/0.10.32/common.gypi "--depth=." "-Goutput_dir=." "--generator-output=build" "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/home/francis/.node-gyp/0.10.32" "-Dmodule_root_dir=/home/francis/git/mvrw/web/node" binding.gyp
-Makefile: $(srcdir)/../../../../../../usr/local/lib/node_modules/node-gyp/addon.gypi $(srcdir)/../../../../.node-gyp/0.10.32/common.gypi $(srcdir)/build/config.gypi $(srcdir)/binding.gyp
+cmd_regen_makefile = cd $(srcdir); /usr/local/lib/node_modules/node-gyp/gyp/gyp_main.py -fmake --ignore-environment "--toplevel-dir=." -I/home/pi/git/vrcs/web/node/build/config.gypi -I/usr/local/lib/node_modules/node-gyp/addon.gypi -I/home/pi/.node-gyp/0.10.33/common.gypi "--depth=." "-Goutput_dir=." "--generator-output=build" "-Dlibrary=shared_library" "-Dvisibility=default" "-Dnode_root_dir=/home/pi/.node-gyp/0.10.33" "-Dmodule_root_dir=/home/pi/git/vrcs/web/node" binding.gyp
+Makefile: $(srcdir)/../../../../../../usr/local/lib/node_modules/node-gyp/addon.gypi $(srcdir)/build/config.gypi $(srcdir)/binding.gyp $(srcdir)/../../../../.node-gyp/0.10.33/common.gypi
 	$(call do_cmd,regen_makefile)
 
 # "all" is a concatenation of the "all" targets from all the included
