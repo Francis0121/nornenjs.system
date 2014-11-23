@@ -12,8 +12,8 @@ db.serialize(function() {
     // ~ Database Insert
     var stmt = db.prepare("INSERT INTO user (username, password, join_date ) VALUES ( $username, $password, datetime('now') )");
     stmt.run({
-        $username : 'kims0121',
-        $password : '1q23e4r!'  });
+        $username : 'vrcs',
+        $password : 'vrcs'  });
     stmt.finalize();
 
     db.each("SELECT pn, username, password, join_date AS `date` FROM user", function(err, row) {
