@@ -25,11 +25,14 @@
                 <input id="password" name="password" type="password"/>
             </li>
             <li>
-                <button type="button">signin</button>
+                <button type="submit">signin</button>
             </li>
         </ul>
         <a href="/signin/join">Create An Account</a>
     </form>
+    <% if( error != '' ){ %>
+        Error : <%=error%>
+    <% }%>
 </section>
 <footer>
 

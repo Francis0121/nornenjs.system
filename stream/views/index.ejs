@@ -28,6 +28,7 @@
         stream.on('end', function(){
             var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
             document.body.style.backgroundImage = 'url(' + url + ')';
+            document.body.style.backgroundRepeat = 'no-repeat';
         });
     });
 
