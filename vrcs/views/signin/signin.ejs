@@ -14,6 +14,8 @@
     </h1>
 </header>
 <section id="wrapper">
+
+    <% if ( user == undefined ) { %>
     <form name="user" action="/signin" method="post">
         <ul>
             <li>
@@ -30,6 +32,10 @@
         </ul>
         <a href="/signin/join">Create An Account</a>
     </form>
+    <% }else{%>
+        Welcome <%=user.username%>!
+    <% }%>
+
     <% if( error != '' ){ %>
         Error : <%=error%>
     <% }%>

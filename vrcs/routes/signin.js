@@ -4,8 +4,9 @@ var router = express.Router();
 
 // ~ signin get
 router.get('/', function(req, res) {
-  res.render('signin/signin', { error : ''});
+    res.render('signin/signin', { error : '', user : req.session.user });
 });
+
 // ~ signin post
 router.post('/', function(req, res){
     var data = req.body;
@@ -14,6 +15,8 @@ router.post('/', function(req, res){
     sqlite.db.get(sqlite.sql.user.selectUserOne, query, function(err, user){
         if(data.password  == user.password){
             console.log('Success signin');
+            user.password = '';
+            req.session.user = user;
             res.redirect('../');
         }else{
             console.log('Fail signin');
