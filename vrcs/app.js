@@ -5,12 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session')
+var busboy = require('connect-busboy'); //middleware for form/file upload
 
 var routes = require('./routes/index');
 var volume = require('./routes/volume');
 var signin = require('./routes/signin')
 
 var app = express();
+
 var sqlite3 = require('./sql/default');
 
 // view engine setup
@@ -23,13 +25,15 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(busboy()); // file upload
 app.use(express.static(path.join(__dirname, 'public')));
-// ~ sessiomn
+// ~ session
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true
 }));
+
 
 app.use('/', routes);
 app.use('/volume', volume);
