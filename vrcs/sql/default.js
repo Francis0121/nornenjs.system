@@ -7,17 +7,35 @@ var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(':memory:');
 
 db.serialize(function() {
+    // ~ Create table
     db.run(sql.user.create);
+    db.run(sql.volume.create);
 
-    // ~ Database Insert
-    var user = { $username : 'vrcs', $password : 'vrcs'  };
+    // ~ Insert sample data
+    var user = {
+        $username : 'vrcs',
+        $password : 'vrcs'  };
     var stmt = db.prepare(sql.user.insert);
     stmt.run(user);
     stmt.finalize();
 
-    db.each("SELECT pn, username, password, join_date AS joinDate, update_date AS updateDate FROM user", function(err, row) {
-        console.log(row.pn + ": " + row.username + ": " + row.password + ": " + row.joinDate + ":" + row.updateDate);
+    db.get(sql.user.select, function(err, uData) {
+        console.log(uData);
+        var volume = {
+            $userpn : uData.pn,
+            $title : 'Volume Rendering',
+            $fileName : 'head.dan'
+        };
+
+        stmt = db.prepare(sql.volume.insert);
+        stmt.run(volume);
+        stmt.finalize();
+
+        db.each(sql.volume.selectVolumeList, { $userpn : uData.pn }, function(err, vData){
+            console.log(vData)
+        });
     });
+
 });
 
 module.exports.db = db;
