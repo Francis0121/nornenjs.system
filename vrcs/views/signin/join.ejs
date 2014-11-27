@@ -12,14 +12,34 @@
     <h1>Join</h1>
 </header>
 <section id="wrapper">
+
     <form name="user" action="/signin/join" method="post">
+        <% if (user == undefined){ %>
+        <input type="hidden" name="_method" value="post">
+        <% } else { %>
+        <input type="hidden" name="_method" value="update">
+        <% } %>
         <ul>
             <li>
                 <label>Username</label>
+                <% if (user == undefined){ %>
                 <input id="username" name="username" type="text"/>
+                <% } else {%>
+                <%=user.username%>
+                <% }%>
             </li>
+            <% if (user != undefined) {%>
             <li>
+                <label>Original Password</label>
+                <input id="originalpw" name="originalpw" type="password"/>
+            </li>
+            <% }%>
+            <li>
+                <% if (user == undefined) { %>
                 <label>Password</label>
+                <% } else { %>
+                <label>Change Password</label>
+                <% } %>
                 <input id="password" name="password" type="password"/>
             </li>
             <li>
@@ -27,7 +47,11 @@
                 <input id="confirmpw" name="confirmpw" type="password"/>
             </li>
             <li>
+                <% if (user == undefined) {%>
                 <button type="submit">Create An Account</button>
+                <% } else { %>
+                <button type="submit">Modify Account</button>
+                <% } %>
             </li>
         </ul>
         <% if(error != ''){%>

@@ -21,12 +21,20 @@ var user = {
         "   ( $username, $password, datetime('now'), datetime('now') ) ",
 
     update :
-        "UPDATE user" +
-        "SET" +
+        "UPDATE user " +
+        "SET " +
         "   password = $password, " +
         "   update_date = datetime('now') " +
         "WHERE " +
         "   pn = $pn ",
+
+    updatepw :
+        "UPDATE user " +
+        "SET " +
+        "   password = $password, " +
+        "   update_date = datetime('now') " +
+        "WHERE " +
+        "   username = $username ",
 
     delete :
         "DELETE FROM " +
