@@ -68,7 +68,7 @@ var volume = {
         "   title TEXT NOT NULL, " +
         "   file_name TEXT NOT NULL, " +
         "   input_date TEXT NOT NULL, " +
-        "   FOREIGN KEY(userpn) REFERENCES user(pn) " +
+        "   FOREIGN KEY(userpn) REFERENCES user(pn) ON DELETE CASCADE " +
         ") ",
 
     insert :
