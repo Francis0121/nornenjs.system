@@ -44,22 +44,33 @@ router.post('/upload', function(req, res){
         file.pipe(fstream);
         fstream.on('close', function () {
             console.log('Upload Finished of ' + savename);
-            var query = {
-                $userpn : req.session.user.pn,
-                $title : 'Volume Data',
-                $saveName : savename,
-                $fileName : filename
-            };
+        });
 
-            sqlite.db.run(sqlite.sql.volume.insert, query, function (err) {
-                console.log('Success join');
-                if (err == null) {
-                    res.redirect('./');
-                }else{
-                    res.render('volume/upload', { error : 'File upload error' });
-                }
-            });
+        req.body['filename'] = filename;
+        req.body['savename'] = savename;
+    });
 
+    req.busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
+        req.body[fieldname] = val;
+        console.log(fieldname + '_' +val);
+    });
+
+    req.busboy.on('finish', function(){
+        var query = {
+            $userpn : req.session.user.pn,
+            $title : req.body.title,
+            $saveName : req.body.savename,
+            $fileName : req.body.filename
+        };
+        console.log(query);
+        sqlite.db.run(sqlite.sql.volume.insert, query, function (err) {
+            console.log('Success file');
+            if (err == null) {
+                res.redirect('./');
+            }else{
+                console.log(err);
+                res.render('volume/upload', { error : 'File upload error' });
+            }
         });
     });
 
