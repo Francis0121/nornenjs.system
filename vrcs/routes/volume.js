@@ -76,10 +76,4 @@ router.post('/upload', function(req, res){
 
 });
 
-/* GET users listing. */
-router.get('/stream', function(req, res) {
-    res.render('volume/stream', { });
-});
-
-
 module.exports = router;

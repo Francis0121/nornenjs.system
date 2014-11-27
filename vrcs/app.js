@@ -9,7 +9,8 @@ var busboy = require('connect-busboy'); //middleware for form/file upload
 
 var routes = require('./routes/index');
 var volume = require('./routes/volume');
-var signin = require('./routes/signin')
+var signin = require('./routes/signin');
+var stream = require('./routes/stream');
 
 var app = express();
 
@@ -38,6 +39,7 @@ app.use(session({
 app.use('/', routes);
 app.use('/volume', volume);
 app.use('/signin', signin);
+app.use('/stream', stream);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
