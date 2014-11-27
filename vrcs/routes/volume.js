@@ -16,7 +16,14 @@ router.use(function(req, res, next) {
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-    res.render('volume/list', { });
+    var query = {
+        $userpn : req.session.user.pn
+    };
+
+    sqlite.db.all(sqlite.sql.volume.selectVolumeList, query, function(err, volumes){
+        console.log(volumes);
+        res.render('volume/list', { volumes : volumes });
+    });
 });
 
 /* GET users listing. */
@@ -38,7 +45,7 @@ router.post('/upload', function(req, res){
         fstream.on('close', function () {
             console.log('Upload Finished of ' + savename);
             var query = {
-                $userpn : req.session.user.username,
+                $userpn : req.session.user.pn,
                 $title : 'Volume Data',
                 $saveName : savename,
                 $fileName : filename
@@ -47,7 +54,7 @@ router.post('/upload', function(req, res){
             sqlite.db.run(sqlite.sql.volume.insert, query, function (err) {
                 console.log('Success join');
                 if (err == null) {
-                    res.redirect('../../');
+                    res.redirect('./');
                 }else{
                     res.render('volume/upload', { error : 'File upload error' });
                 }

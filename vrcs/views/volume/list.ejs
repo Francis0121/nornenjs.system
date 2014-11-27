@@ -16,18 +16,33 @@
         <table>
             <thead>
                 <tr>
-                    <th></th>
+                    <th>pn</th>
+                    <th>userpn</th>
+                    <th>title</th>
+                    <th>file_name</th>
+                    <th>save_name</th>
+                    <th>input_date</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr>
-                    <td></td>
+                    <td rowspan="6">tfoot</td>
                 </tr>
             </tfoot>
             <tbody>
+                <%
+                    for(var i=0; i< volumes.length; i++) {
+                        var volume = volumes[i];
+                %>
                 <tr>
-                    <td></td>
+                    <td><%=volume.pn%></td>
+                    <td><%=volume.userpn%></td>
+                    <td><%=volume.save_name%></td>
+                    <td><%=volume.file_name%></td>
+                    <td><%=volume.title%></td>
+                    <td><%=volume.input_date%></td>
                 </tr>
+                <% } %>
             </tbody>
         </table>
     </section>
