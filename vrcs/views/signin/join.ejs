@@ -12,7 +12,7 @@
     <h1>Join</h1>
 </header>
 <section id="wrapper">
-    <form name="user" action="/sigin/join" method="post">
+    <form name="user" action="/signin/join" method="post">
         <ul>
             <li>
                 <label>Username</label>
@@ -27,9 +27,12 @@
                 <input id="confirmpw" name="confirmpw" type="password"/>
             </li>
             <li>
-                <button type="button">Create An Account</button>
+                <button type="submit">Create An Account</button>
             </li>
         </ul>
+        <% if(error != ''){%>
+            <%=error%>
+        <% }%>
     </form>
 </section>
 <footer>

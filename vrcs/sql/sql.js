@@ -40,8 +40,7 @@ var user = {
         "FROM " +
         "   user " +
         "WHERE " +
-        "   username = $" +
-            "username"
+        "   username = $username"
 
 }
 
