@@ -5,6 +5,7 @@
     <title>Volume Rendering Cloud System</title>
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="http://cdn.binaryjs.com/0/binary.js"></script>
 </head>
 <body>
 
@@ -15,10 +16,43 @@
         <% if( error != '') { %>
            <%=error%>
         <% }%>
+        <input type="file" id="fileinput" accept="image/*" capture="camera" />
+
+        <div style="width : 512px; height: 512px; border: 1px solid #808080; margin: 10px;" id="view_port">
+
+        </div>
     </section>
     <footer>
 
     </footer>
 
+    <script type="text/javascript">
+
+        // connect to the same host this was served from
+        var client = new BinaryClient('ws://' + document.location.host);
+
+        client.on('stream', function(stream, meta){
+
+            // collect stream data
+            var parts = [];
+            stream.on('data', function(data){
+                parts.push(data);
+            });
+
+            // when finished, set it as the background image
+            stream.on('end', function(){
+                var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
+                document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
+                document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
+            });
+        });
+
+        // listen for a file being chosen
+        fileinput.addEventListener('change', function(event){
+            var file = event.target.files[0];
+            client.send(file);
+        }, false);
+
+    </script>
 </body>
 </html>

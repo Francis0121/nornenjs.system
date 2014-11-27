@@ -1,9 +1,33 @@
 #!/usr/bin/env node
 var debug = require('debug')('vrcs');
 var app = require('../app');
+var http = require('http');
+
+// ~ binary js
+var BinaryServer = require('binaryjs').BinaryServer;
+var server = http.createServer(app);
+
+// ~ Start Binary.js server
+var bs = BinaryServer({server : server});
+// Wait for new user connections
+bs.on('connection', function(client){
+    // Incoming stream from browsers
+    client.on('stream', function(stream, meta){
+
+        // broadcast to all other clients
+        for(var id in bs.clients){
+            if(bs.clients.hasOwnProperty(id)){
+                var otherClient = bs.clients[id];
+                if(otherClient != client){
+                    var send = otherClient.createStream(meta);
+                    stream.pipe(send);
+                }
+            }
+        }
+    });
+});
 
 app.set('port', process.env.PORT || 3000);
-
-var server = app.listen(app.get('port'), function() {
-  debug('Express server listening on port ' + server.address().port);
+var server = server.listen(app.get('port'), function() {
+    debug('Express server listening on port ' + server.address().port);
 });
