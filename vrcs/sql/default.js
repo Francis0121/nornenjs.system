@@ -24,6 +24,7 @@ db.serialize(function() {
         var volume = {
             $userpn : uData.pn,
             $title : 'Volume Rendering',
+            $saveName : '[2014-11-27 20:00:00]_head.dan',
             $fileName : 'head.dan'
         };
 

@@ -66,6 +66,7 @@ var volume = {
         "   pn INTEGER PRIMARY KEY AUTOINCREMENT, " +
         "   userpn INTEGER NOT NULL, " +
         "   title TEXT NOT NULL, " +
+        "   save_name TEXT NOT NULL, " +
         "   file_name TEXT NOT NULL, " +
         "   input_date TEXT NOT NULL, " +
         "   FOREIGN KEY(userpn) REFERENCES user(pn) ON DELETE CASCADE " +
@@ -74,9 +75,9 @@ var volume = {
     insert :
         "INSERT INTO " +
         "volume " +
-        "   ( userpn, title, file_name, input_date ) " +
+        "   ( userpn, title, save_name, file_name, input_date ) " +
         "VALUES " +
-        "   ( $userpn, $title, $fileName, datetime('now') )",
+        "   ( $userpn, $title, $saveName, $fileName, datetime('now') )",
 
     delete :
         "DELETE FROM " +
@@ -86,7 +87,7 @@ var volume = {
 
     selectVolumeList :
         "SELECT " +
-        "   pn, userpn, title, file_name, input_date " +
+        "   pn, userpn, title, file_name, save_name, input_date " +
         "FROM " +
         "   volume " +
         "WHERE " +
@@ -96,7 +97,7 @@ var volume = {
 
     selectVolumeOne :
         "SELECT " +
-        "   pn, userpn, title, file_name, input_date " +
+        "   pn, userpn, title, file_name, save_name, input_date " +
         "FROM " +
         "   volume " +
         "WHERE " +
