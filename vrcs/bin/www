@@ -13,8 +13,13 @@ var bs = BinaryServer({server : server});
 bs.on('connection', function(client){
     // Incoming stream from browsers
     client.on('stream', function(stream, meta){
-
-        // broadcast to all other clients
+        var volumes = app.volumes;
+        for(var i=0; i<volumes.length; i++){
+            var volume = volumes[i];
+            console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
+        }
+        // brozadcast to all other clients
+        console.log(client.id);
         for(var id in bs.clients){
             if(bs.clients.hasOwnProperty(id)){
                 var otherClient = bs.clients[id];

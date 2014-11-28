@@ -27,9 +27,16 @@
     </footer>
 
     <script type="text/javascript">
-
         // connect to the same host this was served from
         var client = new BinaryClient('ws://' + document.location.host);
+
+        var accessInfo = {
+            volumeIndex : '<%=accessInfo.volumeIndex%>',
+            userPn : '<%=accessInfo.userPn%>'
+        };
+        console.log(accessInfo);
+
+        //client.send(accessInfo); // send access Information
 
         client.on('stream', function(stream, meta){
 
@@ -41,6 +48,7 @@
 
             // when finished, set it as the background image
             stream.on('end', function(){
+                console.log(stream.id);
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
                 document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
                 document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
