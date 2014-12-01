@@ -8,41 +8,48 @@
 </head>
 <body>
 
-<header>
-    <h1>
-        Sign In
-    </h1>
+<header class="template_header">
+    <h1>Sign In</h1>
 </header>
-<section id="wrapper">
 
-    <% if ( user == undefined ) { %>
-    <form name="user" action="/signin" method="post">
-        <ul>
-            <li>
-                <label>Username</label>
-                <input id="username" name="username" type="text"/>
-            </li>
-            <li>
-                <label>Password</label>
-                <input id="password" name="password" type="password"/>
-            </li>
-            <li>
-                <button type="submit">signin</button>
-            </li>
-        </ul>
-        <a href="/signin/join">Create An Account</a>
-    </form>
-    <% }else{%>
-        Welcome <%=user.username%>!
-        <a href="/signin/logout">Log out</a>
-    <% }%>
+<section class="template_section">
+    <article>
+        <a href="/" class="default_a">Main</a><br/>
+        <% if ( user == undefined ) { %>
+        <form name="user" action="/signin" method="post">
+            <ul class="default_user">
+                <li>
+                    <label class="default_label">Username</label>
+                    <input id="username" name="username" type="text" class="default_input"/>
+                </li>
+                <li>
+                    <label class="default_label">Password</label>
+                    <input id="password" name="password" type="password" class="default_input"/>
+                </li>
+                <li>
+                    <button type="submit" class="default_btn">Sign In</button>
+                </li>
+                <li>
+                    <a href="/signin/join" class="default_a">Create An Account</a>
+                </li>
+            </ul>
+        </form>
 
-    <% if( error != '' ){ %>
-        Error : <%=error%>
-    <% }%>
+        <% }else{%>
+            <span class="default_span">Welcome <%=user.username%>!</span>
+            <a href="/signin/logout" class="default_a">Log out</a>
+        <% }%>
+
+        <div class="default_error">
+        <% if( error != '' ){ %>
+            <p><%=error%></p>
+        <% }%>
+        </div>
+    </article>
 </section>
-<footer>
 
+<footer class="template_footer">
+    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
 </footer>
 
 </body>

@@ -8,12 +8,15 @@
 </head>
 <body>
 
-    <header>
-        <h1>Volume Data List</h1>
-        <a href="/volume/upload">Upload</a>
-    </header>
-    <section>
-        <table>
+<header class="template_header">
+    <h1>Volume Data List</h1>
+</header>
+
+<section class="template_section">
+    <article>
+        <a href="/" class="default_a">Main</a>
+        <a href="/volume/upload" class="default_a">Upload</a>
+        <table class="default_table">
             <thead>
                 <tr>
                     <th>pn</th>
@@ -26,7 +29,7 @@
             </thead>
             <tfoot>
                 <tr>
-                    <td rowspan="6">tfoot</td>
+                    <td colspan="6">more...</td>
                 </tr>
             </tfoot>
             <tbody>
@@ -38,7 +41,7 @@
                     <td><%=volume.pn%></td>
                     <td><%=volume.userpn%></td>
                     <td>
-                        <a href="../stream/volumepn/<%=volume.pn%>"><%=volume.title%></a>
+                        <a href="../stream/volumepn/<%=volume.pn%>" ><%=volume.title%></a>
                     </td>
                     <td><%=volume.file_name%></td>
                     <td><%=volume.save_name%></td>
@@ -47,10 +50,12 @@
                 <% } %>
             </tbody>
         </table>
-    </section>
-    <footer>
+    </article>
+</section>
 
-    </footer>
+<footer class="template_footer">
+    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+</footer>
 
 </body>
 </html>

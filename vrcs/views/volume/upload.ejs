@@ -8,20 +8,34 @@
 </head>
 <body>
 
-    <header>
-        <h1>Volume Data Upload</h1>
-    </header>
-    <section>
-        <form action="/volume/upload" method="post" enctype="multipart/form-data">
-            <label>Title</label>
-            <input id="title" name="title" type="text"/>
-            <input id="volumefile" name="volumefile" type="file"/>
-            <button type="submit">Submit</button>
-        </form>
-    </section>
-    <footer>
+<header class="template_header">
+    <h1>Volume Data Upload</h1>
+</header>
 
-    </footer>
+<section class="template_section">
+    <article>
+        <a href="/" class="default_a">Main</a>
+        <a href="/volume" class="default_a">Volume List</a>
+        <form action="/volume/upload" method="post" enctype="multipart/form-data">
+            <ul class="default_volume">
+                <li>
+                    <label class="default_label">Title</label>
+                    <input id="title" name="title" type="text" class="default_input"/>
+                </li>
+                <li>
+                    <input id="volumefile" name="volumefile" type="file" class="default_file"/>
+                </li>
+                <li>
+                    <button type="submit" class="default_btn">Upload</button>
+                </li>
+            </ul>
+        </form>
+    </article>
+</section>
+
+<footer class="template_footer">
+
+</footer>
 
 </body>
 </html>

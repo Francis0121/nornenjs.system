@@ -28,7 +28,7 @@ ol, ul, menu{
 }
 
 body{
-    line-height: 1;
+    line-height: 1; height: 100%; margin: 0; padding: 0;
 }
 
 blockquote, q{
@@ -53,8 +53,7 @@ a img {
 }
 
 input, textarea, select{
-    color: #000;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #000; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 input:FOCUS, textarea:FOCUS, select:FOCUS, button:FOCUS{
@@ -66,8 +65,7 @@ button{
 }
 
 html{
-    overflow-x: auto;
-    overflow-y: scroll;
+    height: 100%; margin: 0; padding: 0; overflow: hidden;
 }
 
 pre{

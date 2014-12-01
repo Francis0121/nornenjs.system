@@ -8,13 +8,23 @@
 </head>
 <body>
 
-<div id="wrapper">
-    <a href="/signin">Sign In</a>
-    <a href="/signin/join">Join</a>
-    <% if (user != undefined ){ %>
-    <a href="/volume">Volume List</a>
-    <% } %>
-</div>
+<header class="template_header">
+    <h1>Volume Rendering Cloud System</h1>
+</header>
+
+<section class="template_section">
+    <article>
+        <a href="/signin" class="default_a">Sign In</a>
+        <a href="/signin/join" class="default_a">Join</a>
+        <% if (user != undefined ){ %>
+        <a href="/volume" class="default_a">Volume List</a>
+        <% } %>
+    </article>
+</section>
+
+<footer class="template_footer">
+    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+</footer>
 
 </body>
 </html>

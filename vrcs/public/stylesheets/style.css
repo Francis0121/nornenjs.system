@@ -1,2 +1,43 @@
 @CHARSET "UTF-8";
-#wrapper{ width: 990px; margin: 0 auto; min-height: 1000px; }
+
+.template_header{ width: 100%; height: 50px; text-align: center;}
+.template_header>h1{ padding: 15px; font-size: 87.5%;}
+.template_section{ width: 100%; min-height: 100%; margin-top: -50px;}
+.template_section>article{ padding-top: 50px; text-align: center;}
+.template_footer{ width: 100%; height: 50px; margin-top: -50px; text-align: center;}
+.template_footer>span{ padding: 10px; font-size: 67.5%;}
+
+.default_user{ width: 180px; margin: 0 auto;}
+.default_user>li{ padding: 5px 0; width: 100%; float:left;}
+
+.default_volume{ width: 180px; margin: 0 auto;}
+.default_volume>li{ padding: 5px 0; width: 100%; float:left;}
+
+.default_error{ width: 180px; margin: 0 auto; padding: 5px 0;}
+.default_error>p{width: 100%; color: darkred; font-size: 67.5%;}
+
+.default_span{ font-size: 75%; color: #000;}
+
+.default_a, .default_a:visited{ font-size: 75%; color: #808080;}
+.default_a:hover{ color: #000;}
+
+.default_btn{ font-size: 75%; color: #808080; border: 0px; padding: 0; margin: 0; background: transparent; cursor: pointer; }
+.default_btn:hover{ color: #000;}
+
+.default_input{ border: 1px solid #808080; padding: 3px 5px; font-size: 75%; width: 100px;}
+.default_input:active{ border: 1px solid #000; }
+
+.default_file{ font-size: 75%; width: 180px;}
+
+.default_label{ font-size: 75%; width: 60px; float: left; height: 26px; line-height: 26px; text-align: center;}
+
+.default_stream{ width : 512px; height: 512px; border: 1px solid #808080; margin: 20px auto; }
+
+.default_table{ border-bottom : 1px solid #808080; border-right: 1px solid #808080; width: 600px; margin: 10px auto; }
+.default_table th, .default_table td{ padding: 3px; font-size: 75%;}
+.default_table>thead>tr>th{ border-top: 1px solid #808080; border-left: 1px solid #808080; }
+.default_table>tfoot>tr>td{ border-top: 1px solid #808080; border-left: 1px solid #808080; }
+.default_table>tbody>tr>td{ border-top: 1px solid #808080; border-left: 1px solid #808080; }
+.default_table>tbody>tr>td>a, .default_table>tbody>tr>td>a:visited{ color: #808080; }
+.default_table>tbody>tr>td>a:hover{color: #000;}
+

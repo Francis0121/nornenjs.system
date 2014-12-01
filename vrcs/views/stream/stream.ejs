@@ -9,22 +9,32 @@
 </head>
 <body>
 
-    <header>
-        <h1>Volume Stream</h1>
-    </header>
-    <section>
-        <% if( error != '') { %>
-           <%=error%>
-        <% }%>
+<header class="template_header">
+    <h1>Volume Stream</h1>
+</header>
+
+<section class="template_section">
+    <article>
+        <a href="/" class="default_a">Main</a>
+        <a href="/volume" class="default_a">Volume List</a>
+
         <input type="file" id="fileinput" accept="image/*" capture="camera" />
 
-        <div style="width : 512px; height: 512px; border: 1px solid #808080; margin: 10px;" id="view_port">
+        <div id="view_port" class="default_stream">
 
         </div>
-    </section>
-    <footer>
 
-    </footer>
+        <div class="default_error">
+        <% if( error != '') { %>
+            <%=error%>
+        <% }%>
+        </div>
+    </article>
+</section>
+
+<footer class="template_footer">
+    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+</footer>
 
     <script type="text/javascript">
         // connect to the same host this was served from

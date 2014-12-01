@@ -8,59 +8,66 @@
 </head>
 <body>
 
-<header>
+<header class="template_header">
     <h1>Join</h1>
 </header>
-<section id="wrapper">
 
-    <form name="user" action="/signin/join" method="post">
-        <% if (user == undefined){ %>
-        <input type="hidden" name="_method" value="post">
-        <% } else { %>
-        <input type="hidden" name="_method" value="update">
-        <% } %>
-        <ul>
-            <li>
-                <label>Username</label>
-                <% if (user == undefined){ %>
-                <input id="username" name="username" type="text"/>
-                <% } else {%>
-                <%=user.username%>
+<section class="template_section">
+    <article>
+        <a href="/" class="default_a">Main</a><br/>
+        <form name="user" action="/signin/join" method="post">
+            <% if (user == undefined){ %>
+            <input type="hidden" name="_method" value="post">
+            <% } else { %>
+            <input type="hidden" name="_method" value="update">
+            <% } %>
+            <ul class="default_user">
+                <li>
+                    <label class="default_label">Username</label>
+                    <% if (user == undefined){ %>
+                    <input id="username" name="username" type="text" class="default_input"/>
+                    <% } else {%>
+                    <span class="default_span"><%=user.username%></span>
+                    <% }%>
+                </li>
+                <% if (user != undefined) {%>
+                <li>
+                    <label class="default_label">OriginalPw</label>
+                    <input id="originalpw" name="originalpw" type="password" class="default_input"/>
+                </li>
                 <% }%>
-            </li>
-            <% if (user != undefined) {%>
-            <li>
-                <label>Original Password</label>
-                <input id="originalpw" name="originalpw" type="password"/>
-            </li>
-            <% }%>
-            <li>
-                <% if (user == undefined) { %>
-                <label>Password</label>
-                <% } else { %>
-                <label>Change Password</label>
-                <% } %>
-                <input id="password" name="password" type="password"/>
-            </li>
-            <li>
-                <label>Confirm Password</label>
-                <input id="confirmpw" name="confirmpw" type="password"/>
-            </li>
-            <li>
-                <% if (user == undefined) {%>
-                <button type="submit">Create An Account</button>
-                <% } else { %>
-                <button type="submit">Modify Account</button>
-                <% } %>
-            </li>
-        </ul>
-        <% if(error != ''){%>
-            <%=error%>
-        <% }%>
-    </form>
-</section>
-<footer>
+                <li>
+                    <% if (user == undefined) { %>
+                    <label class="default_label">Password</label>
+                    <% } else { %>
+                    <label class="default_label">ChangePw</label>
+                    <% } %>
+                    <input id="password" name="password" type="password" class="default_input"/>
+                </li>
+                <li>
+                    <label class="default_label">ConfirmPw</label>
+                    <input id="confirmpw" name="confirmpw" type="password" class="default_input"/>
+                </li>
+                <li>
+                    <% if (user == undefined) {%>
+                    <button type="submit" class="default_btn">Create An Account</button>
+                    <% } else { %>
+                    <button type="submit" class="default_btn">Modify Account</button>
+                    <% } %>
+                </li>
+            </ul>
+        </form>
 
+        <div class="default_error">
+        <% if(error != ''){%>
+            <p><%=error%></p>
+        <% }%>
+        </div>
+    </article>
+</section>
+
+<footer class="template_footer">
+    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
 </footer>
 
 </body>
