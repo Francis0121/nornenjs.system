@@ -41,9 +41,15 @@
         <% }%>
 
         <div class="default_error">
-        <% if( error != '' ){ %>
-            <p><%=error%></p>
+        <% if( message.error != '' ){ %>
+            <p><%=message.error%></p>
         <% }%>
+        </div>
+
+        <div class="default_success">
+            <% if( message.success != '' ){ %>
+            <p><%=message.success%></p>
+            <% }%>
         </div>
     </article>
 </section>

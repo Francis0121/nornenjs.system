@@ -4,25 +4,36 @@ var router = express.Router();
 
 // ~ signin get
 router.get('/', function(req, res) {
-    res.render('signin/signin', { error : '', user : req.session.user });
+    var message = {
+        error : '',
+        success : ''
+    };
+    res.render('signin/signin', { message : message, user : req.session.user });
 });
 
 // ~ signin post
 router.post('/', function(req, res){
     var data = req.body;
+    var message = {
+        error : '',
+        success : ''
+    };
 
     var query = { $username : data.username };
     sqlite.db.get(sqlite.sql.user.selectUserOne, query, function(err, user){
 
         if(user == undefined){
-            res.render('signin/signin', { error : 'Not exist user', user : undefined });
+            message.error = 'Not exist user';
+            res.render('signin/signin', { message : message, user : undefined });
         }else if(data.password != user.password){
-            res.render('signin/signin', { error : 'Wrong password', user : undefined });
+            message.error = 'Wrong Password';
+            res.render('signin/signin', { message : message, user : undefined });
         }else{
             console.log('Success signin');
             user.password = '';
             req.session.user = user;
-            res.redirect('../');
+            message.success = 'Success sign in';
+            res.render('signin/signin', { message : message, user : req.session.user });
         }
     });
 });
@@ -36,8 +47,8 @@ router.get('/logout', function(req, res){
 router.get('/join', function(req, res) {
     var message = {
         error : '',
-        success : '',
-    }
+        success : ''
+    };
     res.render('signin/join', { message : message, postUser : undefined, user : req.session.user });
 });
 
