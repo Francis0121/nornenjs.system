@@ -33,7 +33,7 @@ router.post('/', function(req, res){
             user.password = '';
             req.session.user = user;
             message.success = 'Success sign in';
-            res.render('signin/signin', { message : message, user : req.session.user });
+            res.redirect('../')
         }
     });
 });
