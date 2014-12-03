@@ -48,7 +48,6 @@
         socket.emit('join', { room : accessInfo.volumeIndex } );
 
         socket.on('message', function(data){
-            console.log('data', data);
             if(!data.success){
                 console.log(data.error);
             }

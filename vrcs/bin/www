@@ -43,10 +43,8 @@ io.sockets.on('connection', function(socket){
             error : '',
             success : false
         };
-        var index = room[data.room] == undefined ? 1 : room[data.room] + 1;
-        room[data.room] = index;
 
-        if(index <= 4){
+        if(findClientsSocketByRoomId(data.room).length < 4){
             socket.join(data.room);
             message.success = true;
         }else{
@@ -62,3 +60,14 @@ app.set('port', process.env.PORT || 3000);
 var server = server.listen(app.get('port'), function() {
     debug('Express server listening on port ' + server.address().port);
 });
+
+function findClientsSocketByRoomId(roomId) {
+    var res = []
+        , room = io.sockets.adapter.rooms[roomId];
+    if (room) {
+        for (var id in room) {
+            res.push(io.sockets.adapter.nsp.connected[id]);
+        }
+    }
+    return res;
+}
