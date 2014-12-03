@@ -34,24 +34,28 @@ bs.on('connection', function(client){
 });
 
 // ~ socket bind message
-var room;
+var room = {};
 
 io.sockets.on('connection', function(socket){
-    socket.emit('news', { hello : 'world'});
-    socket.on('my other event', function(data){
-        console.log(data);
-    });
 
     socket.on('join', function(data){
-        console.log('join data: ', data);
-        socket.join(data.room);
+        var message = {
+            error : '',
+            success : false
+        };
+        var index = room[data.room] == undefined ? 1 : room[data.room] + 1;
+        room[data.room] = index;
+
+        if(index <= 4){
+            socket.join(data.room);
+            message.success = true;
+        }else{
+            message.error = 'Visitor limit';
+        }
+
+        socket.emit('message', message);
     });
 
-    socket.on('client', function(data){
-        console.log('client receive: ', data);
-        io.sockets.in(data.room).emit('server', data
-        );
-    });
 });
 
 app.set('port', process.env.PORT || 3000);

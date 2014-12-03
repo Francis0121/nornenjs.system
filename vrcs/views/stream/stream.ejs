@@ -37,30 +37,21 @@
     <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
 </footer>
     <script type="text/javascript">
-        // ~ Socket.io
-        var socket = io.connect('http://localhost:3000');
-        // ~ TODO delete code [socket test code]
-        socket.on('news', function(data){
-            console.log(data);
-            socket.emit('my other event', { my : 'data'});
-        });
-
-        // ~ Byte streaming
-        // connect to the same host this was served from
-        var client = new BinaryClient('ws://' + document.location.host);
-
+        var socket = io.connect('http://localhost:3000'); // Socket.io
+        var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
         var accessInfo = {
             volumeIndex : '<%=accessInfo.volumeIndex%>',
             userPn : '<%=accessInfo.userPn%>'
         };
-        console.log(accessInfo);
+        // ~ init room setting
+        console.log('accessInfo: ',accessInfo);
+        socket.emit('join', { room : accessInfo.volumeIndex } );
 
-        //client.send(accessInfo); // send access Information
-        socket.emit('join', { room : accessInfo.volumeIndex } ); // room create
-
-        socket.emit('client', { room: accessInfo.volumeIndex});
-        socket.on('server', function(data){
-            console.log('server receive: ', data);
+        socket.on('message', function(data){
+            console.log('data', data);
+            if(!data.success){
+                console.log(data.error);
+            }
         });
 
         client.on('stream', function(stream, meta){
