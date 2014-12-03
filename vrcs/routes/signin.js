@@ -34,21 +34,47 @@ router.get('/logout', function(req, res){
 });
 
 router.get('/join', function(req, res) {
-    res.render('signin/join', { error : '', user : req.session.user });
+    var message = {
+        error : '',
+        success : '',
+    }
+    res.render('signin/join', { message : message, postUser : undefined, user : req.session.user });
 });
 
 router.post('/join', function(req, res) {
     var data  = req.body;
     var method = data._method;
+    var message = {
+        error : '',
+        success : ''
+    };
 
     if(method == 'post'){
+        // ~ validation
+        var username = data.username;
+        if(username == ''){
+            console.log('Validation join');
+            message.error = 'Please enter username';
+            res.render('signin/join', { message : message, postUser : { username : '' }, user : undefined } );
+            return;
+        }
+
+        if(data.password == ''){
+            console.log('Validation join');
+            message.error = 'Please enter password';
+            res.render('signin/join', { message : message, postUser : { username : username },  user : undefined } );
+            return;
+        }
+
+        // ~ query
         var query = {
             $username : data.username,
             $password : data.password  };
 
         if(data.password != data.confirmpw){
             console.log('Fail join');
-            res.render('signin/join', { error : 'Not equal each password', user : undefined } );
+            message.error = 'Not equal each password';
+            res.render('signin/join', { message : message, postUser : {username : username }, user : undefined } );
             return;
         }
 
@@ -56,7 +82,8 @@ router.post('/join', function(req, res) {
             // ~ Exist user
             if(user != undefined) {
                 console.log('Fail join');
-                res.render('signin/join', { error : 'Exist User', user : undefined } );
+                message.error = 'Exist user';
+                res.render('signin/join', { message : message, postUser : {username : username }, user : undefined } );
             }else{
                 sqlite.db.run(sqlite.sql.user.insert, query, function (err) {
                     console.log('Success join');
@@ -69,13 +96,23 @@ router.post('/join', function(req, res) {
         });
 
     }else if(method == 'update'){
+        // ~ validation
+        if(data.password == ''){
+            console.log('Validation join');
+            message.error = 'Please enter password';
+            res.render('signin/join', { message : message, user : req.session.user } );
+            return;
+        }
+
+        // ~ query
         var query = {
             $username : req.session.user.username,
             $password : data.password  };
 
         if(data.password != data.confirmpw){
             console.log('Fail join');
-            res.render('signin/join', { error : 'Not equal each password', user : req.session.user } );
+            message.error = 'Not equal each password';
+            res.render('signin/join', { message : message, user : req.session.user } );
             return;
         }
 
@@ -83,18 +120,21 @@ router.post('/join', function(req, res) {
             // ~ Exist user
             if(user == undefined) {
                 console.log('Fail join');
-                res.render('signin/join', { error : 'Noe exist user', user : req.session.user } );
+                message.error = 'Not exist user'
+                res.render('signin/join', { message : message, user : req.session.user } );
             }else{
 
                 if(user.password != data.originalpw){
                     console.log('Fail join');
-                    res.render('signin/join', { error : 'Wrong password', user : req.session.user } );
+                    message.error = 'Wrong password';
+                    res.render('signin/join', { message : message, user : req.session.user } );
                 }else{
                     sqlite.db.run(sqlite.sql.user.updatepw, query, function(err){
                         console.log('Success update');
                         if (err == null) {
                             req.session.user = { username : req.session.user.username };
-                            res.redirect('../../');
+                            message.success = 'Change password success';
+                            res.render('signin/join', { message : message, user : req.session.user } );
                         }
                     });
                 }
@@ -103,7 +143,8 @@ router.post('/join', function(req, res) {
 
     }else{
         console.log('Fail join');
-        res.render('signin/join', { error : 'Something wrong', user : undefined } );
+        message.error = 'Something wrong';
+        res.render('signin/join', { message : message, user : undefined } );
     }
 
 });

@@ -25,7 +25,7 @@
                 <li>
                     <label class="default_label">Username</label>
                     <% if (user == undefined){ %>
-                    <input id="username" name="username" type="text" class="default_input"/>
+                        <input id="username" name="username" type="text" class="default_input" value="<%=postUser == undefined ? '': postUser.username%>"/>
                     <% } else {%>
                     <span class="default_span"><%=user.username%></span>
                     <% }%>
@@ -59,10 +59,16 @@
         </form>
 
         <div class="default_error">
-        <% if(error != ''){%>
-            <p><%=error%></p>
+        <% if(message.error != ''){%>
+            <p><%=message.error%></p>
         <% }%>
         </div>
+        <div class="default_success">
+            <% if(message.success != ''){%>
+            <p><%=message.success%></p>
+            <% }%>
+        </div>
+
     </article>
 </section>
 

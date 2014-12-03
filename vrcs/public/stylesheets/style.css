@@ -16,6 +16,9 @@
 .default_error{ width: 180px; margin: 0 auto; padding: 5px 0;}
 .default_error>p{width: 100%; color: darkred; font-size: 67.5%;}
 
+.default_success{ width: 180px; margin: 0 auto; padding: 5px 0;}
+.default_success>p{width: 100%; color: darkblue; font-size: 67.5%;}
+
 .default_span{ font-size: 75%; color: #000;}
 
 .default_a, .default_a:visited{ font-size: 75%; color: #808080;}
