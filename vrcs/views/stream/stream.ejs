@@ -6,6 +6,7 @@
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="http://cdn.binaryjs.com/0/binary.js"></script>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 </head>
 <body>
 
@@ -35,8 +36,16 @@
 <footer class="template_footer">
     <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
 </footer>
-
     <script type="text/javascript">
+        // ~ Socket.io
+        var socket = io.connect('http://localhost:3000');
+        // ~ TODO delete code [socket test code]
+        socket.on('news', function(data){
+            console.log(data);
+            socket.emit('my other event', { my : 'data'});
+        });
+
+        // ~ Byte streaming
         // connect to the same host this was served from
         var client = new BinaryClient('ws://' + document.location.host);
 
@@ -47,6 +56,12 @@
         console.log(accessInfo);
 
         //client.send(accessInfo); // send access Information
+        socket.emit('join', { room : accessInfo.volumeIndex } ); // room create
+
+        socket.emit('client', { room: accessInfo.volumeIndex});
+        socket.on('server', function(data){
+            console.log('server receive: ', data);
+        });
 
         client.on('stream', function(stream, meta){
 

@@ -2,10 +2,11 @@
 var debug = require('debug')('vrcs');
 var app = require('../app');
 var http = require('http');
-
 // ~ binary js
 var BinaryServer = require('binaryjs').BinaryServer;
 var server = http.createServer(app);
+// ~ socket io
+var io = require('socket.io').listen(server);
 
 // ~ Start Binary.js server
 var bs = BinaryServer({server : server});
@@ -29,6 +30,27 @@ bs.on('connection', function(client){
                 }
             }
         }
+    });
+});
+
+// ~ socket bind message
+var room;
+
+io.sockets.on('connection', function(socket){
+    socket.emit('news', { hello : 'world'});
+    socket.on('my other event', function(data){
+        console.log(data);
+    });
+
+    socket.on('join', function(data){
+        console.log('join data: ', data);
+        socket.join(data.room);
+    });
+
+    socket.on('client', function(data){
+        console.log('client receive: ', data);
+        io.sockets.in(data.room).emit('server', data
+        );
     });
 });
 
