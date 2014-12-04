@@ -34,6 +34,8 @@ bs.on('connection', function(client){
 });
 
 // ~ socket bind message
+var rooms = []; // total count web clients
+
 io.sockets.on('connection', function(socket){
 
     socket.on('join', function(data){
@@ -41,10 +43,14 @@ io.sockets.on('connection', function(socket){
             error : '',
             success : false
         };
-        var totalClientsCount = io.sockets.server.eio.clientsCount;
+        // ~ rooms 정보 추가
+        if(rooms.indexOf(data.room) == -1){
+            rooms.push(data.room);
+        }
 
-        if(totalClientsCount < 4){
-            // findClientsSocketByRoomId(data.room);
+        var totalCount = findClientsSocket().length;
+        console.log('Total count: ', totalCount);
+        if( totalCount < 4){
             socket.join(data.room);
             message.success = true;
         }else{
@@ -61,14 +67,27 @@ var server = server.listen(app.get('port'), function() {
     debug('Express server listening on port ' + server.address().port);
 });
 
-// ~ util function
-function findClientsSocketByRoomId(roomId) {
-    var res = []
-        , room = io.sockets.adapter.rooms[roomId];
-    if (room) {
+function findClientsSocket() {
+    var res = [];
+    var delRooms = [];
+    //console.log('Start Rooms: '+ rooms);
+    for (var i in rooms) {
+        var roomId = rooms[i];
+        var room = io.sockets.adapter.rooms[roomId];
+        if(room == undefined){
+            delRooms.push(roomId);
+            continue;
+        }
         for (var id in room) {
-            res.push(io.sockets.adapter.nsp.connected[id]);
+            var clients = io.sockets.adapter.nsp.connected[id];
+            res.push(clients);
         }
     }
+    // Delete room
+    for(var i in delRooms){
+        //console.log('del ', delRooms[i])
+        rooms.splice(rooms.indexOf(roomId), 1);
+    }
+    //console.log('End Rooms: '+ rooms);
     return res;
 }

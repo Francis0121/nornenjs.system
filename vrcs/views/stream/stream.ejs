@@ -5,8 +5,9 @@
     <title>Volume Rendering Cloud System</title>
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
-    <script src="http://cdn.binaryjs.com/0/binary.js"></script>
-    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src='http://cdn.binaryjs.com/0/binary.js'></script>
+    <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+    <script src='/javascripts/jquery-1.11.1.min.js'></script>
 </head>
 <body>
 
@@ -45,11 +46,20 @@
         };
         // ~ init room setting
         console.log('accessInfo: ',accessInfo);
-        socket.emit('join', { room : accessInfo.volumeIndex } );
 
+        var joinSocket = function(){
+            console.log('Request join socket')
+            socket.emit('join', { room : accessInfo.volumeIndex } );
+        };
+
+        joinSocket();
         socket.on('message', function(data){
             if(!data.success){
                 console.log(data.error);
+                $('.default_error').append('<p>'+data.error+'</p>')
+                setTimeout(joinSocket, 1000);
+            }else{
+                $('.default_error').html('');
             }
         });
 
