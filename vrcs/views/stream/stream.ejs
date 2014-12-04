@@ -53,14 +53,22 @@
         };
 
         joinSocket();
+
         socket.on('message', function(data){
             if(!data.success){
                 console.log(data.error);
                 $('.default_error').append('<p>'+data.error+'</p>')
                 setTimeout(joinSocket, 1000);
-            }else{
-                $('.default_error').html('');
+                return;
             }
+            // ~ success
+            $('.default_error').html('');
+            var buffer = new ArrayBuffer(4);
+            var dataView = new DataView(buffer);
+
+            dataView.setInt32(0, accessInfo.volumeIndex);
+            console.log(dataView.getInt32(0));
+            client.send(buffer);
         });
 
         client.on('stream', function(stream, meta){
@@ -79,12 +87,6 @@
                 document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
             });
         });
-
-        // listen for a file being chosen
-        fileinput.addEventListener('change', function(event){
-            var file = event.target.files[0];
-            client.send(file);
-        }, false);
 
     </script>
 </body>

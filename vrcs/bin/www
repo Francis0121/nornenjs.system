@@ -14,22 +14,38 @@ var bs = BinaryServer({server : server});
 bs.on('connection', function(client){
     // Incoming stream from browsers
     client.on('stream', function(stream, meta){
+
+//        var buffer = new Buffer(4);
+        var part = [];
+
+        stream.on('data', function(data){
+//            buffer.copy(data);
+            part.push(data);
+        });
+
+        // when finished, set it as the background image
+        stream.on('end', function(){
+            console.log('-----');
+//            console.log(buffer);
+            console.log(part);
+        });
+
         var volumes = app.volumes;
         for(var i=0; i<volumes.length; i++){
             var volume = volumes[i];
             console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
         }
-        // brozadcast to all other clients
-        console.log(client.id);
-        for(var id in bs.clients){
-            if(bs.clients.hasOwnProperty(id)){
-                var otherClient = bs.clients[id];
-                if(otherClient != client){
-                    var send = otherClient.createStream(meta);
-                    stream.pipe(send);
-                }
-            }
-        }
+
+        // broadcast to all other clients
+//        for(var id in bs.clients){
+//            if(bs.clients.hasOwnProperty(id)){
+//                var otherClient = bs.clients[id];
+//                if(otherClient != client){
+//                    var send = otherClient.createStream(meta);
+//                    stream.pipe(send);
+//                }
+//            }
+//        }
     });
 });
 
@@ -43,11 +59,11 @@ io.sockets.on('connection', function(socket){
             error : '',
             success : false
         };
-        // ~ rooms 정보 추가
+        // ~ add room information
         if(rooms.indexOf(data.room) == -1){
             rooms.push(data.room);
         }
-
+        // ~ data.room : volumeIndex
         var totalCount = findClientsSocket().length;
         console.log('Total count: ', totalCount);
         if( totalCount < 4){
