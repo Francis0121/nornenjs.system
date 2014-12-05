@@ -13,6 +13,15 @@ var path = require('path');
 
 // ~ Start Binary.js server
 var bs = BinaryServer({server : server});
+
+// TODO Deprcated Here load file
+var queue = [];
+
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head1.png')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head2.png')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head3.png')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head4.png')));
+
 // Wait for new user connections
 bs.on('connection', function(client){
     // Incoming stream from browsers
@@ -33,8 +42,8 @@ bs.on('connection', function(client){
                 console.log('volume index not exist');
                 return;
             }else{
-                console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
-                fs.readFile(path.join(__dirname, '../public/upload/'+volume.save_name), function (err, data) {
+                //console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
+                /*fs.readFile(path.join(__dirname, '../public/upload/'+volume.save_name), function (err, data) {
                     if(err){
                        // TODO error handler
                         console.log('file read error');
@@ -42,7 +51,14 @@ bs.on('connection', function(client){
                     }
                     console.log('file data: ',data.length);
                     client.send(data);
-                });
+                });*/
+                //client.send(queue[0]);
+                var sender = function(){
+                    console.log('do');
+                    client.send(queue[0]);
+                };
+
+                setInterval(sender, 34);
             }
         });
     });

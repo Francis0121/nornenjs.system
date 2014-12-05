@@ -21,7 +21,7 @@
         <a href="/volume" class="default_a">Volume List</a>
 
         <div id="view_port" class="default_stream">
-
+            <img src="" style="width: 512px; height: 512px;"/>
         </div>
 
         <div class="default_error">
@@ -81,9 +81,10 @@
             // when finished, set it as the background image
             stream.on('end', function(){
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
-                document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
-                requestStream();
+                //document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
+                //document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
+                $('#view_port>img').attr('src', url);
+                //requestStream();
             });
         });
 
