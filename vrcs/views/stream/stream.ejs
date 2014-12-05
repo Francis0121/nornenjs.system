@@ -71,6 +71,8 @@
             requestStream();
         });
 
+        var count = 0;
+
         client.on('stream', function(stream, meta){
             // collect stream data
             var parts = [];
@@ -81,12 +83,17 @@
             // when finished, set it as the background image
             stream.on('end', function(){
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                //document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
-                //document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
                 $('#view_port>img').attr('src', url);
-                //requestStream();
+                count++;
             });
         });
+
+        var printFrame = function(){
+            console.log('frame : ', count);
+            count = 0;
+        };
+
+        setInterval(printFrame, 1000);
 
     </script>
 </body>
