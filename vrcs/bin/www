@@ -7,6 +7,9 @@ var BinaryServer = require('binaryjs').BinaryServer;
 var server = http.createServer(app);
 // ~ socket io
 var io = require('socket.io').listen(server);
+// ~ file
+var fs = require('fs-extra');
+var path = require('path');
 
 // ~ Start Binary.js server
 var bs = BinaryServer({server : server});
@@ -15,37 +18,33 @@ bs.on('connection', function(client){
     // Incoming stream from browsers
     client.on('stream', function(stream, meta){
 
-//        var buffer = new Buffer(4);
         var part = [];
-
         stream.on('data', function(data){
-//            buffer.copy(data);
             part.push(data);
         });
 
         // when finished, set it as the background image
         stream.on('end', function(){
-            console.log('-----');
-//            console.log(buffer);
-            console.log(part);
+            var volumeIndex = part[0].readInt32BE(0);
+            var volume = app.volumes[volumeIndex];
+
+            if(volume == undefined){
+                // TODO error handler
+                console.log('volume index not exist');
+                return;
+            }else{
+                console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
+                fs.readFile(path.join(__dirname, '../public/upload/'+volume.save_name), function (err, data) {
+                    if(err){
+                       // TODO error handler
+                        console.log('file read error');
+                        return;
+                    }
+                    console.log('file data: ',data.length);
+                    client.send(data);
+                });
+            }
         });
-
-        var volumes = app.volumes;
-        for(var i=0; i<volumes.length; i++){
-            var volume = volumes[i];
-            console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
-        }
-
-        // broadcast to all other clients
-//        for(var id in bs.clients){
-//            if(bs.clients.hasOwnProperty(id)){
-//                var otherClient = bs.clients[id];
-//                if(otherClient != client){
-//                    var send = otherClient.createStream(meta);
-//                    stream.pipe(send);
-//                }
-//            }
-//        }
     });
 });
 

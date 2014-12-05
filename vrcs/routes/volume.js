@@ -41,7 +41,6 @@ router.post('/upload', function(req, res){
         var date = new Date();
         var savename = '['+date.toDBString('YY-MM-DD HH24:MI:SS') +']_' + filename;
         fstream = fs.createWriteStream(path.join(__dirname, '../public/upload/') + savename);
-        file.pipe(fstream);
         fstream.on('close', function () {
             console.log('Upload Finished of ' + savename);
         });

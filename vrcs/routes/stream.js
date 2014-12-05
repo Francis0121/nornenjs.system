@@ -25,7 +25,7 @@ router.get('/volumepn/:pn', function(req, res) {
             console.log('Fail select volume');
             res.render('stream/stream', { error : 'Not exist volume data', accessInfo : undefined } );
         }else {
-            volumeIndexOf = function(inv){
+            var volumeIndexOf = function(inv){
                 for(var i=0; i<volumes.length; i++){
                     var staticv = volumes[i];
                     if(staticv.pn == inv.pn){

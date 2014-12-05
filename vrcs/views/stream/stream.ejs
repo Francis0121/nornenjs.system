@@ -20,8 +20,6 @@
         <a href="/" class="default_a">Main</a>
         <a href="/volume" class="default_a">Volume List</a>
 
-        <input type="file" id="fileinput" accept="image/*" capture="camera" />
-
         <div id="view_port" class="default_stream">
 
         </div>
@@ -67,12 +65,11 @@
             var dataView = new DataView(buffer);
 
             dataView.setInt32(0, accessInfo.volumeIndex);
-            console.log(dataView.getInt32(0));
+            //console.log(dataView.getInt32(0));
             client.send(buffer);
         });
 
         client.on('stream', function(stream, meta){
-
             // collect stream data
             var parts = [];
             stream.on('data', function(data){
@@ -81,7 +78,6 @@
 
             // when finished, set it as the background image
             stream.on('end', function(){
-                console.log(stream.id);
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
                 document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
                 document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
