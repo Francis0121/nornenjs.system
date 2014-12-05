@@ -50,6 +50,13 @@
             socket.emit('join', { room : accessInfo.volumeIndex } );
         };
 
+        var requestStream = function(){
+            var buffer = new ArrayBuffer(4);
+            var dataView = new DataView(buffer);
+            dataView.setInt32(0, accessInfo.volumeIndex);
+            client.send(buffer);
+        };
+
         joinSocket();
 
         socket.on('message', function(data){
@@ -59,14 +66,9 @@
                 setTimeout(joinSocket, 1000);
                 return;
             }
-            // ~ success
+            // ~ success request byte stre
             $('.default_error').html('');
-            var buffer = new ArrayBuffer(4);
-            var dataView = new DataView(buffer);
-
-            dataView.setInt32(0, accessInfo.volumeIndex);
-            //console.log(dataView.getInt32(0));
-            client.send(buffer);
+            requestStream();
         });
 
         client.on('stream', function(stream, meta){
@@ -81,6 +83,7 @@
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
                 document.getElementById('view_port').style.backgroundImage = 'url(' + url + ')';
                 document.getElementById('view_port').style.backgroundRepeat = 'no-repeat';
+                requestStream();
             });
         });
 
