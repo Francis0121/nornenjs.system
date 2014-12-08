@@ -53,10 +53,11 @@ bs.on('connection', function(client){
                 var sender = function() {
 //                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
 //                    jpeg.encode(function(jpeg_img){
+//                        console.log('confirm jpeg', count++);
 //                       client.send(jpeg_img)
 //                    });
 
-                    var png = new Png(queue[0], 512, 512, 'rgb');
+                    var png = new Png(queue[0], 512, 512, 'rgba');
                     png.encode(function(png_image){
                         console.log('confirm png', count++);
                         client.send(png_image);
@@ -70,7 +71,7 @@ bs.on('connection', function(client){
 
     // Close client
     client.on('close', function(stream, meta){
-        //clearInterval(volumeInterval);
+        clearInterval(volumeInterval);
     });
 });
 
