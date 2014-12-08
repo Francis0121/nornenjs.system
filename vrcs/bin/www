@@ -12,6 +12,8 @@ var fs = require('fs-extra');
 var path = require('path');
 // ~ jpeg
 var Jpeg = require('jpeg').Jpeg;
+// ~ png
+var Png = require('png').Png;
 
 // ~ Start Binary.js server
 var bs = BinaryServer({server : server});
@@ -57,12 +59,16 @@ bs.on('connection', function(client){
                         var jpeg = new Jpeg(data, 720, 400, 'rgba');
                         var jpeg_img = jpeg.encodeSync();
 
+                        var png = new Png(data, 720, 400, 'rgba');
+                        var png_image = png.encodeSync();
+
                         if (err) {
                             // TODO error handler
                             console.log('file read error');
                             return;
                         }
-                        client.send(jpeg_img);
+
+                        client.send(png_image);
                     });
                 };
 
