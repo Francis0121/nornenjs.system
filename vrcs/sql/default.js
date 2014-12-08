@@ -24,12 +24,12 @@ db.serialize(function() {
         var volume = [{
             $userpn : uData.pn,
             $title : 'Volume Rendering',
-            $saveName : '[2014-11-27 20:00:00]_head1.png',
+            $saveName : '[2014-11-27 20:00:00]_head1.dat',
             $fileName : 'head.dan'
         },{
             $userpn : uData.pn,
             $title : 'Volume Rendering2',
-            $saveName : '[2014-11-27 20:00:00]_head2.png',
+            $saveName : '[2014-11-27 20:00:00]_head2.dat',
             $fileName : 'head2.dan'
         }];
 

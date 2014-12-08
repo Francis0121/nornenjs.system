@@ -21,14 +21,7 @@ var bs = BinaryServer({server : server});
 // TODO Deprcated Here load file
 var queue = [];
 
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/01.dat')));
-
-/*
-decodePng.decode(, function(data) {
-    console.log('PNG Data 01: ', data);
-    queue.push(data);
-});
-*/
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head1.dat')));
 
 var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
@@ -58,31 +51,18 @@ bs.on('connection', function(client){
                 console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
 
                 var sender = function() {
+//                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
+//                    jpeg.encode(function(jpeg_img){
+//                       client.send(jpeg_img)
+//                    });
 
-                    //fs.readFile(path.join(__dirname, '../public/upload/01.dat'), function(err,data){
-                    //fs.readFile(path.join(__dirname, '../public/upload/' + volume.save_name), function (err, data) {
-//                        var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
-//                        jpeg.encode(function(jpeg_img){
-//                           client.send(jpeg_img)
-//                        });
-
-                        var png = new Png(queue[0], 512, 512, 'rgb');
-                        png.encode(function(png_image){
-                            console.log('confirm png', count++);
-                            client.send(png_image);
-                        });
-
-//                        if (err) {
-//                            // TODO error handler
-//                            console.log('file read error');
-//                            return;
-//                        }
-
-
-                    //});
+                    var png = new Png(queue[0], 512, 512, 'rgb');
+                    png.encode(function(png_image){
+                        console.log('confirm png', count++);
+                        client.send(png_image);
+                    });
                 };
 
-                //setTimeout(sender, 1000);
                 volumeInterval = setInterval(sender, volumeFrame);
             }
         });
