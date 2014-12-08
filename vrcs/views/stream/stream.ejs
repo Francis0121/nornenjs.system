@@ -6,7 +6,7 @@
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src='http://cdn.binaryjs.com/0/binary.js'></script>
-    <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+    <script src='http://112.108.40.165:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
 </head>
 <body>
@@ -29,6 +29,10 @@
             <%=error%>
         <% }%>
         </div>
+
+        <div class="default_success">
+
+        </div>
     </article>
 </section>
 
@@ -36,7 +40,7 @@
     <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
 </footer>
     <script type="text/javascript">
-        var socket = io.connect('http://localhost:3000'); // Socket.io
+        var socket = io.connect('http://112.108.40.165:3000'); // Socket.io
         var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
         var accessInfo = {
             volumeIndex : '<%=accessInfo.volumeIndex%>',
@@ -70,7 +74,7 @@
             $('.default_error').html('');
             requestStream();
         });
-
+        var second = 0;
         var count = 0;
 
         client.on('stream', function(stream, meta){
@@ -89,7 +93,9 @@
         });
 
         var printFrame = function(){
+            second++;
             console.log('frame : ', count);
+            $('.default_success').append('<p> sec: '+ second + ' c: ' +count+'</p>');
             count = 0;
         };
 
