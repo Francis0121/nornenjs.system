@@ -10,6 +10,8 @@ var io = require('socket.io').listen(server);
 // ~ file
 var fs = require('fs-extra');
 var path = require('path');
+// ~ jpeg
+var Jpeg = require('jpeg').Jpeg;
 
 // ~ Start Binary.js server
 var bs = BinaryServer({server : server});
@@ -47,26 +49,32 @@ bs.on('connection', function(client){
                 return;
             }else{
                 console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
+
                 var sender = function() {
 
-                    fs.readFile(path.join(__dirname, '../public/upload/' + volume.save_name), function (err, data) {
+                    fs.readFile(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head1.dat'), function(err,data){
+                    //fs.readFile(path.join(__dirname, '../public/upload/' + volume.save_name), function (err, data) {
+                        var jpeg = new Jpeg(data, 720, 400, 'rgba');
+                        var jpeg_img = jpeg.encodeSync();
+
                         if (err) {
                             // TODO error handler
                             console.log('file read error');
                             return;
                         }
-                        client.send(data);
+                        client.send(jpeg_img);
                     });
                 };
 
-                volumeInterval = setInterval(sender, volumeFrame);
+                setTimeout(sender, 1000);
+                //volumeInterval = setInterval(sender, volumeFrame);
             }
         });
     });
 
     // Close client
     client.on('close', function(stream, meta){
-        clearInterval(volumeInterval);
+        //clearInterval(volumeInterval);
     });
 });
 
