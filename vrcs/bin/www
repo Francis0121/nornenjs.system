@@ -21,7 +21,7 @@ var bs = BinaryServer({server : server});
 // TODO Deprcated Here load file
 var queue = [];
 
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head1.dat')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head1.den')));
 
 var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
