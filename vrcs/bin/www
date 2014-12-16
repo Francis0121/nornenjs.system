@@ -51,17 +51,17 @@ bs.on('connection', function(client){
                 console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
 
                 var sender = function() {
-//                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
-//                    jpeg.encode(function(jpeg_img){
-//                        console.log('confirm jpeg', count++);
-//                       client.send(jpeg_img)
-//                    });
-
-                    var png = new Png(queue[0], 512, 512, 'rgba');
-                    png.encode(function(png_image){
-                        console.log('confirm png', count++);
-                        client.send(png_image);
+                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgb');
+                    jpeg.encode(function(jpeg_img){
+                       //console.log('confirm jpeg', count++);
+                        client.send(jpeg_img)
                     });
+
+//                    var png = new Png(queue[0], 512, 512, 'rgba');
+//                    png.encode(function(png_image){
+//                        console.log('confirm png', count++);
+//                        client.send(png_image);
+//                    });
                 };
 
                 volumeInterval = setInterval(sender, volumeFrame);
