@@ -25,6 +25,16 @@ queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/01_test.den')));
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/02_test.den')));
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/03_test.den')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/05_test.den')));
+
+
+var jpeg1 = new Jpeg(queue[4], 512, 512, 'rgba');
+var jpeg_img1 = jpeg1.encodeSync().toString('binary');
+fs.writeFileSync('./jpeg.jpeg', jpeg_img1, 'binary');
+
+var png1 = new Png(queue[4], 512, 512, 'rgba');
+var png_image1 = png1.encodeSync();
+fs.writeFileSync('./png.png', png_image1.toString('binary'), 'binary');
 
 var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
@@ -54,11 +64,13 @@ bs.on('connection', function(client){
                 console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
 
                 var sender = function() {
-                    var jpeg = new Jpeg(queue[3], 512, 512, 'rgb');
+                    var jpeg = new Jpeg(queue[4], 512, 512, 'rgba');
                     jpeg.encode(function(jpeg_img){
                        //console.log('confirm jpeg', count++);
                         client.send(jpeg_img)
                     });
+
+
 
 //                    var png = new Png(queue[0], 512, 512, 'rgba');
 //                    png.encode(function(png_image){
