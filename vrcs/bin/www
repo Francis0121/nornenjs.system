@@ -22,6 +22,9 @@ var bs = BinaryServer({server : server});
 var queue = [];
 
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head2.den')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/01_test.den')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/02_test.den')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/03_test.den')));
 
 var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
@@ -51,7 +54,7 @@ bs.on('connection', function(client){
                 console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
 
                 var sender = function() {
-                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
+                    var jpeg = new Jpeg(queue[3], 512, 512, 'rgb');
                     jpeg.encode(function(jpeg_img){
                        //console.log('confirm jpeg', count++);
                         client.send(jpeg_img)
