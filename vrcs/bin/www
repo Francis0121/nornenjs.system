@@ -88,7 +88,7 @@ bs.on('connection', function(client){
                 if( time - 5 > sum / 3  ){
                     console.log('increase frame');
                     obj.frame = obj.frame + 1 == frameList.length ? obj.frame : obj.frame + 1;
-                }else if( time + 5 < sum /3 ){
+                }else if( time - 2 < sum /3 ){
                     console.log('decrease frame');
                     obj.frame = obj.frame-1 == -1 ? obj.frame : obj.frame - 1 ;
                 }else{

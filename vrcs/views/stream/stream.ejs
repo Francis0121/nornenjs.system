@@ -62,6 +62,7 @@
 
         joinSocket();
 
+        var success = false;
         socket.on('message', function(data){
             $('.debug_wrap').append('<p>connect byte stream</p>');
             if(!data.success){
@@ -70,6 +71,7 @@
             }
             // ~ success request byte stream
             $('.default_error').html('');
+            success = true;
             requestStream();
         });
 
@@ -120,7 +122,7 @@
             second+=1;
             sum+=count;
             $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
-            if(second%3 == 0) {
+            if(second%3 == 0 && success) {
                 adaptiveByteStream();
                 sum = 0;
             }
