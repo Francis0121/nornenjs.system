@@ -5,6 +5,7 @@
 var fs = require('fs-extra'); // FILE
 var path = require('path');
 var debug = require('debug')('vrcs');
+var HashMap = require('hashmap').HashMap;
 
 var Jpeg = require('jpeg').Jpeg; // JPEG
 var Png = require('png').Png; // PNG
@@ -24,16 +25,20 @@ queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/03_test.den')));
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/05_test.den')));
 
-var standard_frame = [ 30, 25, 20, 15, 10 ];
-var volumeInterval;
-var volumeFrame = standard_frame[0];
-
-
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
+var frameList = [ 30, 25, 20, 15, 10 ];
+var streamMap = new HashMap();
+var useMap = new HashMap();
+
+function ab2str(buf) {
+    return String.fromCharCode.apply(null, new Uint16Array(buf));
+}
+
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
+        console.log('byte stream connect attempt ' + client.id);
 
         var part = [];
 
@@ -49,12 +54,20 @@ bs.on('connection', function(client){
                 console.log('volume index not exist');
                 return;
             }else{
+                var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn)+1;
+                useMap.set(volumePn, use);
+
+                var obj = { volumePn : volumePn,
+                            interval : undefined,
+                            frame : frameList[0] };
+
                 var sender = function() {
+
                     // TODO selection png or jpeg ( make this part function)
-                    var jpeg = new Jpeg(queue[volumePn], 512, 512, 'rgba');
-                    jpeg.encode(function(jpeg_img){
-                        client.send(jpeg_img)
-                    });
+//                    var jpeg = new Jpeg(queue[volumePn], 512, 512, 'rgba');
+//                    jpeg.encode(function(jpeg_img){
+//                        client.send(jpeg_img)
+//                    });
 /*
                     var png = new Png(queue[0], 512, 512, 'rgba');
                     png.encode(function(png_image){
@@ -63,13 +76,30 @@ bs.on('connection', function(client){
 */
                 };
 
-                volumeInterval = setInterval(sender, volumeFrame);
+                obj.interval = setInterval(sender, obj.frame);
+                streamMap.set(client.id, obj);
             }
+
+            console.log('connect byte stream ' + client.id + ' volume use ' + use);
         });
     });
 
     client.on('close', function(stream, meta){
-        clearInterval(volumeInterval);
+        console.log('close byte stream connection ' + client.id);
+        var obj = streamMap.get(client.id);
+        if(obj != undefined) {
+            clearInterval(obj.interval);
+            streamMap.remove(client.id);
+
+            var use = useMap.get(obj.volumePn) - 1;
+            console.log('do remove ' + client.id + ' volume use ' + use);
+            if(use == 0){
+                app.volumeMap.remove(obj.volumePn);
+                useMap.remove(obj.volumePn);
+            }else{
+                useMap.set(obj.volumePn, use);
+            }
+        }
     });
 
 });
@@ -81,31 +111,34 @@ bs.on('connection', function(client){
 // ~ socket bind message ( Implement socket room )
 
 var socket_queue = [];
-var totalCount = 0;
+var streamUserCount = 0;
 
 io.sockets.on('connection', function(socket){
 
-    socket.on('join', function(data){
-        console.log('id : ' + socket.id);
+    socket.on('join', function(){
+        var clientId = socket.id;
         var message = {
             error : '',
-            success : false
+            success : false,
+            clientId : clientId
         };
-        if(totalCount < 3){
-            totalCount++;
+
+        if(streamUserCount < 3){
+            streamUserCount++;
             message.success = true;
         }else{
-            socket_queue.push(socket.id);
+            socket_queue.push(clientId);
             message.error = 'Visitor limit';
         }
-        console.log('connect total count[ ' + totalCount + ' ]');
+
+        console.log('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
         socket.emit('message', message);
     });
 
     socket.on('disconnect', function () {
-        totalCount--;
-        console.log('disconnect total count[ ' + totalCount + ' ]');
+        streamUserCount--;
         var clientId = socket_queue.shift();
+        console.log('disconnect total count[ ' + streamUserCount + ' ] , sockey id : ' + clientId);
         if(clientId != undefined){
             socket.broadcast.to(clientId).emit('user_disconnected');
         }

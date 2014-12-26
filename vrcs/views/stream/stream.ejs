@@ -49,42 +49,50 @@
 
         var socket = io.connect('http://112.108.40.165:3000'); // Socket.io
         var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
-
         var accessInfo = {
             volumePn : '<%=accessInfo.volumePn%>',
             userPn : '<%=accessInfo.userPn%>'
         };
 
-        // ~ init room setting
-        console.log('accessInfo: ',accessInfo);
-
+        // ~ Socket IO
         var joinSocket = function(){
             console.log('Request join socket')
             socket.emit('join');
         };
 
-        var requestStream = function(){
+        joinSocket();
+
+        socket.on('message', function(data){
+            $('.debug_wrap').append('<p>connect byte stream</p>');
+            if(!data.success){
+                $('.debug_wrap').append('<p>'+data.error+'</p>');
+                return;
+            }
+            // ~ success request byte stream
+            $('.default_error').html('');
+            requestStream(data.clientId);
+        });
+
+        socket.on('user_disconnected', function(data){
+            joinSocket();
+        });
+
+        // ~ Byte stream
+        var requestStream = function(clientId){
             var buffer = new ArrayBuffer(4);
             var dataView = new DataView(buffer);
             dataView.setInt32(0, accessInfo.volumePn);
             client.send(buffer);
         };
 
-        joinSocket();
-
-        socket.on('message', function(data){
-            if(!data.success){
-                $('.debug_wrap').append('<p>'+data.error+'</p>');
-                return;
+        function str2ab(str) {
+            var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+            var bufView = new Uint16Array(buf);
+            for (var i=0, strLen=str.length; i < strLen; i++) {
+                bufView[i] = str.charCodeAt(i);
             }
-            // ~ success request byte stre
-            $('.default_error').html('');
-            requestStream();
-        });
-
-        socket.on('user_disconnected', function(data){
-            joinSocket();
-        });
+            return buf;
+        }
 
         var second = 0;
         var count = 0;
@@ -110,8 +118,7 @@
             second++, count = 0;
         };
 
-        setInterval(debug, 1000);
-
+//        setInterval(debug, 1000);
     </script>
 </body>
 </html>
