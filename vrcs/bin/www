@@ -18,12 +18,11 @@ var bs = BinaryServer({server : server}); // Start BinaryJs server
 var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
+//#######################################
+// ~ cuda source
 
-// TODO Deprcated Here load file and make queue multiple user
-var queue = [];
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head2.den')));
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/03_test.den')));
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/05_test.den')));
+
+//#######################################
 
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
@@ -37,7 +36,7 @@ bs.on('connection', function(client){
         console.log('byte stream connect attempt ' + client.id);
         var sender = function () {
             // TODO selection png or jpeg ( make this part function)
-            var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
+            var jpeg = new Jpeg(d_outputBuffer, 512, 512, 'rgba');
             jpeg.encode(function (jpeg_img) {
                 client.send(jpeg_img);
             });

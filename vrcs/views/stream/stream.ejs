@@ -6,102 +6,8 @@
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src='http://cdn.binaryjs.com/0/binary.js'></script>
-    <script src='http://112.108.40.165:3000/socket.io/socket.io.js'></script>
+    <script src='http://112.108.40.19:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
-    <script type="text/javascript">
-
-        var socket = io.connect('http://112.108.40.165:3000', { reconnection : false }); // Socket.io
-        var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
-        var accessInfo = {
-            volumePn : '<%=accessInfo.volumePn%>',
-            userPn : '<%=accessInfo.userPn%>'
-        };
-
-        // ~ Socket IO
-        var joinSocket = function(){
-            console.log('Request join socket')
-            socket.emit('join');
-        };
-
-        joinSocket();
-
-        var success = false;
-        socket.on('message', function(data){
-            $('.debug_wrap').append('<p>connect byte stream</p>');
-            if(!data.success){
-                $('.debug_wrap').append('<p>'+data.error+'</p>');
-                return;
-            }
-            // ~ success request byte stream
-            $('.default_error').html('');
-            success = true;
-            requestStream();
-        });
-
-        socket.on('user_disconnected', function(data){
-            joinSocket();
-        });
-
-        // ~ Byte stream
-        var requestStream = function(){
-            var buffer = new ArrayBuffer(16);
-            var x = new Int32Array(buffer);
-            x[0] = 1;
-            x[1] = accessInfo.volumePn;
-            $('.debug_wrap').append('<p>' +x[2]  + '</p>');
-            client.send(buffer);
-        };
-
-        var second = 0;
-        var count = 0;
-        var sum = 0;
-        var debugInterval = undefined;
-
-        var adaptiveByteStream = function(){
-            var buffer = new ArrayBuffer(16);
-            var x = new Int32Array(buffer);
-            x[0] = 2;
-            x[1] = sum;
-            $('.debug_wrap').append('<p>' + sum  + '</p>');
-            client.send(buffer);
-        };
-
-        client.on('stream', function(stream, meta){
-            // collect stream data
-            var parts = [];
-            stream.on('data', function(data){
-                parts.push(data);
-            });
-
-            // when finished, set it as the background image
-            stream.on('end', function(){
-                var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                $('#view_port>img').attr('src', url);
-                count++;
-                if(debugInterval == undefined){
-                    debugInterval = setInterval(debug, 1000);
-                }
-            });
-        });
-
-        // ~ TODO debug 재정의
-        var debug = function(){
-            if(count == 0){
-                clearInterval(debugInterval);
-                debugInterval = undefined;
-            }
-
-            second+=1;
-            sum+=count;
-            $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
-            if(second%3 == 0 && success) {
-                adaptiveByteStream();
-                sum = 0;
-            }
-            count = 0;
-        };
-
-    </script>
 </head>
 <body>
 
@@ -139,6 +45,99 @@
     <span>Copyright(c) Teriusbin.lee Francis.kim All rights reserved</span>
 </footer>
 
+<script type="text/javascript">
 
+    var socket = io.connect('http://112.108.40.19:3000', { reconnection : false }); // Socket.io
+    var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
+    var accessInfo = {
+        volumePn : '<%=accessInfo.volumePn%>',
+        userPn : '<%=accessInfo.userPn%>'
+    };
+
+    // ~ Socket IO
+    var joinSocket = function(){
+        console.log('Request join socket')
+        socket.emit('join');
+    };
+
+    joinSocket();
+
+    var success = false;
+    socket.on('message', function(data){
+        $('.debug_wrap').append('<p>connect byte stream</p>');
+        if(!data.success){
+            $('.debug_wrap').append('<p>'+data.error+'</p>');
+            return;
+        }
+        // ~ success request byte stream
+        $('.default_error').html('');
+        success = true;
+        requestStream();
+    });
+
+    socket.on('user_disconnected', function(data){
+        joinSocket();
+    });
+
+    // ~ Byte stream
+    var requestStream = function(){
+        var buffer = new ArrayBuffer(16);
+        var x = new Int32Array(buffer);
+        x[0] = 1;
+        x[1] = accessInfo.volumePn;
+        $('.debug_wrap').append('<p>' +x[2]  + '</p>');
+        client.send(buffer);
+    };
+
+    var second = 0;
+    var count = 0;
+    var sum = 0;
+    var debugInterval = undefined;
+
+    var adaptiveByteStream = function(){
+        var buffer = new ArrayBuffer(16);
+        var x = new Int32Array(buffer);
+        x[0] = 2;
+        x[1] = sum;
+        $('.debug_wrap').append('<p>' + sum  + '</p>');
+        client.send(buffer);
+    };
+
+    client.on('stream', function(stream, meta){
+        // collect stream data
+        var parts = [];
+        stream.on('data', function(data){
+            parts.push(data);
+        });
+
+        // when finished, set it as the background image
+        stream.on('end', function(){
+            var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
+            $('#view_port>img').attr('src', url);
+            count++;
+            if(debugInterval == undefined){
+                debugInterval = setInterval(debug, 1000);
+            }
+        });
+    });
+
+    // ~ TODO debug 재정의
+    var debug = function(){
+        if(count == 0){
+            clearInterval(debugInterval);
+            debugInterval = undefined;
+        }
+
+        second+=1;
+        sum+=count;
+        $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
+        if(second%3 == 0 && success) {
+            adaptiveByteStream();
+            sum = 0;
+        }
+        count = 0;
+    };
+
+</script>
 </body>
 </html>
