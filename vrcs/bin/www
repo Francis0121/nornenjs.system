@@ -19,8 +19,10 @@ var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
 //#######################################
-// ~ cuda source
-
+var vrcs_cuda = require('../cuda/vrcs_cuda');
+vrcs_cuda.init();
+vrcs_cuda.start();
+vrcs_cuda.end();
 
 //#######################################
 
@@ -36,7 +38,7 @@ bs.on('connection', function(client){
         console.log('byte stream connect attempt ' + client.id);
         var sender = function () {
             // TODO selection png or jpeg ( make this part function)
-            var jpeg = new Jpeg(d_outputBuffer, 512, 512, 'rgba');
+            var jpeg = new Jpeg(vrcs_cuda.d_outputBuffer, 512, 512, 'rgba');
             jpeg.encode(function (jpeg_img) {
                 client.send(jpeg_img);
             });
