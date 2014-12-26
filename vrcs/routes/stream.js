@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var sqlite = require('../sql/default');
+var HashMap = require('hashmap').HashMap;
 
 // Not sign in user don`t access this router
 router.use(function(req, res, next) {
@@ -16,6 +17,7 @@ router.param('pn', function (req, res, next, pn) {
 })
 
 var volumes = [];
+var volumeMap = new HashMap();
 /* GET home page. */
 router.get('/volumepn/:pn', function(req, res) {
 

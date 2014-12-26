@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
+//#######################################
 // ~ load module and start server
-
 var fs = require('fs-extra'); // FILE
 var path = require('path');
 var debug = require('debug')('vrcs');
@@ -9,15 +9,16 @@ var debug = require('debug')('vrcs');
 var Jpeg = require('jpeg').Jpeg; // JPEG
 var Png = require('png').Png; // PNG
 
-
 var app = require('../app');
 var http = require('http');
 var server = http.createServer(app);
 var BinaryServer = require('binaryjs').BinaryServer; // BinaryJs (Byte stream)
 var bs = BinaryServer({server : server}); // Start BinaryJs server
 var io = require('socket.io').listen(server); // Socket.io
+//#######################################
 
-// TODO Deprcated Here load file
+
+// TODO Deprcated Here load file and make queue multiple user
 var queue = [];
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head2.den')));
 
@@ -25,42 +26,42 @@ var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
 var volumeFrame = standard_frame[0];
 
-// Wait for new user connections
+
+//#######################################
+// ~ Wait for new user connections ( Implement Byte stream )
 bs.on('connection', function(client){
-    // Incoming stream from browsers
+
     client.on('stream', function(stream, meta){
 
         var part = [];
+
         stream.on('data', function(data){
             part.push(data);
         });
 
-        // when finished, set it as the background image
         stream.on('end', function(){
             var volumeIndex = part[0].readInt32BE(0);
             var volume = app.volumes[volumeIndex];
 
             if(volume == undefined){
-                // TODO error handler
                 console.log('volume index not exist');
                 return;
             }else{
                 console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
 
                 var sender = function() {
-                    var jpeg = new Jpeg(queue[4], 512, 512, 'rgba');
+                    // TODO selection png or jpeg ( make this part function)
+                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
                     jpeg.encode(function(jpeg_img){
-                       //console.log('confirm jpeg', count++);
                         client.send(jpeg_img)
                     });
+/*
+                    var png = new Png(queue[0], 512, 512, 'rgba');
+                    png.encode(function(png_image){
+                        client.send(png_image);
+                    });
+*/
 
-
-
-//                    var png = new Png(queue[0], 512, 512, 'rgba');
-//                    png.encode(function(png_image){
-//                        console.log('confirm png', count++);
-//                        client.send(png_image);
-//                    });
                 };
 
                 volumeInterval = setInterval(sender, volumeFrame);
@@ -68,13 +69,17 @@ bs.on('connection', function(client){
         });
     });
 
-    // Close client
     client.on('close', function(stream, meta){
         clearInterval(volumeInterval);
     });
-});
 
-// ~ socket bind message
+});
+//#######################################
+
+
+
+//#######################################
+// ~ socket bind message ( Implement socket room )
 var rooms = []; // total count web clients
 
 io.sockets.on('connection', function(socket){
@@ -102,11 +107,9 @@ io.sockets.on('connection', function(socket){
     });
 
 });
+//#######################################
 
-app.set('port', process.env.PORT || 3000);
-var server = server.listen(app.get('port'), function() {
-    debug('Express server listening on port ' + server.address().port);
-});
+
 
 function findClientsSocket() {
     var res = [];
@@ -132,3 +135,9 @@ function findClientsSocket() {
     //console.log('End Rooms: '+ rooms);
     return res;
 }
+
+// ~ server start
+app.set('port', process.env.PORT || 3000);
+var server = server.listen(app.get('port'), function() {
+    debug('Express server listening on port ' + server.address().port);
+});
