@@ -19,14 +19,6 @@ var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
 //#######################################
-var vrcs_cuda = require('../cuda/vrcs_cuda');
-vrcs_cuda.init();
-vrcs_cuda.start();
-vrcs_cuda.end();
-
-//#######################################
-
-//#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 var streamMap = new HashMap();
@@ -36,6 +28,8 @@ bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
         console.log('byte stream connect attempt ' + client.id);
+        var vrcs_cuda = require('../cuda/vrcs_cuda');
+
         var sender = function () {
             // TODO selection png or jpeg ( make this part function)
             var jpeg = new Jpeg(vrcs_cuda.d_outputBuffer, 512, 512, 'rgba');
@@ -75,6 +69,13 @@ bs.on('connection', function(client){
                         volumePn: volumePn,
                         interval: undefined,
                         frame: 3 };
+
+                    // ~ run cuda
+                    vrcs_cuda.type = vrcs_cuda.type.mri;
+                    vrcs_cuda.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/' + volume.save_name;
+                    vrcs_cuda.init();
+                    vrcs_cuda.start();
+                    vrcs_cuda.end();
 
                     obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
                     streamMap.set(client.id, obj);

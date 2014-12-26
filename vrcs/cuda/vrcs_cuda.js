@@ -28,7 +28,7 @@ var vrcs_cuda = {
         transferScale : 1.0
     },
 
-    textureFilePath : 'Bighead.den',
+    textureFilePath : '[2014-11-27 20:00:00]_head1.den',
 
     d_output : undefined,
     d_invViewMatrix : undefined,
@@ -54,6 +54,14 @@ var vrcs_cuda = {
 
         // ~ View Vector
         this.makeViewVector();
+
+        // ~ rendering
+        this.render();
+    },
+
+    render : function(){
+        var _opt = this.options;
+        var _cuModule = this.cuModule;
 
         // ~ Rendering
         var cuFunction = undefined;
@@ -153,3 +161,4 @@ var vrcs_cuda = {
 
 
 module.exports = vrcs_cuda;
+module.exports.type = rendering_cuda;
