@@ -1,45 +1,29 @@
 #!/usr/bin/env node
+
+// ~ load module and start server
+
+var fs = require('fs-extra'); // FILE
+var path = require('path');
 var debug = require('debug')('vrcs');
+
+var Jpeg = require('jpeg').Jpeg; // JPEG
+var Png = require('png').Png; // PNG
+
+
 var app = require('../app');
 var http = require('http');
-// ~ binary js
-var BinaryServer = require('binaryjs').BinaryServer;
 var server = http.createServer(app);
-// ~ socket io
-var io = require('socket.io').listen(server);
-// ~ file
-var fs = require('fs-extra');
-var path = require('path');
-// ~ jpeg
-var Jpeg = require('jpeg').Jpeg;
-// ~ png
-var Png = require('png').Png;
-
-// ~ Start Binary.js server
-var bs = BinaryServer({server : server});
+var BinaryServer = require('binaryjs').BinaryServer; // BinaryJs (Byte stream)
+var bs = BinaryServer({server : server}); // Start BinaryJs server
+var io = require('socket.io').listen(server); // Socket.io
 
 // TODO Deprcated Here load file
 var queue = [];
-
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head2.den')));
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/01_test.den')));
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/02_test.den')));
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/03_test.den')));
-queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/05_test.den')));
-
-
-var jpeg1 = new Jpeg(queue[4], 512, 512, 'rgba');
-var jpeg_img1 = jpeg1.encodeSync().toString('binary');
-fs.writeFileSync('./jpeg.jpeg', jpeg_img1, 'binary');
-
-var png1 = new Png(queue[4], 512, 512, 'rgba');
-var png_image1 = png1.encodeSync();
-fs.writeFileSync('./png.png', png_image1.toString('binary'), 'binary');
 
 var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
 var volumeFrame = standard_frame[0];
-var count = 0;
 
 // Wait for new user connections
 bs.on('connection', function(client){

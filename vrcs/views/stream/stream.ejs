@@ -6,7 +6,7 @@
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src='http://cdn.binaryjs.com/0/binary.js'></script>
-    <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+    <script src='http://112.108.40.165:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
 </head>
 <body>
@@ -24,28 +24,37 @@
             <img src="" style="width: 512px; height: 512px;"/>
         </div>
 
+        <div class="debug_wrap">
+
+        </div>
+
         <div class="default_error">
-        <% if( error != '') { %>
-            <%=error%>
-        <% }%>
+            <% if(error != '') { %>
+                <%=error%>
+            <% } %>
         </div>
 
         <div class="default_success">
 
         </div>
+
     </article>
 </section>
 
 <footer class="template_footer">
-    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+    <span>Copyright(c) Teriusbin.lee Francis.kim All rights reserved</span>
 </footer>
+
     <script type="text/javascript">
-        var socket = io.connect('http://localhost:3000'); // Socket.io
+
+        var socket = io.connect('http://112.108.40.165:3000'); // Socket.io
         var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
+
         var accessInfo = {
             volumeIndex : '<%=accessInfo.volumeIndex%>',
             userPn : '<%=accessInfo.userPn%>'
         };
+
         // ~ init room setting
         console.log('accessInfo: ',accessInfo);
 
@@ -92,14 +101,13 @@
             });
         });
 
-        var printFrame = function(){
-            second++;
-            console.log('frame : ', count);
-            $('.default_success').append('<p> sec: '+ second + ' c: ' +count+'</p>');
-            count = 0;
+        // ~ TODO debug 재정의
+        var debug = function(){
+            $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
+            second++, count = 0;
         };
 
-        setInterval(printFrame, 1000);
+        setInterval(debug, 1000);
 
     </script>
 </body>
