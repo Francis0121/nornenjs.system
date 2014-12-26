@@ -64,10 +64,10 @@ bs.on('connection', function(client){
                 var sender = function() {
 
                     // TODO selection png or jpeg ( make this part function)
-//                    var jpeg = new Jpeg(queue[volumePn], 512, 512, 'rgba');
-//                    jpeg.encode(function(jpeg_img){
-//                        client.send(jpeg_img)
-//                    });
+                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
+                    jpeg.encode(function(jpeg_img){
+                        client.send(jpeg_img)
+                    });
 /*
                     var png = new Png(queue[0], 512, 512, 'rgba');
                     png.encode(function(png_image){
@@ -81,6 +81,10 @@ bs.on('connection', function(client){
             }
 
             console.log('connect byte stream ' + client.id + ' volume use ' + use);
+        });
+
+        stream.on('error', function(error){
+            console.log(error);
         });
     });
 

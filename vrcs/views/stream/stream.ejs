@@ -47,7 +47,7 @@
 
     <script type="text/javascript">
 
-        var socket = io.connect('http://112.108.40.165:3000'); // Socket.io
+        var socket = io.connect('http://112.108.40.165:3000', { 'reconnect' : false }); // Socket.io
         var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
         var accessInfo = {
             volumePn : '<%=accessInfo.volumePn%>',
@@ -118,7 +118,7 @@
             second++, count = 0;
         };
 
-//        setInterval(debug, 1000);
+        setInterval(debug, 1000);
     </script>
 </body>
 </html>
