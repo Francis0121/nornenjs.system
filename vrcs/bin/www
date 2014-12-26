@@ -27,18 +27,27 @@ queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/05_test.den'))
 
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
-var frameList = [ 30, 25, 20, 15, 10 ];
+var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 var streamMap = new HashMap();
 var useMap = new HashMap();
-
-function ab2str(buf) {
-    return String.fromCharCode.apply(null, new Uint16Array(buf));
-}
 
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
         console.log('byte stream connect attempt ' + client.id);
+        var sender = function () {
+            // TODO selection png or jpeg ( make this part function)
+            var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
+            jpeg.encode(function (jpeg_img) {
+                client.send(jpeg_img);
+            });
+            /*
+             var png = new Png(queue[0], 512, 512, 'rgba');
+             png.encode(function(png_image){
+             client.send(png_image);
+             });
+             */
+        };
 
         var part = [];
 
@@ -47,44 +56,48 @@ bs.on('connection', function(client){
         });
 
         stream.on('end', function(){
-            var volumePn = part[0].readInt32BE(0);
-            var volume = app.volumeMap.get(volumePn);
+            var type = part[0].readInt32LE(0);
+            if(type == 1) {
+                var volumePn = part[0].readInt32LE(4);
+                var volume = app.volumeMap.get(volumePn);
 
-            if(volume == undefined){
-                console.log('volume index not exist');
-                return;
-            }else{
-                var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn)+1;
-                useMap.set(volumePn, use);
+                console.log(part[0], type, volumePn);
 
-                var obj = { volumePn : volumePn,
-                            interval : undefined,
-                            frame : frameList[0] };
+                if (volume == undefined) {
+                    console.log('volume index not exist');
+                    return;
+                } else {
+                    var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
+                    useMap.set(volumePn, use);
 
-                var sender = function() {
+                    var obj = {
+                        volumePn: volumePn,
+                        interval: undefined,
+                        frame: 3 };
 
-                    // TODO selection png or jpeg ( make this part function)
-                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
-                    jpeg.encode(function(jpeg_img){
-                        try{
-                            client.send(jpeg_img)
-                        }catch(err){
-                            console.log(err);
-                        }
-                    });
-/*
-                    var png = new Png(queue[0], 512, 512, 'rgba');
-                    png.encode(function(png_image){
-                        client.send(png_image);
-                    });
-*/
-                };
+                    obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
+                    streamMap.set(client.id, obj);
+                }
+                console.log('connect byte stream ' + client.id + ' volume use ' + use);
 
-                obj.interval = setInterval(sender, obj.frame);
+            }else if(type == 2){
+                var sum = part[0].readInt32LE(4);
+                var obj = streamMap.get(client.id);
+                var time = frameList[obj.frame];
+
+                if( time - 5 > sum / 3  ){
+                    console.log('increase frame');
+                    obj.frame = obj.frame + 1 == frameList.length ? obj.frame : obj.frame + 1;
+                }else if( time + 5 < sum /3 ){
+                    console.log('decrease frame');
+                    obj.frame = obj.frame-1 == -1 ? obj.frame : obj.frame - 1 ;
+                }else{
+                    console.log('maintain frame');
+                }
+                clearInterval(obj.interval);
+                obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
                 streamMap.set(client.id, obj);
             }
-
-            console.log('connect byte stream ' + client.id + ' volume use ' + use);
         });
 
         stream.on('error', function(error){

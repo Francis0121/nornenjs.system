@@ -70,7 +70,7 @@
             }
             // ~ success request byte stream
             $('.default_error').html('');
-            requestStream(data.clientId);
+            requestStream();
         });
 
         socket.on('user_disconnected', function(data){
@@ -78,15 +78,27 @@
         });
 
         // ~ Byte stream
-        var requestStream = function(clientId){
-            var buffer = new ArrayBuffer(4);
-            var dataView = new DataView(buffer);
-            dataView.setInt32(0, accessInfo.volumePn);
+        var requestStream = function(){
+            var buffer = new ArrayBuffer(16);
+            var x = new Int32Array(buffer);
+            x[0] = 1;
+            x[1] = accessInfo.volumePn;
+            $('.debug_wrap').append('<p>' +x[2]  + '</p>');
             client.send(buffer);
         };
 
         var second = 0;
         var count = 0;
+        var sum = 0;
+
+        var adaptiveByteStream = function(){
+            var buffer = new ArrayBuffer(16);
+            var x = new Int32Array(buffer);
+            x[0] = 2;
+            x[1] = sum;
+            $('.debug_wrap').append('<p>' + sum  + '</p>');
+            client.send(buffer);
+        };
 
         client.on('stream', function(stream, meta){
             // collect stream data
@@ -105,8 +117,14 @@
 
         // ~ TODO debug 재정의
         var debug = function(){
+            second+=1;
+            sum+=count;
             $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
-            second++, count = 0;
+            if(second%3 == 0) {
+                adaptiveByteStream();
+                sum = 0;
+            }
+            count = 0;
         };
 
         setInterval(debug, 1000);
