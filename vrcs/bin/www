@@ -18,28 +18,24 @@ var bs = BinaryServer({server : server}); // Start BinaryJs server
 var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
-var vrcs_cuda = require('../cuda/vrcs_cuda');
-vrcs_cuda.type = vrcs_cuda.type.mri;
-vrcs_cuda.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/[2014-11-27 20:00:00]_head1.den';
-vrcs_cuda.init();
-vrcs_cuda.start();
-vrcs_cuda.end();
-
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 var streamMap = new HashMap();
 var useMap = new HashMap();
+var vrcsCudaMap = new HashMap();
 
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
         console.log('byte stream connect attempt ' + client.id);
-
         var sender = function () {
             // TODO selection png or jpeg ( make this part function)
+            var vrcs_cuda = vrcsCudaMap.get(client.id);
+            vrcs_cuda.start();
             var jpeg = new Jpeg(vrcs_cuda.d_outputBuffer, 512, 512, 'rgba');
             jpeg.encode(function (jpeg_img) {
+                vrcs_cuda.end();
                 client.send(jpeg_img);
             });
             /*
@@ -76,8 +72,14 @@ bs.on('connection', function(client){
                         interval: undefined,
                         frame: 3 };
 
+                    var vrcs_cuda = require('../cuda/vrcs_cuda');
+                    vrcs_cuda.type = 0;
+                    vrcs_cuda.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.savename;
+                    vrcs_cuda.init();
+
                     obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
                     streamMap.set(client.id, obj);
+                    vrcsCudaMap.set(client.id, vrcs_cuda);
                 }
                 console.log('connect byte stream ' + client.id + ' volume use ' + use);
 
@@ -121,6 +123,12 @@ bs.on('connection', function(client){
             }else{
                 useMap.set(obj.volumePn, use);
             }
+        }
+        var vrcs_cuda = vrcsCudaMap.get(client.id);
+        if(vrcs_cuda != undefined){
+            vrcs_cuda.finish();
+            vrcsCudaMap.remove(client.id);
+            console.log('do remove');
         }
     });
 
