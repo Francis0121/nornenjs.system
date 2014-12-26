@@ -8,43 +8,6 @@
     <script src='http://cdn.binaryjs.com/0/binary.js'></script>
     <script src='http://112.108.40.165:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
-</head>
-<body>
-
-<header class="template_header">
-    <h1>Volume Stream</h1>
-</header>
-
-<section class="template_section">
-    <article>
-        <a href="/" class="default_a">Main</a>
-        <a href="/volume" class="default_a">Volume List</a>
-
-        <div id="view_port" class="default_stream">
-            <img src="" style="width: 512px; height: 512px;"/>
-        </div>
-
-        <div class="debug_wrap">
-
-        </div>
-
-        <div class="default_error">
-            <% if(error != '') { %>
-                <%=error%>
-            <% } %>
-        </div>
-
-        <div class="default_success">
-
-        </div>
-
-    </article>
-</section>
-
-<footer class="template_footer">
-    <span>Copyright(c) Teriusbin.lee Francis.kim All rights reserved</span>
-</footer>
-
     <script type="text/javascript">
 
         var socket = io.connect('http://112.108.40.165:3000', { reconnection : false }); // Socket.io
@@ -92,6 +55,7 @@
         var second = 0;
         var count = 0;
         var sum = 0;
+        var debugInterval = undefined;
 
         var adaptiveByteStream = function(){
             var buffer = new ArrayBuffer(16);
@@ -114,11 +78,19 @@
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
                 $('#view_port>img').attr('src', url);
                 count++;
+                if(debugInterval == undefined){
+                    debugInterval = setInterval(debug, 1000);
+                }
             });
         });
 
         // ~ TODO debug 재정의
         var debug = function(){
+            if(count == 0){
+                clearInterval(debugInterval);
+                debugInterval = undefined;
+            }
+
             second+=1;
             sum+=count;
             $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
@@ -129,7 +101,44 @@
             count = 0;
         };
 
-        setInterval(debug, 1000);
     </script>
+</head>
+<body>
+
+<header class="template_header">
+    <h1>Volume Stream</h1>
+</header>
+
+<section class="template_section">
+    <article>
+        <a href="/" class="default_a">Main</a>
+        <a href="/volume" class="default_a">Volume List</a>
+
+        <div id="view_port" class="default_stream">
+            <img src="" style="width: 512px; height: 512px;"/>
+        </div>
+
+        <div class="debug_wrap">
+
+        </div>
+
+        <div class="default_error">
+            <% if(error != '') { %>
+                <%=error%>
+            <% } %>
+        </div>
+
+        <div class="default_success">
+
+        </div>
+
+    </article>
+</section>
+
+<footer class="template_footer">
+    <span>Copyright(c) Teriusbin.lee Francis.kim All rights reserved</span>
+</footer>
+
+
 </body>
 </html>

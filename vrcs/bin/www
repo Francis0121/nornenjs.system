@@ -124,6 +124,11 @@ bs.on('connection', function(client){
     });
 
 });
+
+bs.on('error', function(error){
+    console.log(error);
+});
+
 //#######################################
 
 
