@@ -21,6 +21,8 @@ var io = require('socket.io').listen(server); // Socket.io
 // TODO Deprcated Here load file and make queue multiple user
 var queue = [];
 queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/[2014-11-27 20:00:00]_head2.den')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/03_test.den')));
+queue.push(fs.readFileSync(path.join(__dirname, '../public/upload/05_test.den')));
 
 var standard_frame = [ 30, 25, 20, 15, 10 ];
 var volumeInterval;
@@ -40,18 +42,16 @@ bs.on('connection', function(client){
         });
 
         stream.on('end', function(){
-            var volumeIndex = part[0].readInt32BE(0);
-            var volume = app.volumes[volumeIndex];
+            var volumePn = part[0].readInt32BE(0);
+            var volume = app.volumeMap.get(volumePn);
 
             if(volume == undefined){
                 console.log('volume index not exist');
                 return;
             }else{
-                console.log(volume.pn +': '+ volume.file_name + ': ' + volume.save_name);
-
                 var sender = function() {
                     // TODO selection png or jpeg ( make this part function)
-                    var jpeg = new Jpeg(queue[0], 512, 512, 'rgba');
+                    var jpeg = new Jpeg(queue[volumePn], 512, 512, 'rgba');
                     jpeg.encode(function(jpeg_img){
                         client.send(jpeg_img)
                     });
@@ -61,7 +61,6 @@ bs.on('connection', function(client){
                         client.send(png_image);
                     });
 */
-
                 };
 
                 volumeInterval = setInterval(sender, volumeFrame);
@@ -80,61 +79,40 @@ bs.on('connection', function(client){
 
 //#######################################
 // ~ socket bind message ( Implement socket room )
-var rooms = []; // total count web clients
+
+var socket_queue = [];
+var totalCount = 0;
 
 io.sockets.on('connection', function(socket){
 
     socket.on('join', function(data){
+        console.log('id : ' + socket.id);
         var message = {
             error : '',
             success : false
         };
-        // ~ add room information
-        if(rooms.indexOf(data.room) == -1){
-            rooms.push(data.room);
-        }
-        // ~ data.room : volumeIndex
-        var totalCount = findClientsSocket().length;
-        console.log('Total count: ', totalCount);
-        if( totalCount < 4){
-            socket.join(data.room);
+        if(totalCount < 3){
+            totalCount++;
             message.success = true;
         }else{
+            socket_queue.push(socket.id);
             message.error = 'Visitor limit';
         }
-
+        console.log('connect total count[ ' + totalCount + ' ]');
         socket.emit('message', message);
+    });
+
+    socket.on('disconnect', function () {
+        totalCount--;
+        console.log('disconnect total count[ ' + totalCount + ' ]');
+        var clientId = socket_queue.shift();
+        if(clientId != undefined){
+            socket.broadcast.to(clientId).emit('user_disconnected');
+        }
     });
 
 });
 //#######################################
-
-
-
-function findClientsSocket() {
-    var res = [];
-    var delRooms = [];
-    //console.log('Start Rooms: '+ rooms);
-    for (var i in rooms) {
-        var roomId = rooms[i];
-        var room = io.sockets.adapter.rooms[roomId];
-        if(room == undefined){
-            delRooms.push(roomId);
-            continue;
-        }
-        for (var id in room) {
-            var clients = io.sockets.adapter.nsp.connected[id];
-            res.push(clients);
-        }
-    }
-    // Delete room
-    for(var i in delRooms){
-        //console.log('del ', delRooms[i])
-        rooms.splice(rooms.indexOf(roomId), 1);
-    }
-    //console.log('End Rooms: '+ rooms);
-    return res;
-}
 
 // ~ server start
 app.set('port', process.env.PORT || 3000);

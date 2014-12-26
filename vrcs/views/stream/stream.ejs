@@ -51,7 +51,7 @@
         var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
 
         var accessInfo = {
-            volumeIndex : '<%=accessInfo.volumeIndex%>',
+            volumePn : '<%=accessInfo.volumePn%>',
             userPn : '<%=accessInfo.userPn%>'
         };
 
@@ -60,13 +60,13 @@
 
         var joinSocket = function(){
             console.log('Request join socket')
-            socket.emit('join', { room : accessInfo.volumeIndex } );
+            socket.emit('join');
         };
 
         var requestStream = function(){
             var buffer = new ArrayBuffer(4);
             var dataView = new DataView(buffer);
-            dataView.setInt32(0, accessInfo.volumeIndex);
+            dataView.setInt32(0, accessInfo.volumePn);
             client.send(buffer);
         };
 
@@ -74,15 +74,18 @@
 
         socket.on('message', function(data){
             if(!data.success){
-                console.log(data.error);
-                $('.default_error').append('<p>'+data.error+'</p>')
-                setTimeout(joinSocket, 1000);
+                $('.debug_wrap').append('<p>'+data.error+'</p>');
                 return;
             }
             // ~ success request byte stre
             $('.default_error').html('');
             requestStream();
         });
+
+        socket.on('user_disconnected', function(data){
+            joinSocket();
+        });
+
         var second = 0;
         var count = 0;
 

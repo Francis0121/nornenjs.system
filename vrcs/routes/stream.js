@@ -14,9 +14,8 @@ router.use(function(req, res, next) {
 
 router.param('pn', function (req, res, next, pn) {
     next();
-})
+});
 
-var volumes = [];
 var volumeMap = new HashMap();
 /* GET home page. */
 router.get('/volumepn/:pn', function(req, res) {
@@ -27,24 +26,10 @@ router.get('/volumepn/:pn', function(req, res) {
             console.log('Fail select volume');
             res.render('stream/stream', { error : 'Not exist volume data', accessInfo : undefined } );
         }else {
-            var volumeIndexOf = function(inv){
-                for(var i=0; i<volumes.length; i++){
-                    var staticv = volumes[i];
-                    if(staticv.pn == inv.pn){
-                        return i;
-                    }
-                }
-                return -1;
-            };
-
-            var index = volumeIndexOf(volume);
-            if( index == -1){
-                volumes.push(volume);
-                index = volumes.length - 1;
-            }
+            volumeMap.set(volume.pn, volume);
 
             var accessInfo = {
-                volumeIndex : index,
+                volumePn : volume.pn,
                 userPn : req.session.user.pn
             };
 
@@ -55,4 +40,4 @@ router.get('/volumepn/:pn', function(req, res) {
 });
 
 module.exports = router;
-module.exports.volumes = volumes;
+module.exports.volumeMap = volumeMap;
