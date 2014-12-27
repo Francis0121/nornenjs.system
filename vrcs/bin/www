@@ -29,7 +29,7 @@ var vrcsBufMap = new HashMap();
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
-        //console.log('byte stream connect attempt ' + client.id);
+        console.log('byte stream connect attempt ' + client.id);
         var cudaInterval = function () {
             // TODO selection png or jpeg ( make this part function)
             var launchCuda = vrcsCudaMap.get(client.id);
@@ -99,7 +99,7 @@ bs.on('connection', function(client){
                     vrcsCudaMap.set(client.id, launchCuda);
                     vrcsBufMap.set(client.id, []);
                 }
-                //console.log('connect byte stream ' + client.id + ' volume use ' + use);
+                console.log('connect byte stream ' + client.id + ' volume use ' + use);
 
             }else if(type == 2){
                 var sum = part[0].readInt32LE(4);
@@ -129,7 +129,7 @@ bs.on('connection', function(client){
     });
 
     client.on('close', function(stream, meta){
-        //console.log('close byte stream connection ' + client.id);
+        console.log('close byte stream connection ' + client.id);
         var obj = streamMap.get(client.id);
         if(obj != undefined) {
             clearInterval(obj.cudaInterval);
@@ -137,7 +137,7 @@ bs.on('connection', function(client){
             streamMap.remove(client.id);
 
             var use = useMap.get(obj.volumePn) - 1;
-            //console.log('do remove ' + client.id + ' volume use ' + use);
+            console.log('do remove ' + client.id + ' volume use ' + use);
             if(use == 0){
                 app.volumeMap.remove(obj.volumePn);
                 useMap.remove(obj.volumePn);
@@ -149,7 +149,7 @@ bs.on('connection', function(client){
         if(launchCuda != undefined){
             launchCuda.finish();
             vrcsCudaMap.remove(client.id);
-            //console.log('do remove');
+            console.log('do destory and free memory');
         }
     });
 
