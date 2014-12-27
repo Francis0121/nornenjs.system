@@ -57,7 +57,9 @@ bs.on('connection', function(client){
                 rendering_type : buffer.readFloatLE(12),
                 brightness : buffer.readFloatLE(16),
                 density : buffer.readFloatLE(20),
-                transferScale : buffer.readFloatLE(24)
+                transferScale : buffer.readFloatLE(24),
+                positionX : buffer.readFloatLE(28),
+                positionY : buffer.readFloatLE(32)
             };
             //console.log(obj);
             return obj;

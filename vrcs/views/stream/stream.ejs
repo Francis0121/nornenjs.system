@@ -25,6 +25,7 @@
         <div class="content_wrap">
             <div id="view_port" class="stream_wrap">
                 <img src=""/>
+                <div class="view_port_fake"></div>
             </div>
 
             <div class="left_option_wrap">
@@ -127,12 +128,14 @@
         rendering_type : 0,
         brightness : 1.0,
         density : 0.05,
-        transferScale : 1.0
+        transferScale : 1.0,
+        positionX : 0,
+        positionY : 0
     };
     var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
 
     var makeBuffer = function(){
-        var buffer = new ArrayBuffer(28);
+        var buffer = new ArrayBuffer(36);
         var x = new Float32Array(buffer);
         x[0] = send_option.request_type;
         x[1] = send_option.volumePn;
@@ -141,6 +144,8 @@
         x[4] = send_option.brightness;
         x[5] = send_option.density;
         x[6] = send_option.transferScale;
+        x[7] = send_option.positionX;
+        x[8] = send_option.positionY;
         return buffer;
     };
 
@@ -196,13 +201,6 @@
             client.send(makeBuffer());
         });
 
-    });
-
-</script>
-
-<script type="text/javascript">
-
-    $(function(){
         $('#scale').each(function() {
             $( this ).empty().slider({
                 range: 'min',
@@ -247,6 +245,25 @@
                 }
             });
         });
+
+        var mouseflag = false;
+        $('#view_port').on('mousedown', function(event){
+            mouseflag = true;
+        });
+
+        $('#view_port').on('mousemove', function(event){
+            if(mouseflag){
+                $('.debug_wrap').append('<p>'+event.pageX + ", " + event.pageY+'</p>');
+                send_option.request_type = REQUEST_TYPE.CHANGE;
+                send_option.positionX = event.pageX;
+                send_option.positionY = event.pageY;
+                client.send(makeBuffer());
+            }
+        });
+
+        $('#view_port').on('mouseup', function(event){
+            mouseflag = false;
+        })
     });
 
 </script>
