@@ -33,7 +33,15 @@ bs.on('connection', function(client){
         var cudaInterval = function () {
             // TODO selection png or jpeg ( make this part function)
             var launchCuda = vrcsCudaMap.get(client.id);
+            if(launchCuda == undefined){
+                return;
+            }
+
             var stack = vrcsBufMap.get(client.id);
+            if(stack == undefined){
+                return;
+            }
+
             launchCuda.start();
             stack.push(launchCuda.d_outputBuffer);
             launchCuda.end();
@@ -41,8 +49,11 @@ bs.on('connection', function(client){
 
         var stackInterval = function(){
             var stack = vrcsBufMap.get(client.id);
-            var buf = stack.shift();
+            if( stack == undefined){
+                return;
+            }
 
+            var buf = stack.shift();
             if(buf == undefined){
                 return;
             }
@@ -51,10 +62,10 @@ bs.on('connection', function(client){
             jpeg.encode(function (jpeg_img) {
                 try {
                     if(client._socket._socket == undefined){
-                        console.log('INFO: Client already disconnected');
-                        return;
+                        console.log('INFO: Client already disconnected ', client.id);
+                    }else{
+                        client.send(jpeg_img);
                     }
-                    client.send(jpeg_img);
                 }catch(err){
                     console.log(err);
                 }
@@ -147,9 +158,10 @@ bs.on('connection', function(client){
         }
         var launchCuda = vrcsCudaMap.get(client.id);
         if(launchCuda != undefined){
-            launchCuda.finish();
+            //launchCuda.finish();
             vrcsCudaMap.remove(client.id);
-            console.log('do destory and free memory');
+            vrcsBufMap.remove(client.id);
+            console.log('do destory and free memory '+ client.id);
         }
     });
 
