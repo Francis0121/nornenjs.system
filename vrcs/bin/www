@@ -18,6 +18,8 @@ var bs = BinaryServer({server : server}); // Start BinaryJs server
 var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
+var CudaRender = require('../cuda/cuda_render').CudaRender;
+
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
@@ -32,8 +34,8 @@ bs.on('connection', function(client){
         console.log('byte stream connect attempt ' + client.id);
         var cudaInterval = function () {
             // TODO selection png or jpeg ( make this part function)
-            var launchCuda = vrcsCudaMap.get(client.id);
-            if(launchCuda == undefined){
+            var cudaRender = vrcsCudaMap.get(client.id);
+            if(cudaRender == undefined){
                 return;
             }
 
@@ -42,11 +44,11 @@ bs.on('connection', function(client){
                 return;
             }
             var hrstart = process.hrtime();
-            launchCuda.start();
-            stack.push(launchCuda.d_outputBuffer);
-            launchCuda.end();
+            cudaRender.start();
+            stack.push(cudaRender.d_outputBuffer);
+            cudaRender.end();
             hrend = process.hrtime(hrstart);
-            //console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1]/1000000);
+            //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
         };
 
         var stackInterval = function(){
@@ -115,15 +117,13 @@ bs.on('connection', function(client){
                         stackInterval : undefined,
                         frame: 3 };
 
-                    var launchCuda = require('../cuda/vrcs_cuda');
-                    launchCuda.type = 0;
-                    launchCuda.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.savename;
-                    launchCuda.init();
+                    var cudaRender = new CudaRender(0, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.savename);
+                    cudaRender.init();
 
                     obj.cudaInterval = setInterval(cudaInterval, 10);
                     obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
                     streamMap.set(client.id, obj);
-                    vrcsCudaMap.set(client.id, launchCuda);
+                    vrcsCudaMap.set(client.id, cudaRender);
                     vrcsBufMap.set(client.id, []);
                 }
                 console.log('connect byte stream ' + client.id + ' volume use ' + use);
@@ -149,8 +149,11 @@ bs.on('connection', function(client){
                 streamMap.set(client.id, obj);
             }else if(param.request_type == 3){
                 console.log(param);
-                var launchCuda = vrcsCudaMap.get(client.id);
-                launchCuda.type = param.rendering_type;
+                var cudaRender = vrcsCudaMap.get(client.id);
+                cudaRender.type = param.rendering_type;
+                cudaRender.options.density = param.density;
+                cudaRender.options.brightness = param.brightness;
+                cudaRender.options.transferScale = param.transferScale;
                 vrcsBufMap.set(client.id, []);
             }
         });
@@ -177,9 +180,9 @@ bs.on('connection', function(client){
                 useMap.set(obj.volumePn, use);
             }
         }
-        var launchCuda = vrcsCudaMap.get(client.id);
-        if(launchCuda != undefined){
-            //launchCuda.finish();
+        var cudaRender = vrcsCudaMap.get(client.id);
+        if(cudaRender != undefined){
+            cudaRender.finish();
             vrcsCudaMap.remove(client.id);
             vrcsBufMap.remove(client.id);
             console.log('do destory and free memory '+ client.id);
