@@ -41,10 +41,12 @@ bs.on('connection', function(client){
             if(stack == undefined){
                 return;
             }
-
+            var hrstart = process.hrtime();
             launchCuda.start();
             stack.push(launchCuda.d_outputBuffer);
             launchCuda.end();
+            hrend = process.hrtime(hrstart);
+            console.info("Execution time (hr): %ds %dms", hrend[0], hrend[1]/1000000);
         };
 
         var stackInterval = function(){
@@ -58,7 +60,6 @@ bs.on('connection', function(client){
                 return;
             }
 
-            var jpeg = new Jpeg(buf, 512, 512, 'rgba');
             jpeg.encode(function (jpeg_img) {
                 try {
                     if(client._socket._socket == undefined){

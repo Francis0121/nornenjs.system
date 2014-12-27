@@ -4,7 +4,7 @@ var Buffer = require('buffer').Buffer;
 var cu = require('./cuda');
 var mat4 = require('./matrix_mat4');
 var vec3 = require('./matrix_vec3');
-
+var sys = require('sys');
 var rendering_cuda = {
     default : 0,
     mip : 1,
@@ -43,6 +43,7 @@ var vrcs_cuda = {
     },
 
     start : function(){
+
         var _opt = this.options;
 
         // ~ 3D volume array
@@ -55,6 +56,7 @@ var vrcs_cuda = {
 
         // ~ rendering
         this.render();
+
     },
 
     makeViewVector : function(){
@@ -62,7 +64,7 @@ var vrcs_cuda = {
         var model_matrix = mat4.create();
 
         vec = vec3.fromValues(-1.0, 0.0, 0.0);
-        mat4.rotate(model_matrix, model_matrix, ((270.0 ) * 3.14159265 / 180.0), vec);
+        mat4.rotate(model_matrix, model_matrix, ((270.0) * 3.14159265 / 180.0), vec);
 
         vec = vec3.fromValues(0.0, 1.0, 0.0);
         mat4.rotate(model_matrix, model_matrix,( 0.0* 3.14159265 / 180.0), vec);
