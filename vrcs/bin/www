@@ -24,27 +24,41 @@ var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 var streamMap = new HashMap();
 var useMap = new HashMap();
 var vrcsCudaMap = new HashMap();
+var vrcsBufMap = new HashMap();
 
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
-        console.log('byte stream connect attempt ' + client.id);
-        var sender = function () {
+        //console.log('byte stream connect attempt ' + client.id);
+        var cudaInterval = function () {
             // TODO selection png or jpeg ( make this part function)
-            var vrcs_cuda = vrcsCudaMap.get(client.id);
-            vrcs_cuda.start();
-            var jpeg = new Jpeg(vrcs_cuda.d_outputBuffer, 512, 512, 'rgba');
-            jpeg.encode(function (jpeg_img) {
-                vrcs_cuda.end();
-                client.send(jpeg_img);
-            });
+            var launchCuda = vrcsCudaMap.get(client.id);
+            var stack = vrcsBufMap.get(client.id);
+            launchCuda.start();
+            stack.push(launchCuda.d_outputBuffer);
+            launchCuda.end();
+        };
 
-            /*
-             var png = new Png(queue[0], 512, 512, 'rgba');
-             png.encode(function(png_image){
-             client.send(png_image);
-             });
-             */
+        var stackInterval = function(){
+            var stack = vrcsBufMap.get(client.id);
+            var buf = stack.shift();
+
+            if(buf == undefined){
+                return;
+            }
+
+            var jpeg = new Jpeg(buf, 512, 512, 'rgba');
+            jpeg.encode(function (jpeg_img) {
+                try {
+                    if(client._socket._socket == undefined){
+                        console.log('INFO: Client already disconnected');
+                        return;
+                    }
+                    client.send(jpeg_img);
+                }catch(err){
+                    console.log(err);
+                }
+            });
         };
 
         var part = [];
@@ -59,10 +73,10 @@ bs.on('connection', function(client){
                 var volumePn = part[0].readInt32LE(4);
                 var volume = app.volumeMap.get(volumePn);
 
-                debug(part[0], type, volumePn);
+                //console.log(part[0], type, volumePn);
 
                 if (volume == undefined) {
-                    debug('volume index not exist');
+                    //console.log('volume index not exist');
                     return;
                 } else {
                     var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
@@ -70,19 +84,22 @@ bs.on('connection', function(client){
 
                     var obj = {
                         volumePn: volumePn,
-                        interval: undefined,
+                        cudaInterval: undefined,
+                        stackInterval : undefined,
                         frame: 3 };
 
-                    var vrcs_cuda = require('../cuda/vrcs_cuda');
-                    vrcs_cuda.type = 0;
-                    vrcs_cuda.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.savename;
-                    vrcs_cuda.init();
+                    var launchCuda = require('../cuda/vrcs_cuda');
+                    launchCuda.type = 0;
+                    launchCuda.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.savename;
+                    launchCuda.init();
 
-                    obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
+                    obj.cudaInterval = setInterval(cudaInterval, 10);
+                    obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
                     streamMap.set(client.id, obj);
-                    vrcsCudaMap.set(client.id, vrcs_cuda);
+                    vrcsCudaMap.set(client.id, launchCuda);
+                    vrcsBufMap.set(client.id, []);
                 }
-                debug('connect byte stream ' + client.id + ' volume use ' + use);
+                //console.log('connect byte stream ' + client.id + ' volume use ' + use);
 
             }else if(type == 2){
                 var sum = part[0].readInt32LE(4);
@@ -90,34 +107,37 @@ bs.on('connection', function(client){
                 var time = frameList[obj.frame];
 
                 if( time - 5 > sum / 3  ){
-                    //debug('decrease frame');
+                    //console.log('decrease frame');
                     obj.frame = obj.frame + 1 == frameList.length ? obj.frame : obj.frame + 1;
                 }else if( time + 1 < sum /3 ){
-                    //debug('increase frame');
+                    //console.log('increase frame');
                     obj.frame = obj.frame-1 == -1 ? obj.frame : obj.frame - 1 ;
                 }else{
-                    //debug('maintain frame');
+                    //console.log('maintain frame');
                 }
-                clearInterval(obj.interval);
-                obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
+                //clearInterval(obj.cudaInterval);
+                clearInterval(obj.stackInterval);
+                //obj.cudaInterval = setInterval(cudaInterval, 1000 / frameList[obj.frame] );
+                obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
                 streamMap.set(client.id, obj);
             }
         });
 
         stream.on('error', function(error){
-            debug(error);
+            //console.log(error);
         });
     });
 
     client.on('close', function(stream, meta){
-        debug('close byte stream connection ' + client.id);
+        //console.log('close byte stream connection ' + client.id);
         var obj = streamMap.get(client.id);
         if(obj != undefined) {
-            clearInterval(obj.interval);
+            clearInterval(obj.cudaInterval);
+            clearInterval(obj.stackInterval);
             streamMap.remove(client.id);
 
             var use = useMap.get(obj.volumePn) - 1;
-            debug('do remove ' + client.id + ' volume use ' + use);
+            //console.log('do remove ' + client.id + ' volume use ' + use);
             if(use == 0){
                 app.volumeMap.remove(obj.volumePn);
                 useMap.remove(obj.volumePn);
@@ -125,18 +145,18 @@ bs.on('connection', function(client){
                 useMap.set(obj.volumePn, use);
             }
         }
-        var vrcs_cuda = vrcsCudaMap.get(client.id);
-        if(vrcs_cuda != undefined){
-            vrcs_cuda.finish();
+        var launchCuda = vrcsCudaMap.get(client.id);
+        if(launchCuda != undefined){
+            launchCuda.finish();
             vrcsCudaMap.remove(client.id);
-            debug('do remove');
+            //console.log('do remove');
         }
     });
 
 });
 
 bs.on('error', function(error){
-    debug(error);
+    //console.log(error);
 });
 
 //#######################################
@@ -167,14 +187,14 @@ io.sockets.on('connection', function(socket){
             message.error = 'Visitor limit';
         }
 
-        debug('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
+        //console.log('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
         socket.emit('message', message);
     });
 
     socket.on('disconnect', function () {
         streamUserCount--;
         var clientId = socket_queue.shift();
-        debug('disconnect total count[ ' + streamUserCount + ' ] , sockey id : ' + clientId);
+        //console.log('disconnect total count[ ' + streamUserCount + ' ] , sockey id : ' + clientId);
         if(clientId != undefined){
             socket.broadcast.to(clientId).emit('user_disconnected');
         }
