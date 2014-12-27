@@ -19,6 +19,7 @@ var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
 var CudaRender = require('../cuda/cuda_render').CudaRender;
+//var CudaRender = require('../cuda/cuda_render2');
 
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
@@ -116,6 +117,11 @@ bs.on('connection', function(client){
                         cudaInterval: undefined,
                         stackInterval : undefined,
                         frame: 3 };
+
+                    //var cudaRender = new CudaRender();
+                    //cudaRender.type = 0;
+                    //cudaRender.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name;
+                    //cudaRender.init();
 
                     var cudaRender = new CudaRender(0, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name);
                     cudaRender.init();
