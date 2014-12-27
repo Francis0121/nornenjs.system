@@ -5,103 +5,11 @@
     <title>Volume Rendering Cloud System</title>
     <link rel='stylesheet' href='/stylesheets/default.css' />
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
     <script src='http://cdn.binaryjs.com/0/binary.js'></script>
     <script src='http://112.108.40.165:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
-    <script type="text/javascript">
-
-        var socket = io.connect('http://112.108.40.165:3000', { reconnection : false }); // Socket.io
-        var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
-        var accessInfo = {
-            volumePn : '<%=accessInfo.volumePn%>',
-            userPn : '<%=accessInfo.userPn%>'
-        };
-
-        // ~ Socket IO
-        var joinSocket = function(){
-            console.log('Request join socket')
-            socket.emit('join');
-        };
-
-        joinSocket();
-
-        var success = false;
-        socket.on('message', function(data){
-            $('.debug_wrap').append('<p>connect byte stream</p>');
-            if(!data.success){
-                $('.debug_wrap').append('<p>'+data.error+'</p>');
-                return;
-            }
-            // ~ success request byte stream
-            $('.default_error').html('');
-            success = true;
-            requestStream();
-        });
-
-        socket.on('user_disconnected', function(data){
-            joinSocket();
-        });
-
-        // ~ Byte stream
-        var requestStream = function(){
-            var buffer = new ArrayBuffer(16);
-            var x = new Int32Array(buffer);
-            x[0] = 1;
-            x[1] = accessInfo.volumePn;
-            $('.debug_wrap').append('<p>' +x[2]  + '</p>');
-            client.send(buffer);
-        };
-
-        var second = 0;
-        var count = 0;
-        var sum = 0;
-        var debugInterval = undefined;
-
-        var adaptiveByteStream = function(){
-            var buffer = new ArrayBuffer(16);
-            var x = new Int32Array(buffer);
-            x[0] = 2;
-            x[1] = sum;
-            $('.debug_wrap').append('<p>' + sum  + '</p>');
-            client.send(buffer);
-        };
-
-        client.on('stream', function(stream, meta){
-            // collect stream data
-            var parts = [];
-            stream.on('data', function(data){
-                parts.push(data);
-            });
-
-            // when finished, set it as the background image
-            stream.on('end', function(){
-                var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                $('#view_port>img').attr('src', url);
-                count++;
-                if(debugInterval == undefined){
-                    debugInterval = setInterval(debug, 1000);
-                }
-            });
-        });
-
-        // ~ TODO debug 재정의
-        var debug = function(){
-            if(count == 0){
-                clearInterval(debugInterval);
-                debugInterval = undefined;
-            }
-
-            second+=1;
-            sum+=count;
-            $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
-            if(second%3 == 0 && success) {
-                adaptiveByteStream();
-                sum = 0;
-            }
-            count = 0;
-        };
-
-    </script>
+    <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
 </head>
 <body>
 
@@ -114,8 +22,43 @@
         <a href="/" class="default_a">Main</a>
         <a href="/volume" class="default_a">Volume List</a>
 
-        <div id="view_port" class="default_stream">
-            <img src="" style="width: 512px; height: 512px;"/>
+        <div class="content_wrap">
+            <div id="view_port" class="stream_wrap">
+                <img src=""/>
+            </div>
+
+            <div class="left_option_wrap">
+                <div class="option_type">
+                    <h6>Select Type</h6>
+
+                    <label for="option_type_vol" class="option_type_label">VOL</label>
+                    <input type="radio" value="0" id="option_type_vol" name="option_type_value" class="option_type_value" checked="checked">
+
+                    <label for="option_type_mri" class="option_type_label">MRI</label>
+                    <input type="radio" value="0" id="option_type_mri" name="option_type_value" class="option_type_value">
+
+                    <label for="option_type_mip"class="option_type_label">MIP</label>
+                    <input type="radio" value="0" id="option_type_mip" name="option_type_value" class="option_type_value">
+                </div>
+
+                <div class="left_option_horizontal">
+                    <h6>Scale</h6>
+                    <span id="scale" class="slider_vertical_len"></span>
+                </div>
+
+                <div class="left_option_horizontal">
+                    <h6>Brightness</h6>
+                    <span id="brightness" class="slider_vertical_len"></span>
+                </div>
+
+            </div>
+
+            <div class="down_option_wrap">
+                <div class="down_option_vertical">
+                    <h6>OTF</h6>
+                    <span id="otf" class="slider_horizontal_len"></span>
+                </div>
+            </div>
         </div>
 
         <div class="debug_wrap">
@@ -139,6 +82,148 @@
     <span>Copyright(c) Teriusbin.lee Francis.kim All rights reserved</span>
 </footer>
 
+<script type="text/javascript">
+    var accessInfo = {
+        volumePn : '<%=accessInfo.volumePn%>',
+        userPn : '<%=accessInfo.userPn%>'
+    };
+
+    // ~ Socket IO
+    var socket = io.connect('http://112.108.40.165:3000', { reconnection : false }); // Socket.io
+    var success = false;
+    var joinSocket = function(){
+        socket.emit('join');
+    };
+
+    joinSocket();
+
+    socket.on('message', function(data){
+        $('.debug_wrap').append('<p>connect byte stream</p>');
+        if(!data.success){
+            $('.debug_wrap').append('<p>'+data.error+'</p>');
+            return;
+        }
+        // ~ success request byte stream
+        $('.default_error').html('');
+        success = true;
+        requestStream();
+    });
+
+    socket.on('user_disconnected', function(data){
+        joinSocket();
+    });
+
+    // ~ Byte stream
+    var second = 0;
+    var count = 0;
+    var sum = 0;
+    var debugInterval = undefined;
+
+    var REQUEST_TYPE = { START : 1, ADAPTIVE : 2 };
+    var send_option = {
+        request_type : REQUEST_TYPE.START,
+        volumePn : accessInfo.volumePn,
+        frame : 0,
+        rendering_type : 0,
+        brightness : 1.0,
+        density : 0.05,
+        transferScale : 1.0
+    };
+    var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
+
+    var makeBuffer = function(){
+        var buffer = new ArrayBuffer(28);
+        var x = new Float32Array(buffer);
+        x[0] = send_option.request_type;
+        x[1] = send_option.volumePn;
+        x[2] = send_option.frame;
+        x[3] = send_option.rendering_type;
+        x[4] = send_option.brightness;
+        x[6] = send_option.density;
+        x[7] = send_option.transferScale;
+        return buffer;
+    };
+
+    var requestStream = function(){
+        send_option.request_type = REQUEST_TYPE.START;
+        client.send(makeBuffer());
+    };
+
+    var adaptiveByteStream = function(){
+        send_option.request_type = REQUEST_TYPE.ADAPTIVE;
+        send_option.frame = sum;
+        client.send(makeBuffer());
+    };
+
+    client.on('stream', function(stream, meta){
+        var parts = [];
+
+        stream.on('data', function(data){
+            parts.push(data);
+        });
+
+        stream.on('end', function(){
+            var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
+            $('#view_port>img').attr('src', url);
+            count++;
+            if(debugInterval == undefined){
+                debugInterval = setInterval(debug, 1000);
+            }
+        });
+    });
+
+    var debug = function(){
+        if(count == 0){
+            clearInterval(debugInterval);
+            debugInterval = undefined;
+        }
+
+        second+=1;
+        sum+=count;
+        $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
+        if(second%3 == 0 && success) {
+            adaptiveByteStream();
+            sum = 0;
+        }
+        count = 0;
+    };
+
+</script>
+
+<script type="text/javascript">
+
+    $(function(){
+        $('#scale').each(function() {
+            // read initial values from markup and remove that
+            $( this ).empty().slider({
+                range: "min",
+                animate: true,
+                orientation: "vertical"
+            });
+        });
+
+        $('#brightness').each(function() {
+            // read initial values from markup and remove that
+            $( this ).empty().slider({
+                value: 0,
+                range: "min",
+                animate: true,
+                orientation: "vertical"
+            });
+        });
+
+        $('#otf').each(function() {
+            // read initial values from markup and remove that
+            $( this ).empty().slider({
+                value: 0,
+                range: "min",
+                animate: true,
+                orientation: "horizontal"
+            });
+        });
+    });
+
+</script>
 
 </body>
 </html>
