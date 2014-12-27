@@ -109,6 +109,8 @@ bs.on('connection', function(client){
                 clearInterval(obj.interval);
                 obj.interval = setInterval(sender, 1000 / frameList[obj.frame] );
                 streamMap.set(client.id, obj);
+            }else if(param.request_type == 3){
+                console.log(param);
             }
         });
 

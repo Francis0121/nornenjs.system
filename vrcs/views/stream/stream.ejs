@@ -35,10 +35,10 @@
                     <input type="radio" value="0" id="option_type_vol" name="option_type_value" class="option_type_value" checked="checked">
 
                     <label for="option_type_mri" class="option_type_label">MRI</label>
-                    <input type="radio" value="0" id="option_type_mri" name="option_type_value" class="option_type_value">
+                    <input type="radio" value="1" id="option_type_mri" name="option_type_value" class="option_type_value">
 
                     <label for="option_type_mip"class="option_type_label">MIP</label>
-                    <input type="radio" value="0" id="option_type_mip" name="option_type_value" class="option_type_value">
+                    <input type="radio" value="2" id="option_type_mip" name="option_type_value" class="option_type_value">
                 </div>
 
                 <div class="left_option_horizontal">
@@ -119,7 +119,7 @@
     var sum = 0;
     var debugInterval = undefined;
 
-    var REQUEST_TYPE = { START : 1, ADAPTIVE : 2 };
+    var REQUEST_TYPE = { START : 1, ADAPTIVE : 2, CHANGE : 3 };
     var send_option = {
         request_type : REQUEST_TYPE.START,
         volumePn : accessInfo.volumePn,
@@ -139,8 +139,8 @@
         x[2] = send_option.frame;
         x[3] = send_option.rendering_type;
         x[4] = send_option.brightness;
-        x[6] = send_option.density;
-        x[7] = send_option.transferScale;
+        x[5] = send_option.density;
+        x[6] = send_option.transferScale;
         return buffer;
     };
 
@@ -188,37 +188,63 @@
         count = 0;
     };
 
+    $(function(){
+
+        $('input.option_type_value:radio').change(function(){
+            send_option.request_type = REQUEST_TYPE.CHANGE;
+            send_option.rendering_type = $(this).val();
+            client.send(makeBuffer());
+        });
+
+    });
+
 </script>
 
 <script type="text/javascript">
 
     $(function(){
         $('#scale').each(function() {
-            // read initial values from markup and remove that
             $( this ).empty().slider({
-                range: "min",
+                range: 'min',
+                min: 0,
+                max: 10,
                 animate: true,
-                orientation: "vertical"
+                orientation: 'vertical',
+                slide: function( event, ui ) {
+                    send_option.request_type = REQUEST_TYPE.CHANGE;
+                    send_option.transferScale = ui.value/10.0;
+                    client.send(makeBuffer());
+                }
             });
         });
 
         $('#brightness').each(function() {
-            // read initial values from markup and remove that
             $( this ).empty().slider({
-                value: 0,
-                range: "min",
+                range: 'min',
+                min: 0,
+                max: 10,
                 animate: true,
-                orientation: "vertical"
+                orientation: 'vertical',
+                slide: function( event, ui ) {
+                    send_option.request_type = REQUEST_TYPE.CHANGE;
+                    send_option.brightness = ui.value/10.0;
+                    client.send(makeBuffer());
+                }
             });
         });
 
         $('#otf').each(function() {
-            // read initial values from markup and remove that
             $( this ).empty().slider({
-                value: 0,
-                range: "min",
+                range: 'min',
+                min: 0,
+                max: 10,
                 animate: true,
-                orientation: "horizontal"
+                orientation: 'horizontal',
+                slide: function( event, ui ) {
+                    send_option.request_type = REQUEST_TYPE.CHANGE;
+                    send_option.density = ui.value/10.0;
+                    client.send(makeBuffer());
+                }
             });
         });
     });
