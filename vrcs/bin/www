@@ -117,9 +117,9 @@ bs.on('connection', function(client){
                         stackInterval : undefined,
                         frame: 3 };
 
-                    var cudaRender = new CudaRender(0, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.savename);
+                    var cudaRender = new CudaRender(0, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name);
                     cudaRender.init();
-
+                    console.log('CudaRender', cudaRender);
                     obj.cudaInterval = setInterval(cudaInterval, 10);
                     obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
                     streamMap.set(client.id, obj);
