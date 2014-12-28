@@ -46,7 +46,9 @@ bs.on('connection', function(client){
             }
             var hrstart = process.hrtime();
             cudaRender.start();
-            stack.push(cudaRender.d_outputBuffer);
+            //stack.push(cudaRender.d_outputBuffer);
+            var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
+            client.send(jpeg.encodeSync());
             cudaRender.end();
             hrend = process.hrtime(hrstart);
             //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
@@ -63,18 +65,18 @@ bs.on('connection', function(client){
                 return;
             }
 
-            var jpeg = new Jpeg(buf, 512, 512, 'rgba');
-            jpeg.encode(function (jpeg_img) {
-                try {
-                    if(client._socket._socket == undefined){
-                        console.log('INFO: Client already disconnected ', client.id);
-                    }else{
-                        client.send(jpeg_img);
-                    }
-                }catch(err){
-                    console.log(err);
-                }
-            });
+            //var jpeg = new Jpeg(buf, 512, 512, 'rgba');
+            //jpeg.encode(function (jpeg_img) {
+            //    try {
+            //        if(client._socket._socket == undefined){
+            //            console.log('INFO: Client already disconnected ', client.id);
+            //        }else{
+            //            client.send(jpeg_img);
+            //        }
+            //    }catch(err){
+            //        console.log(err);
+            //    }
+            //});
         };
 
         var makeObject = function(buffer){
@@ -84,12 +86,12 @@ bs.on('connection', function(client){
                 frame : buffer.readFloatLE(8),
                 rendering_type : buffer.readFloatLE(12),
                 brightness : buffer.readFloatLE(16),
-                density : buffer.readFloatLE(20),
-                transferScale : buffer.readFloatLE(24),
+                positionZ : buffer.readFloatLE(20),
+                transferOffset : buffer.readFloatLE(24),
                 positionX : buffer.readFloatLE(28),
                 positionY : buffer.readFloatLE(32)
             };
-            //console.log(obj);
+            console.log(obj);
             return obj;
         };
 
@@ -116,7 +118,7 @@ bs.on('connection', function(client){
                         volumePn: volumePn,
                         cudaInterval: undefined,
                         stackInterval : undefined,
-                        frame: 3 };
+                        frame: 0 };
 
                     //var cudaRender = new CudaRender();
                     //cudaRender.type = 0;
@@ -157,9 +159,9 @@ bs.on('connection', function(client){
                 console.log(param);
                 var cudaRender = vrcsCudaMap.get(client.id);
                 cudaRender.type = param.rendering_type;
-                cudaRender.options.density = param.density;
+                cudaRender.options.positionZ = param.positionZ;
                 cudaRender.options.brightness = param.brightness;
-                cudaRender.options.transferScale = param.transferScale;
+                cudaRender.options.transferOffset = param.transferOffset;
                 vrcsBufMap.set(client.id, []);
             }
         });

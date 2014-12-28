@@ -128,8 +128,8 @@
         frame : 0,
         rendering_type : 0,
         brightness : 1.0,
-        density : 0.05,
-        transferScale : 1.0,
+        positionZ : 3.0,
+        transferOffset : 0.0,
         positionX : 0,
         positionY : 0
     };
@@ -143,8 +143,8 @@
         x[2] = send_option.frame;
         x[3] = send_option.rendering_type;
         x[4] = send_option.brightness;
-        x[5] = send_option.density;
-        x[6] = send_option.transferScale;
+        x[5] = send_option.positionZ;
+        x[6] = send_option.transferOffset;
         x[7] = send_option.positionX;
         x[8] = send_option.positionY;
         return buffer;
@@ -206,12 +206,13 @@
             $( this ).empty().slider({
                 range: 'min',
                 min: 0,
-                max: 10,
+                value : 3000,
+                max: 10000,
                 animate: true,
                 orientation: 'vertical',
                 slide: function( event, ui ) {
                     send_option.request_type = REQUEST_TYPE.CHANGE;
-                    send_option.transferScale = ui.value/10.0;
+                    send_option.positionZ = ui.value/1000.0;
                     client.send(makeBuffer());
                 }
             });
@@ -221,12 +222,12 @@
             $( this ).empty().slider({
                 range: 'min',
                 min: 0,
-                max: 10,
+                max: 200,
                 animate: true,
                 orientation: 'vertical',
                 slide: function( event, ui ) {
                     send_option.request_type = REQUEST_TYPE.CHANGE;
-                    send_option.brightness = ui.value/10.0;
+                    send_option.brightness = ui.value/100.0;
                     client.send(makeBuffer());
                 }
             });
@@ -235,13 +236,14 @@
         $('#otf').each(function() {
             $( this ).empty().slider({
                 range: 'min',
-                min: 0,
-                max: 10,
+                min: 5000,
+                value: 10000,
+                max: 15000,
                 animate: true,
                 orientation: 'horizontal',
                 slide: function( event, ui ) {
                     send_option.request_type = REQUEST_TYPE.CHANGE;
-                    send_option.density = ui.value/10.0;
+                    send_option.transferOffset = (ui.value-10000)/10000.0;
                     client.send(makeBuffer());
                 }
             });
