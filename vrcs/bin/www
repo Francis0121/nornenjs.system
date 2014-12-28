@@ -88,8 +88,8 @@ bs.on('connection', function(client){
                 brightness : buffer.readFloatLE(16),
                 positionZ : buffer.readFloatLE(20),
                 transferOffset : buffer.readFloatLE(24),
-                positionX : buffer.readFloatLE(28),
-                positionY : buffer.readFloatLE(32)
+                rotationX : buffer.readFloatLE(28),
+                rotationY : buffer.readFloatLE(32)
             };
             console.log(obj);
             return obj;
@@ -162,6 +162,9 @@ bs.on('connection', function(client){
                 cudaRender.options.positionZ = param.positionZ;
                 cudaRender.options.brightness = param.brightness;
                 cudaRender.options.transferOffset = param.transferOffset;
+
+                cudaRender.options.rotationX = param.rotationX;
+                cudaRender.options.rotationY = param.rotationY;
                 vrcsBufMap.set(client.id, []);
             }
         });

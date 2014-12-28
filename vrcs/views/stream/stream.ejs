@@ -130,8 +130,8 @@
         brightness : 1.0,
         positionZ : 3.0,
         transferOffset : 0.0,
-        positionX : 0,
-        positionY : 0
+        rotationX : 0,
+        rotationY : 0
     };
     var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
 
@@ -145,8 +145,8 @@
         x[4] = send_option.brightness;
         x[5] = send_option.positionZ;
         x[6] = send_option.transferOffset;
-        x[7] = send_option.positionX;
-        x[8] = send_option.positionY;
+        x[7] = send_option.rotationX;
+        x[8] = send_option.rotationY;
         return buffer;
     };
 
@@ -250,16 +250,24 @@
         });
 
         var mouseflag = false;
+        var beforeX, beforeY;
         $('#view_port').on('mousedown', function(event){
             mouseflag = true;
+            beforeX = event.pageX;
+            beforeY = event.pageY;
         });
 
         $('#view_port').on('mousemove', function(event){
             if(mouseflag){
                 $('.debug_wrap').append('<p>'+event.pageX + ", " + event.pageY+'</p>');
                 send_option.request_type = REQUEST_TYPE.CHANGE;
-                send_option.positionX = event.pageX;
-                send_option.positionY = event.pageY;
+
+                send_option.rotationX += (event.pageX - beforeX)/5.0;
+                send_option.rotationY += (event.pageY - beforeY)/5.0;
+
+                beforeX = event.pageX;
+                beforeY = event.pageY;
+
                 client.send(makeBuffer());
             }
         });
