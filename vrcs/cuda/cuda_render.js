@@ -81,10 +81,10 @@ var vec3 = require('./matrix_vec3');
             var model_matrix = mat4.create();
 
             vec = vec3.fromValues(-1.0, 0.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix, ( (270.0 + _opt.rotationX) * 3.14159265 / 180.0), vec);
+            mat4.rotate(model_matrix, model_matrix, ( (270.0 + (_opt.rotationY * -1)) * 3.14159265 / 180.0), vec);
 
             vec = vec3.fromValues(0.0, 1.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix,( (0.0 + _opt.rotationY) * 3.14159265 / 180.0), vec);
+            mat4.rotate(model_matrix, model_matrix,( (0.0 + (_opt.rotationX*-1)) * 3.14159265 / 180.0), vec);
 
             vec = vec3.fromValues(0.0, 0.0, _opt.positionZ);
             mat4.translate(model_matrix, model_matrix,vec)
