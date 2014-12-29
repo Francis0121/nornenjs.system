@@ -7,7 +7,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
     <script src='http://cdn.binaryjs.com/0/binary.js'></script>
-    <script src='http://112.108.40.19:3000/socket.io/socket.io.js'></script>
+    <script src='http://112.108.40.165:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
     <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
 </head>
@@ -90,7 +90,7 @@
     };
 
     // ~ Socket IO
-    var socket = io.connect('http://112.108.40.19:3000', { reconnection : false }); // Socket.io
+    var socket = io.connect('http://112.108.40.165:3000', { reconnection : false }); // Socket.io
     var success = false;
     var joinSocket = function(){
         socket.emit('join');
