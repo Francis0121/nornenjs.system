@@ -11,6 +11,20 @@
 
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
     <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
+
+    <script>
+        $(function(){
+            $('#delete_password').bind('change', function(){
+                var value = $(this).val();
+                if(value != ''){
+                    $(this).addClass('delete_input_active');
+                } else{
+                    $(this).removeClass('delete_input_active');
+                }
+            });
+        });
+    </script>
+
 </head>
 <body>
 
@@ -21,10 +35,17 @@
                 <span class="mark">Symbol</span>
                 <a href="/">Home</a>
             </li>
+            <% if (user == undefined){ %>
             <li class="history">
                 <span class="mark">Nav</span>
                 <a href="/signin/join">Join</a>
             </li>
+            <% } else { %>
+            <li class="history">
+                <span class="mark">Nav</span>
+                <a href="/signin/join">Profile</a>
+            </li>
+            <% } %>
         </ul>
         <ul class="right">
             <li class="help">
@@ -58,8 +79,9 @@
     <div class="layout_section">
 
         <div class="join_content_wrap">
+
+            <% if (user == undefined){ %>
             <div class="join_content">
-                <% if (user == undefined){ %>
                 <!-- Sign up for volume render -->
                 <div class="left">
                     <p class="title">Volume Rendering Cloud System</p>
@@ -118,15 +140,27 @@
                         </ul>
                     </form>
                 </div>
-                <% } else { %>
-                <!-- Modify Information -->
+            </div>
+            <% } else { %>
+            <!-- Modify Information -->
+            <div class="modify_content">
+
+                <header>
+                    <ul>
+                        <li class="left">
+                            <span>empty</span>
+                            <h4>Profile</h4>
+                        </li>
+                    </ul>
+                </header>
+
                 <form name="user" action="/signin/join" method="post">
                     <input type="hidden" name="_method" value="update">
 
-                    <ul>
+                    <ul class="modify_form">
                         <li>
                             <label>Username</label>
-                            <span><%=user.username%></span>
+                            <input type="text" value="<%=user.username%>" readonly="readonly" class="readonly"/>
                         </li>
                         <li>
                             <label>Original Password</label>
@@ -142,22 +176,34 @@
                             <input id="confirmpw" name="confirmpw" type="password"/>
                         </li>
                         <% if(message.error != ''){%>
-                        <li class="form_error">
-                            <p class="bold"><%=message.error%></p>
+                        <li class="form_error large">
+                            <p><%=message.error%></p>
                         </li>
                         <% }%>
                         <% if(message.success != ''){%>
-                        <li class="form_success">
-                            <p class="bold"><%=message.success%></p>
+                        <li class="form_success large">
+                            <p><%=message.success%></p>
                         </li>
                         <% }%>
                         <li>
-                            <button type="submit">Modify Account</button>
+                            <button type="submit" class="changepw_btn">Change Password</button>
                         </li>
                     </ul>
                 </form>
-                <% } %>
+
+                <form name="user" action="/signin/join" method="post">
+                    <input type="hidden" name="_method" value="delete">
+                    <div class="delete_form">
+                        <p>
+                            All will be deleted. Deleted information please think carefully before recovery is not possible in any way haohni be deleted.
+                        </p>
+                        <button type="submit" class="delete_btn">Delete</button>
+                        <input id="delete_password" name="password" type="password" class="delete_input"/>
+                    </div>
+                </form>
+
             </div>
+            <% } %>
         </div>
 
     </div>

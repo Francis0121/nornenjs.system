@@ -94,6 +94,33 @@ body{ background: #231f20; }
 .join_btn:visited{ color: #fff; }
 .join_btn:hover{ background: #56cfca;}
 
+.modify_content{ }
+.modify_content{ width: 500px; margin: 20px auto 0 auto;}
+.modify_content>header{ width: 500px; float: left;}
+.modify_content>header>ul{ float: left; width: 100%; }
+.modify_content>header>ul>li{ float: left; width: 50%; }
+.modify_content>header li.left>span{ text-indent: -9999px; width: 5px; height: 20px; background: #42b9b4; margin-right: 8px; text-indent: -9999px; float: left;}
+.modify_content>header li.left>h4{ font-size: 87.5%; color: #fff; float: left; height: 20px; line-height: 20px;}
+
+.modify_form{ width: 500px; float: left; margin-top: 5px;}
+.modify_form>li{ width: 200px; float: left; margin: 10px 20px 0 0 ;}
+.modify_form>li.large{ width: 400px; text-align: left;}
+.modify_form>li>label{ font-size: 75%; color: #3d3d3d; width: 190px; display: block; text-align: left; padding: 5px; color: #fff;}
+.modify_form>li>input{ width: 186px; height: 20px; padding: 5px; border: 2px solid #e6e6e6; font-size: 87.5%; margin-top: 5px; }
+.modify_form>li>input.readonly{ color: #7e7e7e;}
+
+.changepw_btn{ font-size: 75%; color: #fff; width: 150px; height: 30px; border: 1px solid #2eb3ae; background: #42b9b4; text-align: center; line-height: 30px; cursor: pointer; }
+.changepw_btn:visited{ color: #fff; }
+.changepw_btn:hover{ background: #56cfca;}
+
+.delete_form{ width: 420px; float: left; margin-top: 40px;}
+.delete_form>p{ font-size: 75%; color: #fff; width: 400px; background: #370511; float: left; border: 1px solid #6c6c6c; padding: 10px; margin-bottom: 10px;}
+
+.delete_btn{ font-size: 75%; color: #fff; width: 100px; height: 30px; background: #c10f3a; text-align: center; line-height: 30px; cursor: pointer; border: 0px; margin-left: 1px;}
+.delete_input{ width: 180px; height: 16px; padding: 5px; font-size: 87.5%; margin-top: 5px; border: 2px solid #fff;background-image: url("../image/delete_input.png"); background-position: -1px -1px; }
+.delete_input:focus{ background-image: none;}
+.delete_input_active{ background-image: none !important;}
+
 /** volume data list */
 .list_content{ width: 500px; margin: 20px auto 0 auto;}
 .list_content>header{ width: 500px; float: left;}
@@ -182,6 +209,6 @@ body{ background: #231f20; }
 
 .option_axis{ display: none;}
 
-.slider_len{ float: left; width: 240px !important; margin: 10px 20px; }
-.slider_len .ui-slider-range{ background-color: #bee4e3 !important; background-image: none !important; }
-.slider_len .ui-slider-handle{ background-color: #42b9b4 !important; background-image: none !important; border: 0px !important;}
+.slider_len{ float: left; width: 240px !important; margin: 10px 20px; height: 10px !important; border: 1px solid #000;}
+.slider_len .ui-slider-range{ background-color: #bee4e3 !important; background-image: none !important; outline: 0px !important; }
+.slider_len .ui-slider-handle{ background-color: #42b9b4 !important; background-image: none !important; border: 0px !important; outline: 0px !important; cursor: pointer !important; width: 20px !important; height: 20px !important; border-radius:10px;}
