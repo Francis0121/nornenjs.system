@@ -24,7 +24,7 @@ router.get('/volumepn/:pn', function(req, res) {
         console.log(volume);
         if(volume == undefined) {
             console.log('Fail select volume');
-            res.render('stream/stream', { error : 'Not exist volume data', accessInfo : undefined } );
+            res.redirect('/volume');
         }else {
             volumeMap.set(volume.pn, volume);
 
@@ -33,7 +33,7 @@ router.get('/volumepn/:pn', function(req, res) {
                 userPn : req.session.user.pn
             };
 
-            res.render('stream/stream', { error : '', accessInfo : accessInfo });
+            res.render('stream/stream', { error : '', accessInfo : accessInfo, user : req.session.user, volume : volume });
         }
     });
 

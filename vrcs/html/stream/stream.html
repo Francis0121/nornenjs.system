@@ -53,7 +53,7 @@
 <section class="layout_section_wrap">
     <div class="layout_section">
 
-        <article class="stream_content">
+        <article class="stream_content_wrap">
 
             <header>
                 <ul>
@@ -64,44 +64,45 @@
                 </ul>
             </header>
 
-            <div id="view_port" class="stream_wrap">
-                <img src=""/>
-                <div class="view_port_fake"></div>
+            <div class="stream_content">
+                <div id="view_port" class="stream_wrap">
+                    <img src=""/>
+                    <div class="view_port_fake"></div>
+                </div>
+
+                <div class="left_option_wrap">
+                    <div class="option_type">
+                        <h6>Select Type</h6>
+
+                        <label for="option_type_vol" class="option_type_label">VOL</label>
+                        <input type="radio" value="0" id="option_type_vol" name="option_type_value" class="option_type_value" checked="checked">
+
+                        <label for="option_type_mri" class="option_type_label">MRI</label>
+                        <input type="radio" value="1" id="option_type_mri" name="option_type_value" class="option_type_value">
+
+                        <label for="option_type_mip"class="option_type_label">MIP</label>
+                        <input type="radio" value="2" id="option_type_mip" name="option_type_value" class="option_type_value">
+                    </div>
+
+                    <div class="left_option_horizontal">
+                        <h6>Scale</h6>
+                        <span id="scale" class="slider_vertical_len"></span>
+                    </div>
+
+                    <div class="left_option_horizontal">
+                        <h6>Brightness</h6>
+                        <span id="brightness" class="slider_vertical_len"></span>
+                    </div>
+
+                </div>
+
+                <div class="down_option_wrap">
+                    <div class="down_option_vertical">
+                        <h6>OTF</h6>
+                        <span id="otf" class="slider_horizontal_len"></span>
+                    </div>
+                </div>
             </div>
-
-            <div class="left_option_wrap">
-                <div class="option_type">
-                    <h6>Select Type</h6>
-
-                    <label for="option_type_vol" class="option_type_label">VOL</label>
-                    <input type="radio" value="0" id="option_type_vol" name="option_type_value" class="option_type_value" checked="checked">
-
-                    <label for="option_type_mri" class="option_type_label">MRI</label>
-                    <input type="radio" value="1" id="option_type_mri" name="option_type_value" class="option_type_value">
-
-                    <label for="option_type_mip"class="option_type_label">MIP</label>
-                    <input type="radio" value="2" id="option_type_mip" name="option_type_value" class="option_type_value">
-                </div>
-
-                <div class="left_option_horizontal">
-                    <h6>Scale</h6>
-                    <span id="scale" class="slider_vertical_len"></span>
-                </div>
-
-                <div class="left_option_horizontal">
-                    <h6>Brightness</h6>
-                    <span id="brightness" class="slider_vertical_len"></span>
-                </div>
-
-            </div>
-
-            <div class="down_option_wrap">
-                <div class="down_option_vertical">
-                    <h6>OTF</h6>
-                    <span id="otf" class="slider_horizontal_len"></span>
-                </div>
-            </div>
-
         </article>
 
     </div>
