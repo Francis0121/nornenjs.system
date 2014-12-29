@@ -40,7 +40,10 @@ var vec3 = require('./matrix_vec3');
             density : 0.05,
             brightness : 1.0,
             transferOffset : 0.0,
-            transferScale : 1.0
+            transferScale : 1.0,
+            positionZ: 3.0,
+            rotationX: 0,
+            rotationY: 0
         },
 
         d_output : undefined,
@@ -73,16 +76,17 @@ var vec3 = require('./matrix_vec3');
         },
 
         makeViewVector : function(){
+            var _opt = this.options;
             var vec;
             var model_matrix = mat4.create();
 
             vec = vec3.fromValues(-1.0, 0.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix, ((270.0) * 3.14159265 / 180.0), vec);
+            mat4.rotate(model_matrix, model_matrix, ( (270.0 + (_opt.rotationY * -1)) * 3.14159265 / 180.0), vec);
 
             vec = vec3.fromValues(0.0, 1.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix,( 0.0* 3.14159265 / 180.0), vec);
+            mat4.rotate(model_matrix, model_matrix,( (0.0 + (_opt.rotationX*-1)) * 3.14159265 / 180.0), vec);
 
-            vec = vec3.fromValues(0.0, 0.0, 3.0);
+            vec = vec3.fromValues(0.0, 0.0, _opt.positionZ);
             mat4.translate(model_matrix, model_matrix,vec)
 
             /*view vector*/
