@@ -40,9 +40,9 @@ var user = {
 
     delete :
         "DELETE FROM " +
-        "user " +
+        "   user " +
         "WHERE " +
-        "   pn = $pn ",
+        "   username = $username ",
 
     select :
         "SELECT " +

@@ -175,7 +175,10 @@
                             <label class="default_label">Re-enter Password</label>
                             <input id="confirmpw" name="confirmpw" type="password"/>
                         </li>
-                        <% if(message.error != ''){%>
+                        <%
+                        if (message != undefined){
+                            if(message.error != ''){
+                        %>
                         <li class="form_error large">
                             <p><%=message.error%></p>
                         </li>
@@ -184,7 +187,10 @@
                         <li class="form_success large">
                             <p><%=message.success%></p>
                         </li>
-                        <% }%>
+                        <%
+                            }
+                        }
+                        %>
                         <li>
                             <button type="submit" class="changepw_btn">Change Password</button>
                         </li>
@@ -199,6 +205,12 @@
                         </p>
                         <button type="submit" class="delete_btn">Delete</button>
                         <input id="delete_password" name="password" type="password" class="delete_input"/>
+
+                        <% if( delete_message != undefined && delete_message.error != ''){%>
+                        <div class="form_error">
+                            <p><%=delete_message.error%></p>
+                        </div>
+                        <% }%>
                     </div>
                 </form>
 
