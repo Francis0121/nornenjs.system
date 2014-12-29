@@ -1,29 +1,74 @@
 <!DOCTYPE html>
 <html>
-<head lang="ko">
+<head lang="en">
+
     <meta charset="UTF-8">
-    <title>Volume Rendering Cloud System</title>
+    <title>3D Volume Rendering Cloud System</title>
+
     <link rel='stylesheet' href='/stylesheets/default.css' />
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/layout.css' />
+    <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
+
+    <script src='/javascripts/jquery-1.11.1.min.js'></script>
+    <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
+
 </head>
 <body>
 
-<header class="template_header">
-    <h1>Volume Rendering Cloud System</h1>
+<header class="layout_header_wrap">
+    <div class="layout_header">
+        <ul class="left">
+            <li class="symbol">
+                <span class="mark">Symbol</span>
+                <a href="/">Home</a>
+            </li>
+        </ul>
+        <ul class="right">
+            <li class="help">
+                <span class="mark">Question Mark</span>
+                <a href="/">Help</a>
+            </li>
+            <li>
+                <a href="/">Contact</a>
+            </li>
+            <% if ( user == undefined ) { %>
+                <li>
+                    <a href="/signin/join">Join</a>
+                </li>
+                <li>
+                    <a href="/signin">Sign In</a>
+                </li>
+            <% } else { %>
+                <li>
+                    <a href="/signin/logout">Log out</a>
+                </li>
+                <li class="user">
+                    <span class="mark">User Mark</span>
+                    <a href="/signin/join"><%=user.username%></a>
+                </li>
+            <% } %>
+        </ul>
+    </div>
 </header>
 
-<section class="template_section">
-    <article>
-        <a href="/signin" class="default_a">Sign In</a>
-        <a href="/signin/join" class="default_a">Join</a>
-        <% if (user != undefined ){ %>
-        <a href="/volume" class="default_a">Volume List</a>
-        <% } %>
-    </article>
+<section class="layout_section_wrap">
+    <div class="layout_section">
+
+        <div class="main_content">
+            <img src="/image/symbol.png">
+            <span class="title">3D Volume Rendering Cloud System</span>
+            <% if (user != undefined ){ %>
+                <a href="/volume" class="main_btn">Volume Data List</a>
+            <% } %>
+        </div>
+
+    </div>
 </section>
 
-<footer class="template_footer">
-    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+<footer class="layout_footer_wrap">
+    <div class="layout_footer">
+        <span>Copyright(c) Teriusbin.lee. Francis.kim. All rights reserved.</span>
+    </div>
 </footer>
 
 </body>

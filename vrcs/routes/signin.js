@@ -8,7 +8,11 @@ router.get('/', function(req, res) {
         error : '',
         success : ''
     };
-    res.render('signin/signin', { message : message, user : req.session.user });
+    if(req.session.user == undefined){
+        res.render('signin/signin', { message : message, user : req.session.user });
+    }else{
+        res.redirect('../');
+    }
 });
 
 // ~ signin post
@@ -33,7 +37,7 @@ router.post('/', function(req, res){
             user.password = '';
             req.session.user = user;
             message.success = 'Success sign in';
-            res.redirect('../')
+            res.redirect('../');
         }
     });
 });
@@ -41,7 +45,7 @@ router.post('/', function(req, res){
 // ~ logout
 router.get('/logout', function(req, res){
     req.session.user = undefined;
-    res.redirect('./');
+    res.redirect('../');
 });
 
 router.get('/join', function(req, res) {

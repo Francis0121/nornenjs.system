@@ -1,61 +1,127 @@
 <!DOCTYPE html>
 <html>
-<head lang="ko">
+<head lang="en">
+
     <meta charset="UTF-8">
-    <title>Volume Rendering Cloud System</title>
+    <title>3D Volume Rendering Cloud System</title>
+
     <link rel='stylesheet' href='/stylesheets/default.css' />
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/layout.css' />
+    <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
+
+    <script src='/javascripts/jquery-1.11.1.min.js'></script>
+    <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
+    <script>
+        $(function(){
+            $('#username').bind('change', function(){
+                var value = $(this).val();
+                if(value != ''){
+                    $(this).addClass('signin_input_active');
+                } else{
+                    $(this).removeClass('signin_input_active');
+                }
+            });
+
+            $('#password').bind('change', function(){
+                var value = $(this).val();
+                if(value != ''){
+                    $(this).addClass('signin_input_active');
+                } else{
+                    $(this).removeClass('signin_input_active');
+                }
+            });
+        });
+    </script>
+
 </head>
 <body>
 
-<header class="template_header">
-    <h1>Sign In</h1>
+<header class="layout_header_wrap">
+    <div class="layout_header">
+        <ul class="left">
+            <li class="symbol">
+                <span class="mark">Symbol</span>
+                <a href="/">Home</a>
+            </li>
+            <li class="history">
+                <span class="mark">Nav</span>
+                <a href="/signin">Sign In</a>
+            </li>
+        </ul>
+        <ul class="right">
+            <li class="help">
+                <span class="mark">Question Mark</span>
+                <a href="/">Help</a>
+            </li>
+            <li>
+                <a href="/">Contact</a>
+            </li>
+            <% if ( user == undefined ) { %>
+            <li>
+                <a href="/signin/join">Join</a>
+            </li>
+            <li>
+                <a href="/signin">Sign In</a>
+            </li>
+            <% } else { %>
+            <li>
+                <a href="/signin/logout">Log out</a>
+            </li>
+            <li class="user">
+                <span class="mark">User Mark</span>
+                <a href="/signin/join"><%=user.username%></a>
+            </li>
+            <% } %>
+        </ul>
+    </div>
 </header>
 
-<section class="template_section">
-    <article>
-        <a href="/" class="default_a">Main</a><br/>
-        <% if ( user == undefined ) { %>
+<section class="layout_section_wrap">
+    <div class="layout_section">
+
+
+
         <form name="user" action="/signin" method="post">
-            <ul class="default_user">
-                <li>
-                    <label class="default_label">Username</label>
-                    <input id="username" name="username" type="text" class="default_input"/>
+            <ul class="signin_content">
+                <li class="symbol">
+                    <img src="/image/symbol_mid.png">
                 </li>
                 <li>
-                    <label class="default_label">Password</label>
-                    <input id="password" name="password" type="password" class="default_input"/>
+                    <input id="username" name="username" type="text" class="signin_input username"/>
                 </li>
                 <li>
-                    <button type="submit" class="default_btn">Sign In</button>
+                    <input id="password" name="password" type="password" class="signin_input password"/>
                 </li>
+                <% if( message.error != '' ){ %>
+                <li class="form_error">
+                    <p><%=message.error%></p>
+                </li>
+                <% } %>
+                <% if( message.success != '' ){ %>
+                <li class="form_success">
+                    <p><%=message.success%></p>
+                </li>
+                <% } %>
                 <li>
-                    <a href="/signin/join" class="default_a">Create An Account</a>
+                    <button type="submit" class="signin_btn">Sign In</button>
+                </li>
+                <li class="forgot">
+                    <a href="/">Forgot your password?</a>
+                </li>
+                <li class="join">
+                    <span>Don't have an account yet?</span>
+                    <a href="/">Join</a>
                 </li>
             </ul>
         </form>
 
-        <% }else{%>
-            <span class="default_span">Welcome <%=user.username%>!</span>
-            <a href="/signin/logout" class="default_a">Log out</a>
-        <% }%>
-
-        <div class="default_error">
-        <% if( message.error != '' ){ %>
-            <p><%=message.error%></p>
-        <% }%>
-        </div>
-
-        <div class="default_success">
-            <% if( message.success != '' ){ %>
-            <p><%=message.success%></p>
-            <% }%>
-        </div>
-    </article>
+    </div>
 </section>
 
-<footer class="template_footer">
-    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+<footer class="layout_footer_wrap">
+    <div class="layout_footer">
+        <span>Copyright(c) Teriusbin.lee. Francis.kim. All rights reserved.</span>
+    </div>
 </footer>
 
 </body>

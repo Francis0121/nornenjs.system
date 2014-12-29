@@ -28,6 +28,18 @@ body{ background: #231f20; }
 .layout_footer{ width: 900px; height: 30px; margin: 0 auto; text-align: center; }
 .layout_footer>span{ font-size: 56.25%; color: #fff; }
 
+/** */
+.form_error{ float: left; width: 100%; text-align: center; }
+.form_error>p{ padding: 5px; font-size: 67.5%; color: #f8b2b2; }
+.form_success{ float: left; width: 100%; text-align: center; }
+.form_success>p{ padding: 5px; font-size: 67.5%; color: #b2c2f8;}
+
+.default_error{ width: 180px; margin: 0 auto; padding: 5px 0;}
+.default_error>p{width: 100%; color: darkred; font-size: 67.5%;}
+
+.default_success{ width: 180px; margin: 0 auto; padding: 5px 0;}
+.default_success>p{width: 100%; color: darkblue; font-size: 67.5%;}
+
 /** main */
 .main_content{ width: 200px; margin: 0 auto; }
 .main_content>img{ float: left; width: 200px; height: 150px; margin-top: 190px;}
