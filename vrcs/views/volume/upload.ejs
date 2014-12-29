@@ -1,40 +1,124 @@
 <!DOCTYPE html>
 <html>
-<head lang="ko">
+<head lang="en">
+
     <meta charset="UTF-8">
-    <title>Volume Rendering Cloud System</title>
+    <title>3D Volume Rendering Cloud System</title>
+
     <link rel='stylesheet' href='/stylesheets/default.css' />
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/layout.css' />
+    <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
+
+    <script src='/javascripts/jquery-1.11.1.min.js'></script>
+    <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
+
 </head>
 <body>
 
-<header class="template_header">
-    <h1>Volume Data Upload</h1>
+<header class="layout_header_wrap">
+    <div class="layout_header">
+        <ul class="left">
+            <li class="symbol">
+                <span class="mark">Symbol</span>
+                <a href="/">Home</a>
+            </li>
+            <li class="history">
+                <span class="mark">Nav</span>
+                <a href="/volume">Volume Data List</a>
+            </li>
+            <li class="history">
+                <span class="mark">Nav</span>
+                <a href="/volume/upload">Volume Data Upload</a>
+            </li>
+        </ul>
+        <ul class="right">
+            <li class="help">
+                <span class="mark">Question Mark</span>
+                <a href="/">Help</a>
+            </li>
+            <li>
+                <a href="/">Contact</a>
+            </li>
+            <% if ( user == undefined ) { %>
+            <li>
+                <a href="/signin/join">Join</a>
+            </li>
+            <li>
+                <a href="/signin">Sign In</a>
+            </li>
+            <% } else { %>
+            <li>
+                <a href="/signin/logout">Log out</a>
+            </li>
+            <li class="user">
+                <span class="mark">User Mark</span>
+                <a href="/signin/join"><%=user.username%></a>
+            </li>
+            <% } %>
+        </ul>
+    </div>
 </header>
 
-<section class="template_section">
-    <article>
-        <a href="/" class="default_a">Main</a>
-        <a href="/volume" class="default_a">Volume List</a>
-        <form action="/volume/upload" method="post" enctype="multipart/form-data">
-            <ul class="default_volume">
-                <li>
-                    <label class="default_label">Title</label>
-                    <input id="title" name="title" type="text" class="default_input"/>
-                </li>
-                <li>
-                    <input id="volumefile" name="volumefile" type="file" class="default_file"/>
-                </li>
-                <li>
-                    <button type="submit" class="default_btn">Upload</button>
-                </li>
-            </ul>
-        </form>
-    </article>
+<section class="layout_section_wrap">
+    <div class="layout_section">
+
+        <article class="upload_content_wrap">
+
+            <header>
+                <ul>
+                    <li class="left">
+                        <span>empty</span>
+                        <h4>Volume Data Upload</h4>
+                    </li>
+                </ul>
+            </header>
+
+            <div class="upload_content">
+
+                <div class="left">
+
+                </div>
+
+                <div class="right">
+                    <form action="/volume/upload" method="post" enctype="multipart/form-data">
+                        <ul>
+                            <li>
+                                <label>Title</label>
+                                <input id="title" name="title" type="text"/>
+                            </li>
+                            <li class="small">
+                                <label>Width</label>
+                                <input id="width" name="width" type="text"/>
+                            </li>
+                            <li class="small">
+                                <label>Height</label>
+                                <input id="height" name="height" type="text"/>
+                            </li>
+                            <li class="small">
+                                <label>Depth</label>
+                                <input id="depth" name="depth" type="text"/>
+                            </li>
+                            <li>
+                                <label>File</label>
+                                <input id="volumefile" name="volumefile" type="file"/>
+                            </li>
+                            <li>
+                                <button type="submit" class="upload_submit_btn">Upload</button>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+
+        </article>
+
+    </div>
 </section>
 
-<footer class="template_footer">
-
+<footer class="layout_footer_wrap">
+    <div class="layout_footer">
+        <span>Copyright(c) Teriusbin.lee. Francis.kim. All rights reserved.</span>
+    </div>
 </footer>
 
 </body>

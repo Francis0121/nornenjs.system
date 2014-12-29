@@ -28,7 +28,7 @@ router.get('/', function(req, res) {
 
 /* GET users listing. */
 router.get('/upload', function(req, res) {
-    res.render('volume/upload', { error : '' });
+    res.render('volume/upload', { error : '', user : req.session.user });
 });
 
 router.post('/upload', function(req, res){
@@ -68,7 +68,7 @@ router.post('/upload', function(req, res){
                 res.redirect('./');
             }else{
                 console.log(err);
-                res.render('volume/upload', { error : 'File upload error' });
+                res.render('volume/upload', { error : 'File upload error', user : req.session.user });
             }
         });
     });
