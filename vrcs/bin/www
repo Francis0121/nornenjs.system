@@ -29,6 +29,18 @@ var useMap = new HashMap();
 var vrcsCudaMap = new HashMap();
 var vrcsBufMap = new HashMap();
 
+var buf = new Buffer(4);
+
+buf[0] = 0x93;
+buf[1] = 0x01;
+buf[2] = 0xc0;
+buf[3] = 0x00;
+
+console.log('Output buf : ', buf.readInt8(0));
+console.log('Output buf : ', buf.readInt8(1));
+console.log('Output buf : ', buf.readInt8(2));
+console.log('Output buf : ', buf.readInt8(3));
+
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
@@ -48,7 +60,11 @@ bs.on('connection', function(client){
             cudaRender.start();
             //stack.push(cudaRender.d_outputBuffer);
             var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
-            client.send(jpeg.encodeSync());
+            if(client._socket._socket == undefined) {
+                console.log('INFO: Client already disconnected ', client.id);
+            }else{
+                client.send(jpeg.encodeSync());
+            }
             cudaRender.end();
             hrend = process.hrtime(hrstart);
             //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
@@ -91,7 +107,7 @@ bs.on('connection', function(client){
                 rotationX : buffer.readFloatLE(28),
                 rotationY : buffer.readFloatLE(32)
             };
-            console.log(obj);
+            //console.log(obj);
             return obj;
         };
 
@@ -156,7 +172,7 @@ bs.on('connection', function(client){
                 obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
                 streamMap.set(client.id, obj);
             }else if(param.request_type == 3){
-                console.log(param);
+                //console.log(param);
                 var cudaRender = vrcsCudaMap.get(client.id);
                 cudaRender.type = param.rendering_type;
                 cudaRender.options.positionZ = param.positionZ;

@@ -50,7 +50,6 @@ router.post('/upload', function(req, res){
         fstream = fs.createWriteStream(path.join(__dirname, '../public/upload/') + savename);
         file.pipe(fstream);
         fstream.on('close', function () {
-            console.log('5');
             console.log('Upload Finished of ' + savename);
         });
         req.body['filename'] = filename;
@@ -67,7 +66,6 @@ router.post('/upload', function(req, res){
             $height : req.body.height,
             $depth : req.body.depth
         };
-        console.log(query);
         sqlite.db.run(sqlite.sql.volume.insert, query, function (err) {
             console.log('Success file');
             if (err == null) {
