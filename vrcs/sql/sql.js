@@ -69,25 +69,28 @@ var volume = {
         "   save_name TEXT NOT NULL, " +
         "   file_name TEXT NOT NULL, " +
         "   input_date TEXT NOT NULL, " +
+        "   width INTEGER NOT NULL, " +
+        "   height INTEGER NOT NULL, " +
+        "   depth INTEGER NOT NULL, " +
         "   FOREIGN KEY(userpn) REFERENCES user(pn) ON DELETE CASCADE " +
         ") ",
 
     insert :
         "INSERT INTO " +
         "volume " +
-        "   ( userpn, title, save_name, file_name, input_date ) " +
+        "   ( userpn, title, save_name, file_name, width, height, depth, input_date ) " +
         "VALUES " +
-        "   ( $userpn, $title, $saveName, $fileName, datetime('now') )",
+        "   ( $userpn, $title, $saveName, $fileName, $width, $height, $depth, datetime('now') )",
 
     delete :
         "DELETE FROM " +
-        "volume " +
+        "   volume " +
         "WHERE " +
         "   pn = $pn ",
 
     selectVolumeList :
         "SELECT " +
-        "   pn, userpn, title, file_name, save_name, strftime('%d-%m-%Y', input_date) AS input_date  " +
+        "   pn, userpn, title, file_name, save_name, width, height, depth, strftime('%d-%m-%Y', input_date) AS input_date  " +
         "FROM " +
         "   volume " +
         "WHERE " +
@@ -97,7 +100,7 @@ var volume = {
 
     selectVolumeOne :
         "SELECT " +
-        "   pn, userpn, title, file_name, save_name, input_date " +
+        "   pn, userpn, title, file_name, save_name, width, height, depth, input_date " +
         "FROM " +
         "   volume " +
         "WHERE " +

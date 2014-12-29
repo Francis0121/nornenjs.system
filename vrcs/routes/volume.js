@@ -34,24 +34,27 @@ router.get('/upload', function(req, res) {
 router.post('/upload', function(req, res){
 
     var fstream;
+
     req.pipe(req.busboy);
+
+    req.busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
+        req.body[fieldname] = val;
+        console.log(fieldname, val);
+    });
+
     req.busboy.on('file', function (fieldname, file, filename) {
         console.log('Uploading: ' + filename);
         //Path where image will be uploaded
         var date = new Date();
         var savename = '['+date.toDBString('YY-MM-DD HH24:MI:SS') +']_' + filename;
         fstream = fs.createWriteStream(path.join(__dirname, '../public/upload/') + savename);
+        file.pipe(fstream);
         fstream.on('close', function () {
+            console.log('5');
             console.log('Upload Finished of ' + savename);
         });
-
         req.body['filename'] = filename;
         req.body['savename'] = savename;
-    });
-
-    req.busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
-        req.body[fieldname] = val;
-        console.log(fieldname + '_' +val);
     });
 
     req.busboy.on('finish', function(){
@@ -59,7 +62,10 @@ router.post('/upload', function(req, res){
             $userpn : req.session.user.pn,
             $title : req.body.title,
             $saveName : req.body.savename,
-            $fileName : req.body.filename
+            $fileName : req.body.filename,
+            $width : req.body.width,
+            $height : req.body.height,
+            $depth : req.body.depth
         };
         console.log(query);
         sqlite.db.run(sqlite.sql.volume.insert, query, function (err) {

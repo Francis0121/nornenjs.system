@@ -25,12 +25,18 @@ db.serialize(function() {
             $userpn : uData.pn,
             $title : 'Skull',
             $saveName : '[2014-11-27 20:00:00]_head1.den',
-            $fileName : 'head.dan'
+            $fileName : 'head.dan',
+            $width : 256,
+            $height : 256,
+            $depth : 225
         },{
             $userpn : uData.pn,
             $title : 'Big head',
             $saveName : '[2014-11-27 20:00:00]_head2.den',
-            $fileName : 'head2.dan'
+            $fileName : 'head2.dan',
+            $width : 256,
+            $height : 256,
+            $depth : 225
         }];
 
         stmt = db.prepare(sql.volume.insert);
