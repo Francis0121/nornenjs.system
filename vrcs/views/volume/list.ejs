@@ -1,60 +1,137 @@
 <!DOCTYPE html>
 <html>
-<head lang="ko">
+<head lang="en">
+
     <meta charset="UTF-8">
-    <title>Volume Rendering Cloud System</title>
+    <title>3D Volume Rendering Cloud System</title>
+
     <link rel='stylesheet' href='/stylesheets/default.css' />
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/layout.css' />
+    <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
+
+    <script src='/javascripts/jquery-1.11.1.min.js'></script>
+    <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
+
+    <script>
+        $(function(){
+            $('#volume_rendering tbody tr').on('click', function(){
+                var pn = $(this).attr('data-pn');
+                location.href='../stream/volumepn/'+pn;
+            });
+        });
+    </script>
+
 </head>
 <body>
 
-<header class="template_header">
-    <h1>Volume Data List</h1>
+<header class="layout_header_wrap">
+    <div class="layout_header">
+        <ul class="left">
+            <li class="symbol">
+                <span class="mark">Symbol</span>
+                <a href="/">Home</a>
+            </li>
+            <li class="history">
+                <span class="mark">Nav</span>
+                <a href="/volume">Volume Data List</a>
+            </li>
+        </ul>
+        <ul class="right">
+            <li class="help">
+                <span class="mark">Question Mark</span>
+                <a href="/">Help</a>
+            </li>
+            <li>
+                <a href="/">Contact</a>
+            </li>
+            <% if ( user == undefined ) { %>
+            <li>
+                <a href="/signin/join">Join</a>
+            </li>
+            <li>
+                <a href="/signin">Sign In</a>
+            </li>
+            <% } else { %>
+            <li>
+                <a href="/signin/logout">Log out</a>
+            </li>
+            <li class="user">
+                <span class="mark">User Mark</span>
+                <a href="/signin/join"><%=user.username%></a>
+            </li>
+            <% } %>
+        </ul>
+    </div>
 </header>
 
-<section class="template_section">
-    <article>
-        <a href="/" class="default_a">Main</a>
-        <a href="/volume/upload" class="default_a">Upload</a>
-        <table class="default_table">
-            <thead>
+<section class="layout_section_wrap">
+    <div class="layout_section">
+
+        <article class="list_content">
+
+            <header>
+                <ul>
+                    <li class="left">
+                        <span>empty</span>
+                        <h4>Volume Data List</h4>
+                    </li>
+                    <li class="right">
+                        <a href="/volume/upload" class="upload_btn">
+                            <span class="mark"></span>
+                            <span class="text">Upload</span>
+                        </a>
+                    </li>
+                </ul>
+            </header>
+
+            <table id="volume_rendering">
+                <thead>
                 <tr>
-                    <th>pn</th>
-                    <th>userpn</th>
-                    <th>title</th>
-                    <th>file_name</th>
-                    <th>save_name</th>
-                    <th>input_date</th>
+                    <th class="no">
+                        <span>No.</span>
+                    </th>
+                    <th class="title">
+                        <span>Title.</span>
+                    </th>
+                    <th class="filename">
+                        <span>File Name.</span>
+                    </th>
+                    <th class="registrationdate">
+                        <span>Registration Date.</span>
+                    </th>
                 </tr>
-            </thead>
-            <tfoot>
+                </thead>
+                <tfoot>
                 <tr>
-                    <td colspan="6">more...</td>
+                    <td colspan="4">
+
+                    </td>
                 </tr>
-            </tfoot>
-            <tbody>
-                <%
+                </tfoot>
+                <tbody>
+                    <%
                     for(var i=0; i< volumes.length; i++) {
                         var volume = volumes[i];
-                %>
-                <tr>
-                    <td><%=volume.pn%></td>
-                    <td><%=volume.userpn%></td>
-                    <td>
-                        <a href="../stream/volumepn/<%=volume.pn%>" ><%=volume.title%></a>
-                    </td>
-                    <td><%=volume.file_name%></td>
-                    <td><%=volume.save_name%></td>
-                    <td><%=volume.input_date%></td>
-                </tr>
-                <% } %>
-            </tbody>
-        </table>
-    </article>
+                    %>
+                    <tr data-pn="<%=volume.pn%>">
+                        <td><%=volume.pn%></td>
+                        <td><%=volume.title%></td>
+                        <td><%=volume.file_name%></td>
+                        <td><%=volume.input_date%></td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+
+        </article>
+
+    </div>
 </section>
 
-<footer class="template_footer">
-    <span>Copyright(c) Wong.Lee Francis.kim  All rights reserved</span>
+<footer class="layout_footer_wrap">
+    <div class="layout_footer">
+        <span>Copyright(c) Teriusbin.lee. Francis.kim. All rights reserved.</span>
+    </div>
 </footer>
 
 </body>

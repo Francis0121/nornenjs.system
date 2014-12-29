@@ -87,7 +87,7 @@ var volume = {
 
     selectVolumeList :
         "SELECT " +
-        "   pn, userpn, title, file_name, save_name, input_date " +
+        "   pn, userpn, title, file_name, save_name, strftime('%d-%m-%Y', input_date) AS input_date  " +
         "FROM " +
         "   volume " +
         "WHERE " +
