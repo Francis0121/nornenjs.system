@@ -9,7 +9,7 @@
     <link rel='stylesheet' href='/stylesheets/layout.css' />
     <link rel='stylesheet' href='/jquery-ui-1.11.2.custom/jquery-ui.min.css' />
 
-    <!--<script src='http://cdn.binaryjs.com/0/binary.js'></script>-->
+    <script src='http://cdn.binaryjs.com/0/binary.js'></script>
     <script src='http://localhost:3000/socket.io/socket.io.js'></script>
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
     <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
@@ -214,28 +214,28 @@
         rotationY : 0
     };
 
-//    var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
+    var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
 
     var clientSend = function(){
-//        client.send(makeBuffer());
+        client.send(makeBuffer());
     };
 
-//    client.on('stream', function(stream, meta){
-//        var parts = [];
-//
-//            stream.on('data', function(data){
-//                parts.push(data);
-//            });
-//
-//            stream.on('end', function(){
-//                var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-//                $('#view_port>img').attr('src', url);
-//            count++;
-//            if(debugInterval == undefined){
-//                debugInterval = setInterval(debug, 1000);
-//            }
-//        });
-//    });
+    client.on('stream', function(stream, meta){
+        var parts = [];
+
+            stream.on('data', function(data){
+                parts.push(data);
+            });
+
+            stream.on('end', function(){
+                var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
+                $('#view_port>img').attr('src', url);
+            count++;
+            if(debugInterval == undefined){
+                debugInterval = setInterval(debug, 1000);
+            }
+        });
+    });
 
     var makeBuffer = function(){
         var buffer = new ArrayBuffer(36);
