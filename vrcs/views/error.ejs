@@ -17,11 +17,18 @@
 
 
     <% if( error.status == 404 ) { %>
-        404
+        <a href="/" class="error_page">
+            <img src="/image/404.png">
+        </a>
     <% } else if( error.status == 500 ) { %>
-        500
+        <a href="/" class="error_page">
+            <img src="/image/500.png">
+        </a>
     <% } else { %>
-        Other
+        <a href="/" class="error_page">
+            <img src="/image/error.png">
+        </a>
     <% } %>
+
 </body>
 </html>

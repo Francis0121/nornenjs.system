@@ -212,3 +212,6 @@ body{ background: #231f20; }
 .slider_len{ float: left; width: 240px !important; margin: 10px 20px; height: 10px !important; border: 1px solid #000;}
 .slider_len .ui-slider-range{ background-color: #bee4e3 !important; background-image: none !important; outline: 0px !important; }
 .slider_len .ui-slider-handle{ background-color: #42b9b4 !important; background-image: none !important; border: 0px !important; outline: 0px !important; cursor: pointer !important; width: 20px !important; height: 20px !important; border-radius:10px;}
+
+/** error*/
+.error_page{ width: 900px; height: 600px; margin: 0 auto; display: block;}
