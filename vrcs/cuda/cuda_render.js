@@ -25,9 +25,9 @@ var vec3 = require('./matrix_vec3');
         constructor:CudaRender,
 
         RENDERING_CUDA_TYPE : {
-            VOL : 0,
-            MIP : 1,
-            MRI : 2
+            VOL : 1,
+            MIP : 2,
+            MRI : 3
         },
 
         cuCtx : undefined,

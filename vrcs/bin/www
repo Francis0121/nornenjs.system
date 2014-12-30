@@ -64,6 +64,8 @@ bs.on('connection', function(client){
                     }
                 }catch (error){
                     console.log('[ERROR] Connection refused sync jpeg ', error);
+                    closeCallback(client.id);
+                    return;
                 }
                 cudaRender.end();
                 hrend = process.hrtime(hrstart);
@@ -94,6 +96,8 @@ bs.on('connection', function(client){
                         }
                     } catch (error) {
                         console.log('[ERROR] Connection refused async png ', error);
+                        closeCallback(client.id);
+                        return;
                     }
                 });
             }else if(obj.type == REQUEST_TYPE.CHANGE){
@@ -145,7 +149,7 @@ bs.on('connection', function(client){
                         frame: 0,
                         type: param.request_type };
 
-                    var cudaRender = new CudaRender(0, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name);
+                    var cudaRender = new CudaRender(1, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name);
                     cudaRender.init();
                     console.log('CudaRender', cudaRender);
                     obj.cudaInterval = setInterval(cudaInterval, 10);
@@ -183,6 +187,7 @@ bs.on('connection', function(client){
                 //console.log(param);
                 var cudaRender = vrcsCudaMap.get(client.id);
                 cudaRender.type = param.rendering_type;
+
                 cudaRender.options.positionZ = param.positionZ;
                 cudaRender.options.brightness = param.brightness;
                 cudaRender.options.transferOffset = param.transferOffset;
@@ -199,15 +204,18 @@ bs.on('connection', function(client){
     });
 
     client.on('close', function(stream, meta){
-        //console.log('close byte stream connection ' + client.id);
-        var obj = streamMap.get(client.id);
+        closeCallback(client.id);
+    });
+
+    var closeCallback = function(clientId){
+        var obj = streamMap.get(clientId);
         if(obj != undefined) {
             clearInterval(obj.cudaInterval);
             clearInterval(obj.stackInterval);
             streamMap.remove(client.id);
 
             var use = useMap.get(obj.volumePn) - 1;
-            //console.log('do remove ' + client.id + ' volume use ' + use);
+            console.log('[INFO] Remove Interval and volume data ' + client.id + ' volume use ' + use);
             if(use == 0){
                 app.volumeMap.remove(obj.volumePn);
                 useMap.remove(obj.volumePn);
@@ -215,14 +223,14 @@ bs.on('connection', function(client){
                 useMap.set(obj.volumePn, use);
             }
         }
-        var cudaRender = vrcsCudaMap.get(client.id);
+        var cudaRender = vrcsCudaMap.get(clientId);
         if(cudaRender != undefined){
             cudaRender.finish();
             vrcsCudaMap.remove(client.id);
             vrcsBufMap.remove(client.id);
-            //console.log('do destory and free memory '+ client.id);
+            console.log('[INFO] Destroy and free cuda memory and buffer '+ client.id);
         }
-    });
+    };
 
 });
 

@@ -208,11 +208,13 @@
     var debugInterval = undefined;
 
     var REQUEST_TYPE = { START : 1, ADAPTIVE : 2, CHANGE : 3 };
+    var RENDERUNG_TYPE = { VOLUME : 1, MRI : 2, MIP : 3 };
+
     var send_option = {
         request_type : REQUEST_TYPE.START,
         volumePn : accessInfo.volumePn,
         frame : 0,
-        rendering_type : 0,
+        rendering_type : RENDERUNG_TYPE.VOLUME,
         brightness : 1.0,
         positionZ : 3.0,
         transferOffset : 0.0,
@@ -294,17 +296,17 @@
             $('.option_rendering ul li').removeClass('option_select_wrap_active').addClass('option_select_wrap_none');
             thiz.removeClass('option_select_wrap_none').addClass('option_select_wrap_active');
 
-            if(type == 1){
+            if(type == RENDERUNG_TYPE.VOLUME){
                 $('.option_zoom').show();
                 $('.option_brightness').show();
                 $('.option_otf').show();
                 $('.option_axis').hide();
-            }else if(type == 2){
+            }else if(type == RENDERUNG_TYPE.MRI){
                 $('.option_zoom').show();
                 $('.option_brightness').hide();
                 $('.option_otf').hide();
                 $('.option_axis').hide();
-            }else if(type == 3){
+            }else if(type == REQUEST_TYPE.MIP){
                 $('.option_zoom').hide();
                 $('.option_brightness').hide();
                 $('.option_otf').hide();
@@ -313,9 +315,6 @@
 
             send_option.request_type = REQUEST_TYPE.CHANGE;
             send_option.rendering_type = type;
-
-
-
             clientSend();
         });
 
@@ -415,9 +414,9 @@
             }
         });
 
-        $('#view_port').on('mouseup', function(event){
+        $('body').on('mouseup', function(event){
             mouseflag = false;
-        })
+        });
     });
 
 </script>
