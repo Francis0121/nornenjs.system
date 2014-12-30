@@ -10,17 +10,20 @@ var CudaRender = function(){
 CudaRender.prototype.type = undefined;
 CudaRender.prototype.textureFilePath = undefined;
 
-CudaRender.prototype.RENDERING_CUDA_TYPE = { VOL : 0, MIP : 1, MRI : 2 };
+CudaRender.prototype.RENDERING_CUDA_TYPE = { VOL : 1, MIP : 2, MRI : 3};
 CudaRender.prototype.cuCtx = undefined;
 CudaRender.prototype.cuModulePath = '/home/russa/git/vrcs/web/vrcs/cuda/vrcs.ptx';
 CudaRender.prototype.cuModule = undefined;
 CudaRender.prototype.options = {
-    imageWidth: 512,
-    imageHeight: 512,
-    density: 0.05,
-    brightness: 1.0,
-    transferOffset: 0.0,
-    transferScale: 1.0
+    imageWidth : 512,
+    imageHeight : 512,
+    density : 0.05,
+    brightness : 1.0,
+    transferOffset : 0.0,
+    transferScale : 1.0,
+    positionZ: 3.0,
+    rotationX: 0,
+    rotationY: 0
 };
 
 CudaRender.prototype.d_output = undefined;
@@ -28,8 +31,8 @@ CudaRender.prototype.d_invViewMatrix = undefined;
 CudaRender.prototype.d_outputBuffer = undefined;
 
 CudaRender.prototype.init = function(){
-    this.cuCtx = new cu.Ctx(0, cu.Device(0));
-    this.cuModule = cu.moduleLoad(this.cuModulePath);
+    //this.cuCtx = new cu.Ctx(0, cu.Device(0));
+    //this.cuModule = cu.moduleLoad(this.cuModulePath);
     // ~ VolumeLoad & VolumeTexture & TextureBinding
     var error = this.cuModule.memTextureAlloc(this.textureFilePath, 256*256*225);
     //console.log('_cuModule.memTextureAlloc', error);
@@ -53,16 +56,17 @@ CudaRender.prototype.start = function(){
 };
 
 CudaRender.prototype.makeViewVector = function(){
+    var _opt = this.options;
     var vec;
     var model_matrix = mat4.create();
 
     vec = vec3.fromValues(-1.0, 0.0, 0.0);
-    mat4.rotate(model_matrix, model_matrix, ((270.0) * 3.14159265 / 180.0), vec);
+    mat4.rotate(model_matrix, model_matrix, ( (270.0 + (_opt.rotationY * -1)) * 3.14159265 / 180.0), vec);
 
     vec = vec3.fromValues(0.0, 1.0, 0.0);
-    mat4.rotate(model_matrix, model_matrix,( 0.0* 3.14159265 / 180.0), vec);
+    mat4.rotate(model_matrix, model_matrix,( (0.0 + (_opt.rotationX*-1)) * 3.14159265 / 180.0), vec);
 
-    vec = vec3.fromValues(0.0, 0.0, 3.0);
+    vec = vec3.fromValues(0.0, 0.0, _opt.positionZ);
     mat4.translate(model_matrix, model_matrix,vec)
 
     /*view vector*/
@@ -82,7 +86,7 @@ CudaRender.prototype.makeViewVector = function(){
 
     this.d_invViewMatrix = cu.memAlloc(12*4);
     var error = this.d_invViewMatrix.copyHtoD(c_invViewMatrix);
-    //console.log('d_invViewMatrix.copyHtoD', error);
+    //console.log('[INFO_CUDA] d_invViewMatrix.copyHtoD', error);
 };
 
 CudaRender.prototype.render = function(){

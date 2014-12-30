@@ -16,9 +16,11 @@ var vec3 = require('./matrix_vec3');
     }
 }(function () {
 
-    function CudaRender(type, textureFilePath) {
+    function CudaRender(type, textureFilePath, cuCtx, cuModule) {
         this.type = type;
         this.textureFilePath = textureFilePath;
+        this.cuCtx = cuCtx;
+        this.cuModule = cuModule;
     }
 
     var proto = CudaRender.prototype = {
@@ -30,42 +32,38 @@ var vec3 = require('./matrix_vec3');
             MRI : 3
         },
 
-        cuCtx : undefined,
-        cuModulePath : '/home/russa/git/vrcs/web/vrcs/cuda/vrcs.ptx',
-        cuModule : undefined,
+        //cuCtx : undefined,
+        //cuModulePath : '/home/russa/git/vrcs/web/vrcs/cuda/vrcs.ptx',
+        //cuModule : undefined,
 
-        options : {
-            imageWidth : 512,
-            imageHeight : 512,
-            density : 0.05,
-            brightness : 1.0,
-            transferOffset : 0.0,
-            transferScale : 1.0,
-            positionZ: 3.0,
-            rotationX: 0,
-            rotationY: 0
-        },
+        //Option
+        imageWidth : 512,
+        imageHeight : 512,
+        density : 0.05,
+        brightness : 1.0,
+        transferOffset : 0.0,
+        transferScale : 1.0,
+        positionZ: 3.0,
+        rotationX: 0,
+        rotationY: 0,
+
 
         d_output : undefined,
         d_invViewMatrix : undefined,
         d_outputBuffer : undefined,
 
         init : function(){
-            this.cuCtx = new cu.Ctx(0, cu.Device(0));
-            this.cuModule = cu.moduleLoad(this.cuModulePath);
             // ~ VolumeLoad & VolumeTexture & TextureBinding
             var error = this.cuModule.memTextureAlloc(this.textureFilePath, 256*256*225);
-            //console.log('_cuModule.memTextureAlloc', error);
+            console.log('[INFO_CUDA] _cuModule.memTextureAlloc', error);
         },
 
         start : function(){
 
-            var _opt = this.options;
-
             // ~ 3D volume array
-            this.d_output = cu.memAlloc(_opt.imageWidth * _opt.imageHeight * 4);
-            var error = this.d_output.memSet(_opt.imageWidth * _opt.imageHeight * 4);
-            //console.log('d_output.memSet', error);
+            this.d_output = cu.memAlloc(this.imageWidth * this.imageHeight * 4);
+            var error = this.d_output.memSet(this.imageWidth * this.imageHeight * 4);
+            //console.log('[INFO_CUDA] d_output.memSet', error);
 
             // ~ View Vector
             this.makeViewVector();
@@ -76,17 +74,16 @@ var vec3 = require('./matrix_vec3');
         },
 
         makeViewVector : function(){
-            var _opt = this.options;
             var vec;
             var model_matrix = mat4.create();
 
             vec = vec3.fromValues(-1.0, 0.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix, ( (270.0 + (_opt.rotationY * -1)) * 3.14159265 / 180.0), vec);
+            mat4.rotate(model_matrix, model_matrix, ( (270.0 + (this.rotationY * -1)) * 3.14159265 / 180.0), vec);
 
             vec = vec3.fromValues(0.0, 1.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix,( (0.0 + (_opt.rotationX*-1)) * 3.14159265 / 180.0), vec);
+            mat4.rotate(model_matrix, model_matrix,( (0.0 + (this.rotationX*-1)) * 3.14159265 / 180.0), vec);
 
-            vec = vec3.fromValues(0.0, 0.0, _opt.positionZ);
+            vec = vec3.fromValues(0.0, 0.0, this.positionZ);
             mat4.translate(model_matrix, model_matrix,vec)
 
             /*view vector*/
@@ -106,11 +103,10 @@ var vec3 = require('./matrix_vec3');
 
             this.d_invViewMatrix = cu.memAlloc(12*4);
             var error = this.d_invViewMatrix.copyHtoD(c_invViewMatrix);
-            //console.log('d_invViewMatrix.copyHtoD', error);
+            //console.log('[INFO_CUDA] d_invViewMatrix.copyHtoD', error);
         },
 
         render : function(){
-            var _opt = this.options;
             var _cuModule = this.cuModule;
 
             // ~ Rendering
@@ -122,10 +118,12 @@ var vec3 = require('./matrix_vec3');
             }else if(this.type == this.RENDERING_CUDA_TYPE.MRI){
                 cuFunction = _cuModule.getFunction('render_kernel_MRI');
             }else{
-                console.log('type not exist');
+                //console.log('type not exist');
                 // ~ do default
                 cuFunction = _cuModule.getFunction('render_kernel_volume');
+
             }
+            //console.log('[INFO_CUDA] cuFunction', cuFunction);
 
             //cuLaunchKernel
             var error = cu.launch(
@@ -139,43 +137,35 @@ var vec3 = require('./matrix_vec3');
                     value: this.d_invViewMatrix.devicePtr
                 },{
                     type: "Uint32",
-                    value: _opt.imageWidth
+                    value: this.imageWidth
                 },{
                     type: "Uint32",
-                    value: _opt.imageHeight
+                    value: this.imageHeight
                 },{
                     type: "Float32",
-                    value: _opt.density
+                    value: this.density
                 },{
                     type: "Float32",
-                    value: _opt.brightness
+                    value: this.brightness
                 },{
                     type: "Float32",
-                    value: _opt.transferOffset
+                    value: this.transferOffset
                 },{
                     type: "Float32",
-                    value: _opt.transferScale
+                    value: this.transferScale
                 }
                 ]
             );
-            //console.log('cu.launch', error);
+            //console.log('[INFO_CUDA] cu.launch', error);
 
             // cuMemcpyDtoH
-            this.d_outputBuffer = new Buffer(_opt.imageWidth * _opt.imageHeight * 4);
+            this.d_outputBuffer = new Buffer(this.imageWidth * this.imageHeight * 4);
             this.d_output.copyDtoH(this.d_outputBuffer, false);
         },
 
         end : function(){
             this.d_output.free();
             this.d_invViewMatrix.free();
-        },
-
-        finish : function(){
-            var _cuCtx = this.cuCtx;
-            _cuCtx.synchronize(function(error) {
-                _cuCtx.destroy();
-                //console.log('cuCtx.synchronize', error);
-            });
         }
     };
 

@@ -54,7 +54,7 @@ Handle<Value> NodeCuda::Function::LaunchKernel(const Arguments& args) {
     CU_LAUNCH_PARAM_BUFFER_SIZE,    &bufferSize,
     CU_LAUNCH_PARAM_END
   };
-                           
+
   CUresult error = cuLaunchKernel(pfunction->m_function,
       gridDimX, gridDimY, gridDimZ,
       blockDimX, blockDimY, blockDimZ,
