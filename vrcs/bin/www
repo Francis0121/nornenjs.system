@@ -92,12 +92,12 @@ bs.on('connection', function(client){
                         } else {
                             client.send(png_img);
                         }
-                    } catch (err) {
+                    } catch (error) {
                         console.log('[ERROR] Connection refused async png ', error);
                     }
                 });
             }else if(obj.type == REQUEST_TYPE.CHANGE){
-                console.log('[INFO] Do nothing ', error);
+                console.log('[INFO] Do nothing ');
             }else{
                 console.log('[ERROR] Request type not defined');
             }

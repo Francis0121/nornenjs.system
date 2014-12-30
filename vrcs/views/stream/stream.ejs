@@ -79,7 +79,11 @@
             <div class="stream_content">
 
                 <div id="view_port">
-                    <img src=""/>
+                    <img src="" class="data"/>
+                    <div class="loading">
+                        <img src="/image/loading.gif"/>
+                        <span>Please wait for the exit to other users</span>
+                    </div>
                     <div class="view_port_fake"></div>
                 </div>
 
@@ -179,13 +183,15 @@
     joinSocket();
 
     socket.on('message', function(data){
-        $('.debug_wrap').append('<p>connect byte stream</p>');
+        //$('.debug_wrap').append('<p>connect byte stream</p>');
         if(!data.success){
-            $('.debug_wrap').append('<p>'+data.error+'</p>');
+            //$('.debug_wrap').append('<p>'+data.error+'</p>');
+            $('#view_port>img.data').hide();
+            $('#view_port>.loading').show();
             return;
         }
-        // ~ success request byte stream
-        $('.default_error').html('');
+        $('#view_port>.loading').hide();
+        $('#view_port>img.data').show();
         success = true;
         requestStream();
     });
@@ -229,7 +235,7 @@
 
             stream.on('end', function(){
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                $('#view_port>img').attr('src', url);
+                $('#view_port>img.data').attr('src', url);
             count++;
             if(debugInterval == undefined){
                 debugInterval = setInterval(debug, 1000);

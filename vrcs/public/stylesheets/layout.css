@@ -192,7 +192,10 @@ body{ background: #231f20; }
 
 .stream_content{ padding-top: 20px; float: left; width: 850px;}
 #view_port{ float: left; width: 512px; height: 512px; border: 2px solid #fff; }
-#view_port>img{ width: 512px; height: 512px; z-index: 3;}
+#view_port>img.data{ width: 512px; height: 512px; z-index: 3; display: none;}
+#view_port>.loading{ width: 200px; text-align: center; height: 200px; margin: 156px; z-index: 3;}
+#view_port>.loading>img{ width: 100px; height: 100px; float: left; margin : 0 50px; }
+#view_port>.loading>span{ font-size: 75%; color: #fff; float: left; margin-top: 20px;}
 .view_port_fake{ width: 512px; height: 512px; position: relative; margin-top: -515px; z-index: 2; opacity: 0; background: #fff;}
 
 .option_wrap{ float: left;  width: 280px;  border: 2px solid #fff; margin-left: 20px; height: 492px; padding: 10px;}
