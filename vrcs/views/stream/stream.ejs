@@ -214,7 +214,7 @@
         rotationY : 0
     };
 
-    var client = new BinaryClient('ws://' + document.location.host); // Byte streaming
+    var client = new BinaryClient('ws://localhost:9000'); // Byte streaming
 
     var clientSend = function(){
         client.send(makeBuffer());

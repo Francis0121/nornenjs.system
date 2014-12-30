@@ -14,7 +14,7 @@ var app = require('../app');
 var http = require('http');
 var server = http.createServer(app);
 var BinaryServer = require('binaryjs').BinaryServer; // BinaryJs (Byte stream)
-var bs = BinaryServer({server : server}); // Start BinaryJs server
+var bs = BinaryServer({port : 9000}); // Start BinaryJs server
 var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
@@ -28,18 +28,6 @@ var streamMap = new HashMap();
 var useMap = new HashMap();
 var vrcsCudaMap = new HashMap();
 var vrcsBufMap = new HashMap();
-
-var buf = new Buffer(4);
-
-buf[0] = 0x93;
-buf[1] = 0x01;
-buf[2] = 0xc0;
-buf[3] = 0x00;
-
-console.log('Output buf : ', buf.readInt8(0));
-console.log('Output buf : ', buf.readInt8(1));
-console.log('Output buf : ', buf.readInt8(2));
-console.log('Output buf : ', buf.readInt8(3));
 
 bs.on('connection', function(client){
 
@@ -60,10 +48,14 @@ bs.on('connection', function(client){
             cudaRender.start();
             //stack.push(cudaRender.d_outputBuffer);
             var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
-            if(client._socket._socket == undefined) {
-                console.log('INFO: Client already disconnected ', client.id);
-            }else{
-                client.send(jpeg.encodeSync());
+            try {
+                if (client._socket._socket == undefined) {
+                    console.log('INFO: Client already disconnected ', client.id);
+                } else {
+                    client.send(jpeg.encodeSync());
+                }
+            }catch (error){
+                console.log('[ERROR] connection refused', error);
             }
             cudaRender.end();
             hrend = process.hrtime(hrstart);
@@ -135,11 +127,6 @@ bs.on('connection', function(client){
                         cudaInterval: undefined,
                         stackInterval : undefined,
                         frame: 0 };
-
-                    //var cudaRender = new CudaRender();
-                    //cudaRender.type = 0;
-                    //cudaRender.textureFilePath = '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name;
-                    //cudaRender.init();
 
                     var cudaRender = new CudaRender(0, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name);
                     cudaRender.init();
