@@ -11,27 +11,7 @@
 
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
     <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
-    <script>
-        $(function(){
-            $('#username').bind('change', function(){
-                var value = $(this).val();
-                if(value != ''){
-                    $(this).addClass('signin_input_active');
-                } else{
-                    $(this).removeClass('signin_input_active');
-                }
-            });
-
-            $('#password').bind('change', function(){
-                var value = $(this).val();
-                if(value != ''){
-                    $(this).addClass('signin_input_active');
-                } else{
-                    $(this).removeClass('signin_input_active');
-                }
-            });
-        });
-    </script>
+    <script src='/javascripts/vrcs.common.js'></script>
 
 </head>
 <body>

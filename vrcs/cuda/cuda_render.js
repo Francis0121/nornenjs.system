@@ -23,7 +23,7 @@ var vec3 = require('./matrix_vec3');
         this.cuModule = cuModule;
     }
 
-    var proto = CudaRender.prototype = {
+    CudaRender.prototype = {
         constructor:CudaRender,
 
         RENDERING_CUDA_TYPE : {
@@ -31,10 +31,6 @@ var vec3 = require('./matrix_vec3');
             MIP : 2,
             MRI : 3
         },
-
-        //cuCtx : undefined,
-        //cuModulePath : '/home/russa/git/vrcs/web/vrcs/cuda/vrcs.ptx',
-        //cuModule : undefined,
 
         //Option
         imageWidth : 512,

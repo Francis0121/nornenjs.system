@@ -11,15 +11,7 @@
 
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
     <script src='/jquery-ui-1.11.2.custom/jquery-ui.min.js'></script>
-
-    <script>
-        $(function(){
-            $('#volume_rendering tbody tr').on('click', function(){
-                var pn = $(this).attr('data-pn');
-                location.href='../stream/volumepn/'+pn;
-            });
-        });
-    </script>
+    <script src='/javascripts/vrcs.common.js'></script>
 
 </head>
 <body>
