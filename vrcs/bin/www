@@ -120,7 +120,11 @@ bs.on('connection', function(client){
                 positionZ : buffer.readFloatLE(20),
                 transferOffset : buffer.readFloatLE(24),
                 rotationX : buffer.readFloatLE(28),
-                rotationY : buffer.readFloatLE(32)
+                rotationY : buffer.readFloatLE(32),
+                transferScaleX : buffer.readFloatLE(36),
+                transferScaleY : buffer.readFloatLE(40),
+                transferScaleZ : buffer.readFloatLE(44),
+                mriType : buffer.readFloatLE(48)
             };
             //console.log(obj);
             return obj;
@@ -152,7 +156,9 @@ bs.on('connection', function(client){
                         frame: 0,
                         type: param.request_type };
 
-                    var cudaRender = new CudaRender(1, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name, cuCtx, cuModule);
+                    var cudaRender = new CudaRender(1, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name,
+                                                    volume.width, volume.height,volume.depth,cuCtx, cuModule);
+
                     cudaRender.init();
                     console.log('CudaRender', cudaRender);
                     obj.cudaInterval = setInterval(cudaInterval, 10);
@@ -194,9 +200,13 @@ bs.on('connection', function(client){
                 cudaRender.positionZ = param.positionZ;
                 cudaRender.brightness = param.brightness;
                 cudaRender.transferOffset = param.transferOffset;
-
+                cudaRender.transferScaleX = param.transferScaleX;
+                cudaRender.transferScaleY = param.transferScaleY;
+                cudaRender.transferScaleZ = param.transferScaleZ;
                 cudaRender.rotationX = param.rotationX;
                 cudaRender.rotationY = param.rotationY;
+                cudaRender.mriType = param.mriType;
+
                 vrcsBufMap.set(client.id, []);
             }
         });
@@ -260,7 +270,7 @@ io.sockets.on('connection', function(socket){
             clientId : clientId
         };
 
-        if(streamUserCount < 3){
+        if(streamUserCount < 10){
             streamUserCount++;
             message.success = true;
         }else{

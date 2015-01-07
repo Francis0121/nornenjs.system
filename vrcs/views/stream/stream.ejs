@@ -210,6 +210,7 @@
     var debugInterval = undefined;
 
     var REQUEST_TYPE = { START : 1, ADAPTIVE : 2, CHANGE : 3 };
+    var MRI_TYPE = { X : 1, Y : 2, Z : 3 };
     var RENDERING_TYPE = { VOLUME : 1, MIP : 2, MRI : 3 };
 
     var send_option = {
@@ -221,8 +222,37 @@
         positionZ : 3.0,
         transferOffset : 0.0,
         rotationX : 0,
-        rotationY : 0
+        rotationY : 0,
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0,
+        mriType : MRI_TYPE.X
     };
+
+    var mri_default_option = {
+        rotationX : 0,
+        rotationY : 0,
+        positionZ : 3.0
+    };
+
+    var mriX_option = {
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0
+    };
+
+    var mriY_option = {
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0
+    };
+
+    var mriZ_option = {
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0
+    };
+
 
     var client = new BinaryClient('ws://112.108.40.19:9000'); // Byte streaming
 
@@ -248,7 +278,7 @@
     });
 
     var makeBuffer = function(){
-        var buffer = new ArrayBuffer(36);
+        var buffer = new ArrayBuffer(52);
         var x = new Float32Array(buffer);
         x[0] = send_option.request_type;
         x[1] = send_option.volumePn;
@@ -259,6 +289,10 @@
         x[6] = send_option.transferOffset;
         x[7] = send_option.rotationX;
         x[8] = send_option.rotationY;
+        x[9] = send_option.transferScaleX;
+        x[10] = send_option.transferScaleY;
+        x[11] = send_option.transferScaleZ;
+        x[12] = send_option.mriType;
         return buffer;
     };
 
@@ -308,6 +342,11 @@
                 $('.option_brightness').hide();
                 $('.option_otf').hide();
                 $('.option_axis').show();
+
+                send_option.rotationX = mri_default_option.rotationX;
+                send_option.rotationY = mri_default_option.rotationY;
+                send_option.positionZ = mri_default_option.positionZ;
+
             }else if(type == RENDERING_TYPE.MIP){
                 $('.option_zoom').show();
                 $('.option_brightness').hide();
@@ -317,6 +356,22 @@
 
             send_option.request_type = REQUEST_TYPE.CHANGE;
             send_option.rendering_type = type;
+
+            if(send_option.mriType == MRI_TYPE.X){
+                send_option.transferScaleX = mriX_option.transferScaleX;
+                send_option.transferScaleY = mriX_option.transferScaleY;
+                send_option.transferScaleZ = mriX_option.transferScaleZ;
+            }else if(send_option.mriType == MRI_TYPE.Y){
+                send_option.transferScaleX = mriY_option.transferScaleX;
+                send_option.transferScaleY = mriY_option.transferScaleY;
+                send_option.transferScaleZ = mriY_option.transferScaleZ;
+            }else if(send_option.mriType == MRI_TYPE.Z){
+                send_option.transferScaleX = mriZ_option.transferScaleX;
+                send_option.transferScaleY = mriZ_option.transferScaleY;
+                send_option.transferScaleZ = mriZ_option.transferScaleZ;
+            }
+
+
             clientSend();
         });
 
@@ -328,6 +383,26 @@
             thiz.removeClass('option_select_wrap_none').addClass('option_select_wrap_active');
 
             send_option.request_type = REQUEST_TYPE.CHANGE;
+
+            send_option.mriType = type;
+
+            if(send_option.mriType == MRI_TYPE.X){
+                send_option.transferScaleX = mriX_option.transferScaleX;
+                send_option.transferScaleY = mriX_option.transferScaleY;
+                send_option.transferScaleZ = mriX_option.transferScaleZ;
+            }else if(send_option.mriType == MRI_TYPE.Y){
+                send_option.transferScaleX = mriY_option.transferScaleX;
+                send_option.transferScaleY = mriY_option.transferScaleY;
+                send_option.transferScaleZ = mriY_option.transferScaleZ;
+            }else if(send_option.mriType == MRI_TYPE.Z){
+                send_option.transferScaleX = mriZ_option.transferScaleX;
+                send_option.transferScaleY = mriZ_option.transferScaleY;
+                send_option.transferScaleZ = mriZ_option.transferScaleZ;
+            }
+
+
+            clientSend();
+
         });
 
         $('#scale').each(function() {
@@ -350,6 +425,7 @@
             $( this ).empty().slider({
                 range: 'min',
                 min: 0,
+                value: 100,
                 max: 200,
                 animate: true,
                 orientation: 'horizontal',
@@ -380,13 +456,24 @@
         $('#axis').each(function() {
             $( this ).empty().slider({
                 range: 'min',
-                min: 5000,
-                value: 10000,
-                max: 15000,
+                min: 0,
+                value: 0,
+                max: 10000,
                 animate: true,
                 orientation: 'horizontal',
                 slide: function( event, ui ) {
                     send_option.request_type = REQUEST_TYPE.CHANGE;
+
+                    if(send_option.mriType == MRI_TYPE.X){
+                        send_option.transferScaleX = (ui.value)/10000.0;
+                        mriX_option.transferScaleX = (ui.value)/10000.0;
+                    }else if(send_option.mriType == MRI_TYPE.Y){
+                        send_option.transferScaleY = (ui.value)/10000.0;
+                        mriY_option.transferScaleY = (ui.value)/10000.0;
+                    }else if(send_option.mriType == MRI_TYPE.Z){
+                        send_option.transferScaleZ = (ui.value)/10000.0;
+                        mriZ_option.transferScaleZ = (ui.value)/10000.0;
+                    }
                     clientSend();
                 }
             });
