@@ -62,7 +62,7 @@ Handle<Value> Module::TextureAlloc(const Arguments& args) {
    unsigned int depth=225;
     
    size_t size = width * height *depth * sizeof(unsigned char);  
-   FILE *fp = fopen("/home/russa/git2/node-cuda/src/Bighead.den", "rb"); 
+   FILE *fp = fopen("/home/pi/git/web/vrcs/cuda/src/Bighead.den", "rb");
    void *h_data = (void *) malloc(size);
    
    size_t read = fread(h_data, 1, size, fp);

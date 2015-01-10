@@ -22,7 +22,7 @@ var CudaRender = require('../cuda/cuda_render').CudaRender;
 
 var cu = require('../cuda/cuda');
 var cuCtx = new cu.Ctx(0, cu.Device(0));
-var cuModule = cu.moduleLoad('/home/russa/git/vrcs/web/vrcs/cuda/vrcs.ptx');
+var cuModule = cu.moduleLoad('/home/pi/git/web/vrcs/cuda/vrcs.ptx');
 
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
