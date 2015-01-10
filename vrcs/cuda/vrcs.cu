@@ -80,7 +80,9 @@ __global__ void render_kernel_volume(uint *d_output,
 								  float density,
 								  float brightness,
 								  float transferOffset,
-								  float transferScale) 
+								  float transferScaleX,
+								  float transferScaleY,
+								  float transferScaleZ)
 {
 	
 		const int maxSteps = 500;
@@ -118,7 +120,7 @@ __global__ void render_kernel_volume(uint *d_output,
 				
 				float sample = tex3D(tex,pos.x*0.5f+0.5f, pos.y*0.5f+0.5f, pos.z*0.5f+0.5f);
 				
-				float4 col = tex1D(texture_float_1D, (sample-transferOffset)*transferScale);
+				float4 col = tex1D(texture_float_1D, (sample-transferOffset));
      
 				col.x *= col.w;
 				col.y *= col.w;
@@ -136,6 +138,7 @@ __global__ void render_kernel_volume(uint *d_output,
 				pos += (step*0.5);
   
 		}
+		sum *= brightness;
 		sum.w=0.0;
 		d_output[y*imageW + x] = rgbaFloatToInt(sum);
 	}
@@ -148,7 +151,9 @@ __global__ void render_kernel_MIP(uint *d_output,
 								  float density,
 								  float brightness,
 								  float transferOffset,
-								  float transferScale) 
+								  float transferScaleX,
+								  float transferScaleY,
+								  float transferScaleZ)
 {
 	
 		const int maxSteps = 500;
@@ -209,7 +214,9 @@ __global__ void render_kernel_MRI(uint *d_output,
 								  float density,
 								  float brightness,
 								  float transferOffset,
-								  float transferScale) 
+								  float transferScaleX,
+								  float transferScaleY,
+								  float transferScaleZ)
 	{
 		const int maxSteps = 500;
 		const float tstep = 0.01f;
@@ -244,12 +251,12 @@ __global__ void render_kernel_MRI(uint *d_output,
 		float t = tnear;
 		float3 pos = eyeRay.o + eyeRay.d * tnear;
 		float3 step = eyeRay.d*tstep;
-		
-		float max = 0.0f; 
-		
-				
-		float sample = tex3D(tex, pos.x+0.5f, pos.y+0.5f+transferOffset, pos.z+0.5f);
-				
+
+		float max = 0.0f;
+
+
+		float sample = tex3D(tex, pos.x*0.5f+0.5f+transferScaleX, pos.y*0.5f+0.5f+transferScaleY, pos.z*0.5f+0.5f+transferScaleZ);
+
 		sum.x = sample;
 		sum.y = sample;
 		sum.z = sample;

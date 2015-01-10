@@ -7,6 +7,12 @@ var debugInterval = null;
 
 medical.stream = {
 
+    MRI_DEFAULT_OPTION : {
+        rotationX : 0,
+        rotationY : 0,
+        positionZ : 3.0
+    },
+
     REQUEST_TYPE : {
         START : 1,
         ADAPTIVE : 2,
@@ -19,11 +25,33 @@ medical.stream = {
         MRI : 3
     },
 
+    MRI_TYPE : {
+        X : 1,
+        Y : 2,
+        Z : 3
+    },
+
     $sthis : null,
     url : 'ws://'+host+':9000',
     client : null,
-    sendOption : null,
     buffer : null,
+    sendOption : null,
+
+    mriX_option : {
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0
+    },
+    mriY_option : {
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0
+    },
+    mriZ_option : {
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0
+    },
 
     run : function(){
         $sthis = this;
@@ -36,7 +64,11 @@ medical.stream = {
             positionZ : 3.0,
             transferOffset : 0.0,
             rotationX : 0,
-            rotationY : 0
+            rotationY : 0,
+            transferScaleX : 0.0,
+            transferScaleY : 0.0,
+            transferScaleZ : 0.0,
+            mriType : $sthis.MRI_TYPE.X
         };
 
         $sthis.client = new BinaryClient($sthis.url);
@@ -49,7 +81,7 @@ medical.stream = {
     },
 
     makeBuffer : function(){
-        $sthis.buffer = new ArrayBuffer(36);
+        $sthis.buffer = new ArrayBuffer(52);
         var x = new Float32Array($sthis.buffer);
         x[0] = $sthis.sendOption.request_type;
         x[1] = $sthis.sendOption.volumePn;
@@ -60,6 +92,10 @@ medical.stream = {
         x[6] = $sthis.sendOption.transferOffset;
         x[7] = $sthis.sendOption.rotationX;
         x[8] = $sthis.sendOption.rotationY;
+        x[9] = $sthis.sendOption.transferScaleX;
+        x[10] = $sthis.sendOption.transferScaleY;
+        x[11] = $sthis.sendOption.transferScaleZ;
+        x[12] = $sthis.sendOption.mriType;
     },
 
     on : function(){

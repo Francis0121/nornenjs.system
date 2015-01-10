@@ -55,14 +55,14 @@ Handle<Value> Module::TextureAlloc(const Arguments& args) {
    /*volume binding*/
    v8::String::Utf8Value param1(args[0]->ToString());
    char *filename = *param1;
-   size_t volumeSize = args[1]->Uint32Value();
-   
-   unsigned int width=256;
-   unsigned int height=256;
-   unsigned int depth=225;
-    
+
+   unsigned int width = args[1]->Uint32Value();
+   unsigned int height = args[2]->Uint32Value();
+   unsigned int depth = args[3]->Uint32Value();
+
    size_t size = width * height *depth * sizeof(unsigned char);  
-   FILE *fp = fopen("/home/pi/git/web/vrcs/cuda/src/Bighead.den", "rb");
+
+   FILE *fp = fopen(filename, "rb");
    void *h_data = (void *) malloc(size);
    
    size_t read = fread(h_data, 1, size, fp);

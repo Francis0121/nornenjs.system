@@ -16,9 +16,12 @@ var vec3 = require('./matrix_vec3');
     }
 }(function () {
 
-    function CudaRender(type, textureFilePath, cuCtx, cuModule) {
+    function CudaRender(type, textureFilePath, volume_width, volume_height, volume_depth, cuCtx, cuModule) {
         this.type = type;
         this.textureFilePath = textureFilePath;
+        this.volumewidth = volume_width;
+        this.volumeheight = volume_height;
+        this.volumedepth = volume_depth;
         this.cuCtx = cuCtx;
         this.cuModule = cuModule;
     }
@@ -31,6 +34,7 @@ var vec3 = require('./matrix_vec3');
             MIP : 2,
             MRI : 3
         },
+        MRI_TYPE : { X : 1, Y : 2, Z : 3 },
 
         //Option
         imageWidth : 512,
@@ -38,10 +42,13 @@ var vec3 = require('./matrix_vec3');
         density : 0.05,
         brightness : 1.0,
         transferOffset : 0.0,
-        transferScale : 1.0,
+        transferScaleX : 0.0,
+        transferScaleY : 0.0,
+        transferScaleZ : 0.0,
         positionZ: 3.0,
         rotationX: 0,
         rotationY: 0,
+        mriType:1,
 
 
         d_output : undefined,
@@ -50,7 +57,7 @@ var vec3 = require('./matrix_vec3');
 
         init : function(){
             // ~ VolumeLoad & VolumeTexture & TextureBinding
-            var error = this.cuModule.memTextureAlloc(this.textureFilePath, 256*256*225);
+            var error = this.cuModule.memTextureAlloc(this.textureFilePath, this.volumewidth,this.volumeheight, this.volumedepth);
             console.log('[INFO_CUDA] _cuModule.memTextureAlloc', error);
         },
 
@@ -72,16 +79,46 @@ var vec3 = require('./matrix_vec3');
         makeViewVector : function(){
             var vec;
             var model_matrix = mat4.create();
+            if(this.type == this.RENDERING_CUDA_TYPE.MRI ) {
+                if (this.mriType == this.MRI_TYPE.X) {
 
-            vec = vec3.fromValues(-1.0, 0.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix, ( (270.0 + (this.rotationY * -1)) * 3.14159265 / 180.0), vec);
+                    vec = vec3.fromValues(-1.0, 0.0, 0.0);
+                    mat4.rotate(model_matrix, model_matrix, ( (270.0) * 3.14159265 / 180.0), vec);
 
-            vec = vec3.fromValues(0.0, 1.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix,( (0.0 + (this.rotationX*-1)) * 3.14159265 / 180.0), vec);
+                    vec = vec3.fromValues(0.0, 1.0, 0.0);
+                    mat4.rotate(model_matrix, model_matrix, ( (- 90) * 3.14159265 / 180.0), vec);
 
-            vec = vec3.fromValues(0.0, 0.0, this.positionZ);
-            mat4.translate(model_matrix, model_matrix,vec)
+                    vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+                    mat4.translate(model_matrix, model_matrix, vec)
+                }else if(this.mriType == this.MRI_TYPE.Y){
+                    vec = vec3.fromValues(-1.0, 0.0, 0.0);
+                    mat4.rotate(model_matrix, model_matrix, ( (270.0 ) * 3.14159265 / 180.0), vec);
 
+                    vec = vec3.fromValues(0.0, 1.0, 0.0);
+                    mat4.rotate(model_matrix, model_matrix, ( (0.0 ) * 3.14159265 / 180.0), vec);
+
+                    vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+                    mat4.translate(model_matrix, model_matrix, vec)
+                }else if(this.mriType == this.MRI_TYPE.Z) {
+                    vec = vec3.fromValues(-1.0, 0.0, 0.0);
+                    mat4.rotate(model_matrix, model_matrix, ( (180 ) * 3.14159265 / 180.0), vec);
+
+                    vec = vec3.fromValues(0.0, 1.0, 0.0);
+                    mat4.rotate(model_matrix, model_matrix, ( (0.0 ) * 3.14159265 / 180.0), vec);
+
+                    vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+                    mat4.translate(model_matrix, model_matrix, vec)
+                }
+            }else{
+                vec = vec3.fromValues(-1.0, 0.0, 0.0);
+                mat4.rotate(model_matrix, model_matrix, ( (270.0 + (this.rotationY * -1)) * 3.14159265 / 180.0), vec);
+
+                vec = vec3.fromValues(0.0, 1.0, 0.0);
+                mat4.rotate(model_matrix, model_matrix,( (0.0 + (this.rotationX*-1)) * 3.14159265 / 180.0), vec);
+
+                vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+                mat4.translate(model_matrix, model_matrix,vec)
+            }
             /*view vector*/
             var c_invViewMatrix = new Buffer(12*4);
             c_invViewMatrix.writeFloatLE( model_matrix[0], 0*4);
@@ -148,7 +185,13 @@ var vec3 = require('./matrix_vec3');
                     value: this.transferOffset
                 },{
                     type: "Float32",
-                    value: this.transferScale
+                    value: this.transferScaleX
+                },{
+                    type: "Float32",
+                    value: this.transferScaleY
+                },{
+                    type: "Float32",
+                    value: this.transferScaleZ
                 }
                 ]
             );

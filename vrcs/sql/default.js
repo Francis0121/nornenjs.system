@@ -24,19 +24,19 @@ db.serialize(function() {
         var volume = [{
             $userpn : uData.pn,
             $title : 'Skull',
-            $saveName : '[2014-11-27 20:00:00]_head1.den',
-            $fileName : 'head.dan',
+            $saveName : '[2014-11-27 20:00:00]_head.den',
+            $fileName : 'head.den',
             $width : 256,
             $height : 256,
             $depth : 225
         },{
             $userpn : uData.pn,
-            $title : 'Big head',
-            $saveName : '[2014-11-27 20:00:00]_head2.den',
-            $fileName : 'head2.dan',
-            $width : 256,
-            $height : 256,
-            $depth : 225
+            $title : 'Abdomen',
+            $saveName : '[2014-11-27 20:00:00]_abdomen.den',
+            $fileName : '_abdomen.den',
+            $width : 512,
+            $height : 512,
+            $depth : 300
         }];
 
         stmt = db.prepare(sql.volume.insert);
