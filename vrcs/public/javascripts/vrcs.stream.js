@@ -148,6 +148,6 @@ medical.stream = {
         }
 
         $sthis.adaptiveOption.frame = 0;
+
     }
-    
 };
