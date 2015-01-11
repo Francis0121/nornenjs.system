@@ -61,6 +61,7 @@ Handle<Value> Module::TextureAlloc(const Arguments& args) {
    unsigned int depth = args[3]->Uint32Value();
 
    size_t size = width * height *depth * sizeof(unsigned char);  
+
    FILE *fp = fopen(filename, "rb");
    void *h_data = (void *) malloc(size);
    

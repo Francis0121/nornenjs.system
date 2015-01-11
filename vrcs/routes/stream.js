@@ -28,12 +28,18 @@ router.get('/volumepn/:pn', function(req, res) {
         }else {
             volumeMap.set(volume.pn, volume);
 
-            var accessInfo = {
-                volumePn : volume.pn,
-                userPn : req.session.user.pn
+            var model = {
+                error : '',
+                accessInfo : {
+                    volumePn : volume.pn,
+                    userPn : req.session.user.pn
+                },
+                user : req.session.user,
+                volume : volume,
+                host : req.ip
             };
 
-            res.render('stream/stream', { error : '', accessInfo : accessInfo, user : req.session.user, volume : volume });
+            res.render('stream/stream', model);
         }
     });
 
