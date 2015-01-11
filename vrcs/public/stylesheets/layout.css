@@ -192,7 +192,7 @@ body{ background: #231f20; }
 
 .stream_content{ padding-top: 20px; float: left; width: 850px;}
 #view_port{ float: left; width: 512px; height: 512px; border: 2px solid #fff; }
-#view_port>.loading{ width: 200px; text-align: center; height: 200px; margin: 156px; z-index: 5;}
+#view_port>.loading{ width: 200px; text-align: center; height: 200px; padding: 156px; z-index: 5; position: relative; margin-top: -512px;}
 #view_port>.loading>img{ width: 100px; height: 100px; float: left; margin : 0 50px; }
 #view_port>.loading>span{ font-size: 75%; color: #fff; float: left; margin-top: 20px;}
 #view_port>.fps{ color: #fff; position: absolute; z-index: 3; padding: 10px; font-size: 67.5%; display: block; }
