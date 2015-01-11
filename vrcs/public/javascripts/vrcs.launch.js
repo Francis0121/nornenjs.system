@@ -14,7 +14,4 @@ $(function(){
     if( medical.stream !== undefined )
         medical.stream.run();
 
-    if( medical.debug !== undefined )
-        medical.debug.run();
-
 });

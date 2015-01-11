@@ -51,6 +51,8 @@ medical.stream = {
 
         $sthis.client = new BinaryClient($sthis.url);
         $sthis.on();
+
+        $sthis.debug.run();
     },
 
     send : function(){
@@ -123,15 +125,131 @@ medical.stream = {
             $sthis.adaptiveOption.interval = null;
         }
 
+        // ~ adaptive stream
         $sthis.adaptiveOption.elapsedTime += 1;
         $sthis.adaptiveOption.sum += $sthis.adaptiveOption.frame;
 
+        var text = 'second: ' + $sthis.adaptiveOption.elapsedTime + ' frame: ' +  $sthis.adaptiveOption.frame;
+        $sthis.debug.text($sthis.debug.LEVEL.DEBUG, text);
+
         if( ( $sthis.adaptiveOption.elapsedTime % 3 === 0 ) && medical.connect.isConnect) {
             $sthis.adaptive();
-            $sthis.adaptiveOption.elapsedTime = 0;
+            $sthis.adaptiveOption.sum = 0;
         }
 
+        // ~ send debug
+        var $dthis = $sthis.debug;
+        var $option = $dthis.option;
+        if( $option.isAccess === true ){
+            $dthis.statistic();
+        }
         $sthis.adaptiveOption.frame = 0;
 
+    },
+
+    debug : {
+
+        LEVEL : { INFO : 0, DEBUG : 1, ERROR : 2 },
+
+        option : {
+            active : true,
+            host : 'http://112.108.40.166:9080',
+            isAccess : false,
+            uuid : null,
+        },
+
+        document : {
+            streamDebugWrap : null,
+            content : null
+        },
+
+        run : function(){
+
+            if ( !$sthis.debug.option.active ) return;
+
+            $sthis.debug.emit();
+
+            $sthis.debug.view();
+        },
+
+        view : function(){
+            var $dthis = $sthis.debug;
+            var $doc = $dthis.document;
+
+            $doc.streamDebugWrap =
+                $('<div>').attr('id', '_stream_debug')
+                    .addClass('_stream_debug_wrap');
+
+            $doc.content =
+                $('<div>').addClass('content');
+
+            $('html').append($doc.streamDebugWrap.append($doc.content));
+        },
+
+        text : function(level, log){
+            var $dthis = $sthis.debug;
+            var $doc = $dthis.document;
+
+            var $text = $('<p>');
+
+            var pre = null;
+            if( level === $sthis.debug.LEVEL.INFO ){
+                pre = '[INFO] ';
+                $text.addClass('info');
+            }else if( level === $sthis.debug.LEVEL.DEBUG ){
+                pre = '[DEBUG] ';
+                $text.addClass('debug');
+            }else if( level === $sthis.debug.LEVEL.ERROR ){
+                pre = '[ERROR] ';
+                $text.addClass('error');
+            }else {
+                pre = '[NONE] ';
+            }
+
+            $text.text(pre + log);
+            $doc.content.append($text);
+        },
+
+        emit : function(){
+            var $dthis = $sthis.debug;
+            var $option = $dthis.option;
+
+            var url = $option.host + '/access/emit';
+
+            $.getJSON(url, function(uuid){
+                $option.uuid = uuid;
+                $option.isAccess = true;
+            }).error(function(error){
+                console.log('[ERROR]', error);
+                $option.isAccess = false;
+            });
+        },
+
+        statistic : function(){
+            var $dthis = $sthis.debug;
+            var $option = $dthis.option;
+
+            if(!$option.isAccess){
+                return;
+            }
+
+            var url = $option.host + '/access/statistics';
+            var json = {
+                uuidPn : $option.uuid.pn,
+                name : $.browser.name,
+                platform : $.browser.platform,
+                version : $.browser.version,
+                versionNumber : $.browser.versionNumber,
+                isMobile : $.browser.desktop ? 1 : 0,
+                frameCount : $sthis.adaptiveOption.frame
+            };
+
+            $.postJSON(url, json, function(stats_pn){
+                console.log('[INFO] success index ', stats_pn)
+            }).error(function(error){
+                console.log('[ERROR]', error);
+                $option.isAccess = false;
+            });
+        }
     }
 };

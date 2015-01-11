@@ -218,3 +218,11 @@ body{ background: #231f20; }
 
 /** error*/
 .error_page{ width: 900px; height: 600px; margin: 0 auto; display: block;}
+
+/** debug */
+._stream_debug_wrap{ width: 100%; height: 150px; position: absolute; bottom: 50px; }
+._stream_debug_wrap>.content{ width: 388px; margin: 0 auto; height: 138px; overflow-y: scroll; border: 1px solid #fff; padding: 5px; background: #000; }
+._stream_debug_wrap>.content>p{ font-size: 62.5%; color: #fff; line-height: 1.2; padding: 3px 0;}
+._stream_debug_wrap>.content>p.info{ color : #fff836; }
+._stream_debug_wrap>.content>p.debug{ color : #a9c3ff; }
+._stream_debug_wrap>.content>p.error{ color : #f3c8c8; }

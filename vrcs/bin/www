@@ -176,11 +176,15 @@ bs.on('connection', function(client){
                 obj.type = param.request_type;
 
                 if( time - 5 > sum / 3  ){
-                    //console.log('decrease frame');
+                    var text = '[INFO] adaptive stream decrease frame from ' + frameList[obj.frame];
                     obj.frame = obj.frame + 1 == frameList.length ? obj.frame : obj.frame + 1;
-                }else if( time + 1 < sum /3 ){
-                    //console.log('increase frame');
+                    text += ' to ' + frameList[obj.frame];
+                    console.log(text);
+                }else if( time - 1 < sum /3 ){
+                    var text = '[INFO] adaptive stream increase frame from ' + frameList[obj.frame];
                     obj.frame = obj.frame-1 == -1 ? obj.frame : obj.frame - 1 ;
+                    text += ' to ' + frameList[obj.frame];
+                    console.log(text);
                 }else{
                     //console.log('maintain frame');
                 }
