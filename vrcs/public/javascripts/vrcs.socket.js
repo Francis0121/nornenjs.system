@@ -5,6 +5,7 @@ medical.connect = {
     $cthis : null,
     selector : '#view_port',
     document : {
+        fps : $('<span>'),
         view : $('<img>'),
         loading : $('<div>'),
         fake : $('<div>')
@@ -33,6 +34,9 @@ medical.connect = {
      * Make Dom element
      */
     start : function(){
+
+        $cthis.document.fps.addClass('fps');
+
         $cthis.document.view.addClass('data');
 
         $cthis.document.loading.addClass('loading')
@@ -41,7 +45,8 @@ medical.connect = {
 
         $cthis.document.fake.addClass('view_port_fake');
 
-        $($cthis.selector).append($cthis.document.view)
+        $($cthis.selector).append($cthis.document.fps)
+            .append($cthis.document.view)
             .append($cthis.document.loading)
             .append($cthis.document.fake);
     },

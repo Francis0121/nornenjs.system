@@ -137,6 +137,8 @@ medical.stream = {
             $sthis.adaptiveOption.sum = 0;
         }
 
+        medical.connect.document.fps.text('FPS : ' + $sthis.adaptiveOption.frame);
+
         // ~ send debug
         var $dthis = $sthis.debug;
         var $option = $dthis.option;
@@ -153,6 +155,7 @@ medical.stream = {
 
         option : {
             active : true,
+            draw : false,
             host : 'http://112.108.40.166:9080',
             isAccess : false,
             uuid : null,
@@ -168,6 +171,8 @@ medical.stream = {
             if ( !$sthis.debug.option.active ) return;
 
             $sthis.debug.emit();
+
+            if ( !sthis.debug.option.draw ) return;
 
             $sthis.debug.view();
         },
@@ -189,6 +194,8 @@ medical.stream = {
         text : function(level, log){
             var $dthis = $sthis.debug;
             var $doc = $dthis.document;
+
+            if( !$dthis.option.draw ) return;
 
             var $text = $('<p>');
 
