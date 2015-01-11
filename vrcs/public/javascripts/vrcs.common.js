@@ -79,22 +79,15 @@ medical.event = {
                     $('.option_axis').hide();
                 }
 
-                if($sthis.sendOption.mriType === $sthis.MRI_TYPE.X){
-                    $sthis.sendOption.transferScaleX = $sthis.mriX_option.transferScaleX;
-                    $sthis.sendOption.transferScaleY = $sthis.mriX_option.transferScaleY;
-                    $sthis.sendOption.transferScaleZ = $sthis.mriX_option.transferScaleZ;
-                }else if($sthis.sendOption.mriType === $sthis.MRI_TYPE.Y){
-                    $sthis.sendOption.transferScaleX = $sthis.mriY_option.transferScaleX;
-                    $sthis.sendOption.transferScaleY = $sthis.mriY_option.transferScaleY;
-                    $sthis.sendOption.transferScaleZ = $sthis.mriY_option.transferScaleZ;
-                }else if($sthis.sendOption.mriType === $sthis.MRI_TYPE.Z){
-                    $sthis.sendOption.transferScaleX = $sthis.mriZ_option.transferScaleX;
-                    $sthis.sendOption.transferScaleY = $sthis.mriZ_option.transferScaleY;
-                    $sthis.sendOption.transferScaleZ = $sthis.mriZ_option.transferScaleZ;
-                }
+                $sthis.sendOption.transferScaleX = 0;
+                $sthis.sendOption.transferScaleY = 0;
+                $sthis.sendOption.transferScaleZ = 0;
+                $('#axis .ui-slider-range').css('width', '0');
+                $('#axis .ui-slider-handle').css('left', '0');
 
                 $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
                 $sthis.sendOption.rendering_type = type;
+
                 $sthis.send();
             });
         },
@@ -111,19 +104,13 @@ medical.event = {
                 $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
                 $sthis.sendOption.mriType = type;
 
-                if($sthis.sendOption.mriType === $sthis.MRI_TYPE.X){
-                    $sthis.sendOption.transferScaleX = $sthis.mriX_option.transferScaleX;
-                    $sthis.sendOption.transferScaleY = $sthis.mriX_option.transferScaleY;
-                    $sthis.sendOption.transferScaleZ = $sthis.mriX_option.transferScaleZ;
-                }else if($sthis.sendOption.mriType === $sthis.MRI_TYPE.Y){
-                    $sthis.sendOption.transferScaleX = $sthis.mriY_option.transferScaleX;
-                    $sthis.sendOption.transferScaleY = $sthis.mriY_option.transferScaleY;
-                    $sthis.sendOption.transferScaleZ = $sthis.mriY_option.transferScaleZ;
-                }else if($sthis.sendOption.mriType === $sthis.MRI_TYPE.Z){
-                    $sthis.sendOption.transferScaleX = $sthis.mriZ_option.transferScaleX;
-                    $sthis.sendOption.transferScaleY = $sthis.mriZ_option.transferScaleY;
-                    $sthis.sendOption.transferScaleZ = $sthis.mriZ_option.transferScaleZ;
-                }
+                $sthis.sendOption.transferScaleX = 0;
+                $sthis.sendOption.transferScaleY = 0;
+                $sthis.sendOption.transferScaleZ = 0;
+                $('#axis .ui-slider-range').css('width', '0');
+                $('#axis .ui-slider-handle').css('left', '0');
+
+                $sthis.send();
             });
         },
 
@@ -188,9 +175,9 @@ medical.event = {
             $('#axis').each(function() {
                 $( this ).empty().slider({
                     range: 'min',
-                    min: 5000,
-                    value: 10000,
-                    max: 15000,
+                    min: 0,
+                    value: 0,
+                    max: 10000,
                     animate: true,
                     orientation: 'horizontal',
                     slide: function( event, ui ) {
@@ -199,13 +186,10 @@ medical.event = {
 
                         if($sthis.sendOption.mriType == $sthis.MRI_TYPE.X){
                             $sthis.sendOption.transferScaleX = (ui.value)/10000.0;
-                            $sthis.mriX_option.transferScaleX = (ui.value)/10000.0;
                         }else if($sthis.sendOption.mriType == $sthis.MRI_TYPE.Y){
                             $sthis.sendOption.transferScaleY = (ui.value)/10000.0;
-                            $sthis.mriY_option.transferScaleY = (ui.value)/10000.0;
                         }else if($sthis.sendOption.mriType == $sthis.MRI_TYPE.Z){
                             $sthis.sendOption.transferScaleZ = (ui.value)/10000.0;
-                            $sthis.mriZ_option.transferScaleZ = (ui.value)/10000.0;
                         }
 
                         $sthis.send();

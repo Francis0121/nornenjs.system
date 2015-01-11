@@ -31,22 +31,6 @@ medical.stream = {
     buffer : null,
     sendOption : null,
 
-    mriX_option : {
-        transferScaleX : 0.0,
-        transferScaleY : 0.0,
-        transferScaleZ : 0.0
-    },
-    mriY_option : {
-        transferScaleX : 0.0,
-        transferScaleY : 0.0,
-        transferScaleZ : 0.0
-    },
-    mriZ_option : {
-        transferScaleX : 0.0,
-        transferScaleY : 0.0,
-        transferScaleZ : 0.0
-    },
-
     run : function(){
         $sthis = this;
         $sthis.sendOption = {
