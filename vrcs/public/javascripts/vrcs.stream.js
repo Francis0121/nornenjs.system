@@ -90,7 +90,14 @@ medical.stream = {
 
             stream.on('end', function(){
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                medical.connect.document.view.attr('src', url);
+                var canvas = document.getElementById(medical.connect.selector+'_canvas');
+                var ctx = canvas.getContext('2d');
+
+                var img = new Image(512, 512);
+                img.onload = function(){
+                    ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+                };
+                img.src = url;
 
                 $sthis.adaptiveOption.frame++;
                 if($sthis.adaptiveOption.interval === null)
@@ -172,7 +179,7 @@ medical.stream = {
 
             $sthis.debug.emit();
 
-            if ( !sthis.debug.option.draw ) return;
+            if ( !$sthis.debug.option.draw ) return;
 
             $sthis.debug.view();
         },

@@ -220,7 +220,7 @@ bs.on('connection', function(client){
         });
     });
 
-    client.on('close', function(stream, meta){
+    client.on('close', function(stream, meta){http://112.108.40.166:3000/stream/volumepn/1
         closeCallback(client.id);
     });
 
@@ -274,7 +274,7 @@ io.sockets.on('connection', function(socket){
             clientId : clientId
         };
 
-        if(streamUserCount < 10){
+        if(streamUserCount < 3){
             streamUserCount++;
             message.success = true;
         }else{

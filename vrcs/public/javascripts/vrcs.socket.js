@@ -6,7 +6,7 @@ medical.connect = {
     selector : '#view_port',
     document : {
         fps : $('<span>'),
-        view : $('<img>'),
+        canvas : $('<canvas>'),
         loading : $('<div>'),
         fake : $('<div>')
     },
@@ -35,9 +35,11 @@ medical.connect = {
      */
     start : function(){
 
-        $cthis.document.fps.addClass('fps');
+        $cthis.document.fps = $('<span>').addClass('fps');
 
-        $cthis.document.view.addClass('data');
+        $cthis.document.canvas.attr('id', $cthis.selector+'_canvas');
+        $cthis.document.canvas.attr('width', '512px');
+        $cthis.document.canvas.attr('height', '512px');
 
         $cthis.document.loading.addClass('loading')
             .append($('<img>').attr('src','/image/loading.gif'))
@@ -46,7 +48,7 @@ medical.connect = {
         $cthis.document.fake.addClass('view_port_fake');
 
         $($cthis.selector).append($cthis.document.fps)
-            .append($cthis.document.view)
+            .append($cthis.document.canvas)
             .append($cthis.document.loading)
             .append($cthis.document.fake);
     },
@@ -67,11 +69,11 @@ medical.connect = {
             //$('.debug_wrap').append('<p>connect byte stream</p>');
             if(!data.success){
                 //$('.debug_wrap').append('<p>'+data.error+'</p>');
-                $cthis.document.view.hide();
+                $cthis.document.canvas.hide();
                 $cthis.document.loading.show();
                 return;
             }
-            $cthis.document.view.show();
+            $cthis.document.canvas.show();
             $cthis.document.loading.hide();
             $cthis.isConnect = true;
 
