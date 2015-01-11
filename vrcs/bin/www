@@ -22,7 +22,7 @@ var CudaRender = require('../cuda/cuda_render').CudaRender;
 
 var cu = require('../cuda/cuda');
 var cuCtx = new cu.Ctx(0, cu.Device(0));
-var cuModule = cu.moduleLoad('/home/russa/git/vrcs/web/vrcs/cuda/vrcs.ptx');
+var cuModule = cu.moduleLoad(path.join(__dirname, '../cuda/vrcs.ptx'));
 
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
@@ -156,7 +156,7 @@ bs.on('connection', function(client){
                         frame: 0,
                         type: param.request_type };
 
-                    var cudaRender = new CudaRender(1, '/home/russa/git/vrcs/web/vrcs/public/upload/'+volume.save_name,
+                    var cudaRender = new CudaRender(1, path.join(__dirname, '../public/upload/')+volume.save_name,
                                                     volume.width, volume.height,volume.depth,cuCtx, cuModule);
 
                     cudaRender.init();
