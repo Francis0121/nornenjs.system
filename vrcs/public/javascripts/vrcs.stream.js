@@ -1,10 +1,4 @@
 // ~ Byte stream
-
-var second = 0;
-var count = 0;
-var sum = 0;
-var debugInterval = null;
-
 medical.stream = {
 
     MRI_DEFAULT_OPTION : {
@@ -112,10 +106,10 @@ medical.stream = {
                 var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
                 medical.connect.document.view.attr('src', url);
 
-                count++;
-                if(debugInterval === null){
-                    debugInterval = setInterval($sthis.debug, 1000);
-                }
+                $sthis.adaptiveOption.frame++;
+                if($sthis.adaptiveOption.interval === null)
+                    $sthis.adaptiveOption.interval = setInterval($sthis.adaptiveInterval, 1000);
+
             });
         });
     },
@@ -125,26 +119,35 @@ medical.stream = {
         $sthis.send();
     },
 
+    adaptiveOption : {
+        interval : null,
+        frame : 0,
+        sum : 0,
+        elapsedTime : 0
+    },
+
     adaptive : function(){
         $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.ADAPTIVE;
-        $sthis.sendOption.frame = sum;
+        $sthis.sendOption.frame = $sthis.adaptiveOption.sum;
         $sthis.send();
     },
 
-    debug : function(){
+    adaptiveInterval : function(){
 
-        if(count === 0){
-            clearInterval(debugInterval);
-            debugInterval = undefined;
+        if($sthis.adaptiveOption.frame === 0){
+            clearInterval($sthis.adaptiveOption.interval);
+            $sthis.adaptiveOption.interval = null;
         }
 
-        second+=1;
-        sum+=count;
-        $('.debug_wrap').append('<p> sec: '+ second + ' c: ' +count+'</p>');
-        if(second % 3 === 0 && medical.connect.isConnect) {
+        $sthis.adaptiveOption.elapsedTime += 1;
+        $sthis.adaptiveOption.sum += $sthis.adaptiveOption.frame;
+
+        if( ( $sthis.adaptiveOption.elapsedTime % 3 === 0 ) && medical.connect.isConnect) {
             $sthis.adaptive();
-            sum = 0;
+            $sthis.adaptiveOption.elapsedTime = 0;
         }
-        count = 0;
+
+        $sthis.adaptiveOption.frame = 0;
     }
+    
 };
