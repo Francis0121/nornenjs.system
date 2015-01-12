@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var sqlite = require('../sql/default');
 var HashMap = require('hashmap').HashMap;
+var ip = require("ip");
+
+console.log(ip.address());
 
 // Not sign in user don`t access this router
 router.use(function(req, res, next) {
@@ -36,7 +39,7 @@ router.get('/volumepn/:pn', function(req, res) {
                 },
                 user : req.session.user,
                 volume : volume,
-                host : req.ip
+                host : ip.address()
             };
 
             res.render('stream/stream', model);
