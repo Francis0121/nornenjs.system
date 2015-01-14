@@ -2,7 +2,7 @@
 *   Screen min width 720px
 */
 .layout_header_wrap{ height: 40px; }
-.layout_header{ width: 400px; height: 40px; }
+.layout_header{ width: 230px; height: 40px; }
 
 .layout_header>ul.left{ padding: 5px; height: 30px;}
 .layout_header>ul.left>li{ height: 30px; }
@@ -22,7 +22,7 @@
 .layout_header>ul.right>li.user>span.mark{ margin: 8px 0 8px 5px; }
 
 .layout_section_wrap{ margin-top: -41px;}
-.layout_section{ padding: 41px 0; }
+.layout_section{ padding: 81px 0; }
 
 .layout_footer_wrap{ height: 40px; margin-top: -61px;}
 .layout_footer{ height: 40px; }
