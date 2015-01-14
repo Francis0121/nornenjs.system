@@ -35,7 +35,7 @@ medical.connect = {
      */
     start : function(){
 
-        $cthis.document.fps = $('<span>').addClass('fps');
+        $cthis.document.fps = $('<span>').addClass('fps').text('FPS : 0');
 
         $cthis.document.canvas.attr('id', $cthis.selector+'_canvas');
         $cthis.document.canvas.attr('width', '512px');

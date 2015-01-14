@@ -194,31 +194,33 @@
 #view_port>.fps{ padding: 10px; font-size: 67.5%; }
 .view_port_fake{ width: 512px; height: 512px; margin-top: -515px; }
 
-.option_wrap{ }
-.option_wrap>.option_default{ }
-.option_wrap>.option_default>h6{ }
+.option_wrap{ width: 280px; border: 2px solid #fff; margin-left: 20px; height: 492px; padding: 10px; }
+.option_wrap>.option_default{ width: 100%; margin-bottom: 10px; }
+.option_wrap>.option_default>h6{ width: 260px; margin: 4px 8px; font-size: 100%; margin-top: 10px; }
 .option_wrap>.option_default>h6>span.mark{}
-.option_wrap>.option_default>h6>span.text{ }
-.option_select_wrap{ }
-.option_select_wrap>li{ }
+.option_wrap>.option_default>h6>span.text{ font-size: 87.5%; }
+
+.option_select_wrap{ width: 262px; height: 36px; border: 2px solid #fff; margin: 4px 8px; }
+.option_select_wrap>li{ width: 86px; height: 36px; line-height: 36px; font-size: 75%; }
 .option_select_wrap>li:hover{ }
 .option_select_wrap_active{ }
 .option_select_wrap_none{ }
-.option_select_wrap>li:nth-child(1), .option_select_wrap>li:nth-child(2){ }
+.option_select_wrap>li:nth-child(1), .option_select_wrap>li:nth-child(2){ border-right: 2px solid #fff; }
 
 .option_axis{ }
 
-.slider_len{ }
+.slider_len{ width: 240px !important; margin: 10px 20px; height: 10px !important; }
 .slider_len .ui-slider-range{ }
-.slider_len .ui-slider-handle{ }
+.slider_len .ui-slider-handle{ width: 20px !important; height: 20px !important; border-radius:10px; }
 
 /** error*/
-.error_page{ width: 900px; height: 600px; margin: 0 auto; display: block;}
+.error_page{ width: 900px; }
+.error_page>img{ }
 
 /** debug */
-._stream_debug_wrap{ width: 100%; height: 150px; position: absolute; bottom: 50px; }
-._stream_debug_wrap>.content{ width: 388px; margin: 0 auto; height: 138px; overflow-y: scroll; border: 1px solid #fff; padding: 5px; background: #000; }
-._stream_debug_wrap>.content>p{ font-size: 62.5%; color: #fff; line-height: 1.2; padding: 3px 0;}
-._stream_debug_wrap>.content>p.info{ color : #fff836; }
-._stream_debug_wrap>.content>p.debug{ color : #a9c3ff; }
-._stream_debug_wrap>.content>p.error{ color : #f3c8c8; }
+._stream_debug_wrap{ }
+._stream_debug_wrap>.content{  }
+._stream_debug_wrap>.content>p{ }
+._stream_debug_wrap>.content>p.info{ }
+._stream_debug_wrap>.content>p.debug{ }
+._stream_debug_wrap>.content>p.error{ }
