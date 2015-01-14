@@ -1,40 +1,45 @@
 /**
-*   Screen min width 720px
+*   Screen min width 480px
 */
-.layout_header_wrap{ height: 40px; }
-.layout_header{ width: 400px; height: 40px; }
+html{ }
+body{ background: #231f20; }
 
-.layout_header>ul.left{ padding: 5px; height: 30px; width: 40%; }
-.layout_header>ul.left>li{ height: 30px; width: 100%;}
-.layout_header>ul.left>li.symbol>span.mark{ margin: 5px 10px 5px 0; }
-.layout_header>ul.left>li.history>span.mark{ margin: 9px 5px 9px 0; }
-.layout_header>ul.left>li>a{ font-size: 75%; height: 30px; line-height: 30px; margin-right: 7px; }
-.layout_header>ul.left>li>a:visited{ }
-.layout_header>ul.left>li>a:hover{ }
+.layout_header_wrap{ width: 100%; }
+.layout_header{ width: 100%; }
 
-.layout_header>ul.right{ padding: 5px; height: 30px; width: 40%; background: #fff;}
-.layout_header>ul.right>li{ height: 30px; width: 100%;}
-.layout_header>ul.right>li>a{ font-size: 75%; height: 30px; line-height: 30px; margin-left: 10px; }
-.layout_header>ul.right>li>a:visited{ }
-.layout_header>ul.right>li>a:hover{ }
-.layout_header>ul.right>li.help>span.mark{ margin: 9px 0 8px 0; }
-.layout_header>ul.right>li.help>a{ }
-.layout_header>ul.right>li.user>span.mark{ margin: 8px 0 8px 5px; }
+.layout_header>ul.left{ float: left; width: 100%; background: #056461; border-bottom: 2px solid #fff; }
+.layout_header>ul.left>li{ float: left; width: 50%; height: 30px; line-height: 30px; text-align: center; }
+.layout_header>ul.left>li.symbol>span.mark{ margin: 0 auto; width: 90px; height: 30px; background: url("../image/symbol_small.png") no-repeat 0px 5px; text-indent: -9999px; position: relative; display: block; }
+.layout_header>ul.left>li.symbol>a{ margin-top: -30px; display: block; position: relative; }
+.layout_header>ul.left>li.history>span.mark{ display: none;}
+.layout_header>ul.left>li>a{ font-size: 87.5%; color: #fff; }
+.layout_header>ul.left>li>a:visited{ color: #fff; }
+.layout_header>ul.left>li>a:hover{ color: #efefef; }
 
-.layout_section_wrap{ margin-top: -81px;}
-.layout_section{ padding: 41px 0; }
+.layout_header>ul.right{ float: left; width: 100%; background: #28918d; border-bottom: 2px solid #fff; }
+.layout_header>ul.right>li{ float: left; width: 50%; height: 30px; line-height: 30px; text-align: center; }
+.layout_header>ul.right>li>a{ font-size: 87.5%; color: #fff; }
+.layout_header>ul.right>li>a:visited{ color: #fff; }
+.layout_header>ul.right>li>a:hover{ color: #efefef; }
+.layout_header>ul.right>li.help>span.mark{ margin: 0 auto; width: 65px; height: 30px; background: url("../image/help.png") no-repeat 0px 9px; text-indent: -9999px; position: relative; display: block; }
+.layout_header>ul.right>li.help>a{ margin-top: -30px; display: block; position: relative; }
+.layout_header>ul.right>li.user>span.mark{ margin: 0 auto; width: 65px; height: 30px; background: url("../image/user.png") no-repeat 0px 9px; text-indent: -9999px; position: relative; display: block; }
+.layout_header>ul.right>li.user>a{ margin-top: -30px; display: block; position: relative; }
 
-.layout_footer_wrap{ height: 40px; margin-top: -61px;}
-.layout_footer{ height: 40px; }
-.layout_footer>span{ font-size: 68.75%; line-height: 40px; height: 40px; }
+.layout_section_wrap{ width: 100%;}
+.layout_section{ width: 100%; }
+
+.layout_footer_wrap{ width: 100%; margin-top: 40px;}
+.layout_footer{ width: 100%; text-align: center; height: 30px; line-height: 30px;}
+.layout_footer>span{ color: #fff; font-size: 68.75%; }
 
 /** main */
-.main_content{ width: 230px; }
-.main_content>img{ margin-top: 210px; }
-.main_content>.title{ font-size: 87.5%; margin-top: 10px;}
-.main_content>.main_btn{ font-size: 87.5%; height: 30px; line-height: 30px; margin-top: 15px;}
-.main_content>.main_btn:visited{ }
-.main_content>.main_btn:hover{ }
+.main_content{ width: 250px; margin: 0 auto; text-align: center;}
+.main_content>img{ margin: 50px 25px 10px 25px; width: 200px; }
+.main_content>.title{ font-size: 75%; text-align: center; color: #fff;}
+.main_content>.main_btn{ height: 30px; line-height: 30px; background: #42b9b4; color: #fff; width: 100%; display: block; font-size: 87.5%; margin-top: 30px;}
+.main_content>.main_btn:visited{ color: #fff; }
+.main_content>.main_btn:hover{ background: #56cfca; }
 
 /** form */
 .form_error{ }
@@ -51,22 +56,30 @@
 .default_success>p{ }
 
 /** signin */
-.signin_content{ width: 230px; }
-.signin_content>li{ margin-bottom: 15px; }
-.signin_content>li.symbol{ margin-top: 60px; margin-bottom: 25px;}
-.signin_content>li.forgot>a{ font-size: 75%; }
-.signin_content>li.forgot>a:visited{ }
-.signin_content>li.forgot>a:hover{ }
-.signin_content>li.join>span{ font-size: 75%; }
-.signin_content>li.join>a{ font-size: 75%; }
-.signin_content>li.join>a:visited{ }
-.signin_content>li.join>a:hover{ }
+.signin_content{ width: 250px; margin: 0 auto; text-align: center; }
+.signin_content>li{ width: 100%; margin: 0 0 10px 0;}
+.signin_content>li.symbol{ width: 100%; }
+.signin_content>li.symbol>img{ width: 100px; margin: 50px 75px 20px 75px; }
+.signin_content>li.forgot{ }
+.signin_content>li.forgot>a{ color: #fff; font-size: 87.5%;}
+.signin_content>li.forgot>a:visited{ color: #fff; }
+.signin_content>li.forgot>a:hover{ color: #e5e5e5; }
+.signin_content>li.join{ }
+.signin_content>li.join>span{ color: #808080; font-size: 87.5%;}
+.signin_content>li.join>a{ color: #fff; font-size: 87.5%; }
+.signin_content>li.join>a:visited{ color: #fff; }
+.signin_content>li.join>a:hover{ color: #e5e5e5; }
 
-.signin_input{ margin: 0 15px; }
+.signin_input{ width: 190px; height: 20px; padding: 5px; border: 1px solid #525050; font-size: 87.5%;  }
+.signin_input_active{ background: url("../image/input_active.png") no-repeat !important; }
+.username{ background: url("../image/username.png") no-repeat; }
+.username:focus{ background: url("../image/input_active.png") no-repeat; }
+.password{ background: url("../image/password.png") no-repeat; }
+.password:focus{ background: url("../image/input_active.png") no-repeat; }
 
-.signin_btn{ font-size: 81.25%; }
-.signin_btn:visited{ }
-.signin_btn:hover{ }
+.signin_btn{ color: #fff; width: 200px; height: 30px; border: 1px solid #1f6764; background: #42b9b4; text-align: center; line-height: 30px; margin-top: 10px; cursor: pointer; }
+.signin_btn:visited{ color: #fff; }
+.signin_btn:hover{ background: #56cfca;}
 
 /** join */
 .join_content_wrap{ width: 500px; }

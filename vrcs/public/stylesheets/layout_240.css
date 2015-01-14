@@ -1,7 +1,7 @@
 /**
 *   Screen min width 720px
 */
-.layout_header_wrap{ height: 40px; }
+.layout_header_wrap{ width: 100%; }
 .layout_header{ width: 230px; height: 40px; }
 
 .layout_header>ul.left{ padding: 5px; height: 30px;}
