@@ -1,8 +1,6 @@
 /**
 *   Not responsive css
 */
-@charset "utf-8";
-
 html{ height: 100%; }
 body{ background: #231f20; height: 100%; overflow-y: scroll;}
 

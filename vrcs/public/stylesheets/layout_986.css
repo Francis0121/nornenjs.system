@@ -1,7 +1,6 @@
 /**
 *   Screen min width 986px
 */
-@charset "utf-8";
 .layout_header_wrap{ height: 30px; }
 .layout_header{ width: 900px; height: 30px; }
 
@@ -196,7 +195,7 @@
 
 .option_wrap{ width: 280px; border: 2px solid #fff; margin-left: 20px; height: 492px; padding: 10px; }
 .option_wrap>.option_default{ width: 100%; margin-bottom: 10px; }
-.option_wrap>.option_default>h6{ width: 260px; margin: 4px 8px; font-size: 100%; margin-top: 10px; }
+.option_wrap>.option_default>h6{ width: 260px; margin: 4px 8px; font-size: 100%; }
 .option_wrap>.option_default>h6>span.mark{}
 .option_wrap>.option_default>h6>span.text{ font-size: 87.5%; }
 
