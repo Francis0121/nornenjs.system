@@ -112,10 +112,10 @@ minimum-scale=1.0, width=device-width" />
                         var volume = volumes[i];
                     %>
                     <tr data-pn="<%=volume.pn%>">
-                        <td><%=i+1%></td>
-                        <td><%=volume.title%></td>
-                        <td><%=volume.file_name%></td>
-                        <td><%=volume.input_date%></td>
+                        <td class="no"><%=i+1%></td>
+                        <td class="title"><%=volume.title%></td>
+                        <td class="filename"><%=volume.file_name%></td>
+                        <td class="registrationdate"><%=volume.input_date%></td>
                     </tr>
                     <% } %>
                 </tbody>
