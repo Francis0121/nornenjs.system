@@ -93,22 +93,21 @@ body{ background: #231f20; height: 100%; overflow-y: scroll;}
 .join_content>.right li.explain{ margin: 10px 0 0 20px;}
 .join_content>.right li.explain>p{ color: #000; width: 190px; text-align: left; }
 
-.join_btn{  color: #fff; width: 200px; height: 30px; border: 1px solid #2eb3ae; background: #42b9b4; text-align: center; line-height: 30px; margin-top: 10px; cursor: pointer; }
+.join_btn{ color: #fff; width: 200px; height: 30px; border: 1px solid #2eb3ae; background: #42b9b4; text-align: center; line-height: 30px; margin-top: 10px; cursor: pointer; }
 .join_btn:visited{ color: #fff; }
 .join_btn:hover{ background: #56cfca;}
 
-.modify_content{ }
 .modify_content{ margin: 20px auto 0 auto; }
 .modify_content>header{ float: left; }
 .modify_content>header>ul{ float: left; width: 100%; }
 .modify_content>header>ul>li{ float: left; width: 50%; }
-.modify_content>header li.left>span{ text-indent: -9999px; width: 5px; background: #42b9b4; text-indent: -9999px; float: left;}
+.modify_content>header li.left>span{ text-indent: -9999px; width: 5px; background: #42b9b4; float: left;}
 .modify_content>header li.left>h4{ color: #fff; float: left; }
 
 .modify_form{ float: left; margin-top: 5px; }
 .modify_form>li{ float: left; margin: 10px 20px 0 0; }
 .modify_form>li.large{ text-align: left; }
-.modify_form>li>label{ color: #3d3d3d; width: 190px; display: block; text-align: left; padding: 5px; color: #fff;}
+.modify_form>li>label{ width: 190px; display: block; text-align: left; padding: 5px; color: #fff;}
 .modify_form>li>input{ width: 186px; height: 20px; padding: 5px; border: 2px solid #e6e6e6; font-size: 87.5%; margin-top: 5px; }
 .modify_form>li>input.readonly{ color: #7e7e7e;}
 
