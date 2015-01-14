@@ -2,18 +2,18 @@
 *   Screen min width 720px
 */
 .layout_header_wrap{ height: 40px; }
-.layout_header{ width: 600px; height: 40px; }
+.layout_header{ width: 400px; height: 40px; }
 
-.layout_header>ul.left{ padding: 5px; height: 30px;}
-.layout_header>ul.left>li{ height: 30px; }
+.layout_header>ul.left{ padding: 5px; height: 30px; width: 40%; }
+.layout_header>ul.left>li{ height: 30px; width: 100%;}
 .layout_header>ul.left>li.symbol>span.mark{ margin: 5px 10px 5px 0; }
 .layout_header>ul.left>li.history>span.mark{ margin: 9px 5px 9px 0; }
 .layout_header>ul.left>li>a{ font-size: 75%; height: 30px; line-height: 30px; margin-right: 7px; }
 .layout_header>ul.left>li>a:visited{ }
 .layout_header>ul.left>li>a:hover{ }
 
-.layout_header>ul.right{ padding: 5px; height: 30px; }
-.layout_header>ul.right>li{ height: 30px; }
+.layout_header>ul.right{ padding: 5px; height: 30px; width: 40%; background: #fff;}
+.layout_header>ul.right>li{ height: 30px; width: 100%;}
 .layout_header>ul.right>li>a{ font-size: 75%; height: 30px; line-height: 30px; margin-left: 10px; }
 .layout_header>ul.right>li>a:visited{ }
 .layout_header>ul.right>li>a:hover{ }
@@ -21,7 +21,7 @@
 .layout_header>ul.right>li.help>a{ }
 .layout_header>ul.right>li.user>span.mark{ margin: 8px 0 8px 5px; }
 
-.layout_section_wrap{ margin-top: -41px;}
+.layout_section_wrap{ margin-top: -81px;}
 .layout_section{ padding: 41px 0; }
 
 .layout_footer_wrap{ height: 40px; margin-top: -61px;}
