@@ -4,7 +4,7 @@
 @charset "utf-8";
 
 html{ height: 100%; }
-body{ background: #231f20; height: 100%;}
+body{ background: #231f20; height: 100%; overflow-y: scroll;}
 
 .layout_header_wrap{ width: 100%; border-bottom: 1px solid #474445; background: #231f20; }
 .layout_header{ margin: 0 auto; }
@@ -26,12 +26,12 @@ body{ background: #231f20; height: 100%;}
 .layout_header>ul.right>li.help>a{text-indent: -9999px;}
 .layout_header>ul.right>li.user>span.mark{ text-indent: -9999px; width: 14px; height: 14px; background: url("../image/user.png") no-repeat; float: left;}
 
-.layout_section_wrap{ width: 100%; }
+.layout_section_wrap{ width: 100%; min-height: 100%; }
 .layout_section{ }
 
-.layout_footer_wrap{ width: 100%; background: #231f20; border-top : 1px solid #474445; position: absolute; bottom: 0; }
-.layout_footer{ margin: 0 auto; text-align: center; }
-.layout_footer>span{ color: #fff; }
+.layout_footer_wrap{ width: 100%; background: #231f20; }
+.layout_footer{ width: 100%; margin: 0 auto; text-align: center; }
+.layout_footer>span{ float: left; color: #fff; width: 100%; text-align: center; border-top : 1px solid #474445; margin-top: 20px;}
 
 /** main */
 .main_content{ margin: 0 auto; }

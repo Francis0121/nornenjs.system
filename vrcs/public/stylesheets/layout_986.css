@@ -23,11 +23,11 @@
 .layout_header>ul.right>li.user>span.mark{ margin: 3px 0 3px 5px; }
 
 .layout_section_wrap{ margin-top: -31px;}
-.layout_section{ margin: 31px 0; }
+.layout_section{ padding: 31px 0; }
 
-.layout_footer_wrap{ height: 30px; margin-top: -30px;}
-.layout_footer{ width: 900px; height: 30px; }
-.layout_footer>span{ font-size: 56.25%; line-height: 30px;}
+.layout_footer_wrap{ height: 30px; margin-top: -51px;}
+.layout_footer{ height: 30px; }
+.layout_footer>span{ font-size: 56.25%; line-height: 30px; height: 30px; }
 
 /** main */
 .main_content{ width: 200px; }

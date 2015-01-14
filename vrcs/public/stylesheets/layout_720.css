@@ -25,9 +25,9 @@
 .layout_section_wrap{ margin-top: -41px;}
 .layout_section{ padding: 41px 0; }
 
-.layout_footer_wrap{ height: 40px; margin-top: -41px;}
-.layout_footer{ width: 600px; height: 40px; }
-.layout_footer>span{ font-size: 68.75%; line-height: 40px;}
+.layout_footer_wrap{ height: 40px; margin-top: -61px;}
+.layout_footer{ height: 40px; }
+.layout_footer>span{ font-size: 68.75%; line-height: 40px; height: 40px; }
 
 /** main */
 .main_content{ width: 230px; }
