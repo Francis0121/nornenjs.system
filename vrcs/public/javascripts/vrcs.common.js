@@ -273,8 +273,8 @@ medical.event = {
                 if($ethis.stream.isTouchOn){
                     $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
 
-                    $sthis.sendOption.rotationX += (touches[0].pageX - $ethis.stream.touchBeforeX)/5.0;
-                    $sthis.sendOption.rotationY += (touches[0].pageY - $ethis.stream.touchBeforeY)/5.0;
+                    $sthis.sendOption.rotationX += (touches[0].pageX - $ethis.stream.touchBeforeX)/20.0;
+                    $sthis.sendOption.rotationY += (touches[0].pageY - $ethis.stream.touchBeforeY)/20.0;
 
                     $ethis.stream.beforeX = touches[0].pageX;
                     $ethis.stream.beforeY = touches[0].pageY;
@@ -293,9 +293,19 @@ medical.event = {
                 $ethis.stream.isTouchOn = false;
             });
 
-            //el.addEventListener('touchcancel', handleCancel, false);
-            //el.addEventListener('touchleave', handleEnd, false);
-            //el.addEventListener('touchmove', handleMove, false);
+            el.addEventListener('touchcancel', function handleCancel(evt) {
+                evt.preventDefault();
+                $ethis.stream.isTouchOn = false;
+            });
+
+            el.addEventListener('touchleave', function(evt){
+                evt.preventDefault();
+                var el = document.getElementsByTagName('canvas')[0];
+                var ctx = el.getContext('2d');
+                var touches = evt.changedTouches;
+
+                $ethis.stream.isTouchOn = false;
+            });
 
         }
 
