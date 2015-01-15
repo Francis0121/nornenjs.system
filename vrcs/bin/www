@@ -27,7 +27,7 @@ var cuModule = cu.moduleLoad(path.join(__dirname, '../cuda/vrcs.ptx'));
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
-var frameList = [ 15, 10 ];
+var frameList = [ 5, 5 ];
 var streamMap = new HashMap();
 var useMap = new HashMap();
 var vrcsCudaMap = new HashMap();
