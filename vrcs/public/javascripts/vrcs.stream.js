@@ -30,6 +30,11 @@ medical.stream = {
     client : null,
     buffer : null,
     sendOption : null,
+    queue : [],
+    intervalPrint : null,
+    firstEvent : false,
+    frameList : [ 10, 5 ],
+    frameIndex : 0,
 
     run : function(){
         $sthis = this;
@@ -89,26 +94,37 @@ medical.stream = {
             });
 
             stream.on('end', function(){
-                var url = (window.URL || window.webkitURL).createObjectURL(new Blob(parts));
-                var canvas = document.getElementById(medical.connect.selector+'_canvas');
-                var ctx = canvas.getContext('2d');
+                $sthis.queue.push(parts);
 
-                var img = new Image(512, 512);
-                img.onload = function(){
-                    ctx.drawImage(img, 0, 0, 512, 512, 0, 0,$(medical.connect.selector).width(), $(medical.connect.selector).width()); // Or at whatever offset you like
-                };
-                img.src = url;
-
-                $sthis.adaptiveOption.frame++;
-                if($sthis.adaptiveOption.interval === null)
-                    $sthis.adaptiveOption.interval = setInterval($sthis.adaptiveInterval, 1000);
-
-                // ~ browser touch event. Why code here? Not supported jquery touch event
-                if($.browser.mobile){
-                    medical.event.stream.touch();
-                }
+                if($sthis.intervalPrint == null)
+                    $sthis.intervalPrint = setInterval($sthis.printCanvas, 1000/$sthis.frameList[$sthis.frameIndex]);
             });
         });
+    },
+
+    printCanvas : function(){
+        var data = $sthis.queue.shift();
+        if(data == null) return;
+
+        var url = (window.URL || window.webkitURL).createObjectURL(new Blob(data));
+        var canvas = document.getElementById(medical.connect.selector+'_canvas');
+        var ctx = canvas.getContext('2d');
+
+        var img = new Image(512, 512);
+        img.onload = function(){
+            ctx.drawImage(img, 0, 0, 512, 512, 0, 0,$(medical.connect.selector).width(), $(medical.connect.selector).width()); // Or at whatever offset you like
+        };
+        img.src = url;
+
+        $sthis.adaptiveOption.frame++;
+        if($sthis.adaptiveOption.interval === null)
+            $sthis.adaptiveOption.interval = setInterval($sthis.adaptiveInterval, 1000);
+
+        // ~ browser touch event. Why code here? Not supported jquery touch event
+        if(!$sthis.firstEvent && $.browser.mobile){
+            firstEvent = true;
+            medical.event.stream.touch();
+        }
     },
 
     request : function(){

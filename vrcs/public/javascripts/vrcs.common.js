@@ -279,6 +279,7 @@ medical.event = {
                     $ethis.stream.beforeX = touches[0].pageX;
                     $ethis.stream.beforeY = touches[0].pageY;
 
+                    $sthis.queue = [];
                     $sthis.send();
                 }
 
