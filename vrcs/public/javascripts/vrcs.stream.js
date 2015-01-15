@@ -95,7 +95,7 @@ medical.stream = {
 
                 var img = new Image(512, 512);
                 img.onload = function(){
-                    ctx.drawImage(img, 0, 0); // Or at whatever offset you like
+                    ctx.drawImage(img, 0, 0, 512, 512, 0, 0,$(medical.connect.selector).width(), $(medical.connect.selector).width()); // Or at whatever offset you like
                 };
                 img.src = url;
 

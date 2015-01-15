@@ -7,8 +7,7 @@ medical.connect = {
     document : {
         fps : $('<span>'),
         canvas : $('<canvas>'),
-        loading : $('<div>'),
-        fake : $('<div>')
+        loading : $('<div>')
     },
 
     socket : null,
@@ -38,19 +37,17 @@ medical.connect = {
         $cthis.document.fps = $('<span>').addClass('fps').text('FPS : 0');
 
         $cthis.document.canvas.attr('id', $cthis.selector+'_canvas');
-        $cthis.document.canvas.attr('width', '512px');
-        $cthis.document.canvas.attr('height', '512px');
+        $cthis.document.canvas.attr('width', $($cthis.selector).width()+'px');
+        $cthis.document.canvas.attr('height', $($cthis.selector).width()+'px');
 
         $cthis.document.loading.addClass('loading')
             .append($('<img>').attr('src','/image/loading.gif'))
+            .append($('<br>'))
             .append($('<span>').text('Please wait for the exit to other users'));
-
-        $cthis.document.fake.addClass('view_port_fake');
 
         $($cthis.selector).append($cthis.document.fps)
             .append($cthis.document.canvas)
-            .append($cthis.document.loading)
-            .append($cthis.document.fake);
+            .append($cthis.document.loading);
     },
 
     /**
@@ -66,10 +63,7 @@ medical.connect = {
     message : function(){
 
         $cthis.socket.on('message', function(data){
-            //$('.debug_wrap').append('<p>connect byte stream</p>');
             if(!data.success){
-                //$('.debug_wrap').append('<p>'+data.error+'</p>');
-                $cthis.document.canvas.hide();
                 $cthis.document.loading.show();
                 return;
             }

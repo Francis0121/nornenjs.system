@@ -199,7 +199,6 @@ body{ background: #231f20; height: 100%; overflow-y: scroll;}
 #view_port>.loading>span{ color: #fff; float: left; }
 #view_port>.fps{ color: #fff; position: relative; z-index: 3; display: block; height: 30px;}
 #view_port>canvas{ margin-top: -50px; }
-.view_port_fake{ position: relative; z-index: 4; opacity: 0; background: #fff;}
 
 .option_wrap{ float: left; }
 .option_wrap>.option_default{ float: left; }

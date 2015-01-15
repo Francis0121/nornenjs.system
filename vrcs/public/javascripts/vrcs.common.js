@@ -15,6 +15,8 @@ medical.event = {
         $ethis.volumeList();
 
         if( medical.stream !== undefined && medical.connect !== undefined) {
+            $ethis.stream.resize();
+
             $ethis.stream.type();
             $ethis.stream.axisType();
 
@@ -49,6 +51,15 @@ medical.event = {
     },
 
     stream : {
+
+        resize : function(){
+            $(window).resize(function(){
+                var $cthis = medical.connect;
+                $cthis.document.canvas.attr('width', $($cthis.selector).width()+'px');
+                $cthis.document.canvas.attr('height', $($cthis.selector).width()+'px');
+            });
+        },
+
         type : function(){
             $('.option_rendering ul li').on('click', function(){
                 var thiz = $(this);
