@@ -91,8 +91,7 @@
 
 .modify_content{ }
 .modify_content{ }
-.modify_c
-@charset "utf-8";ontent>header{ width: 500px; }
+.modify_content>header{ width: 500px; }
 .modify_content>header>ul{ }
 .modify_content>header>ul>li{ }
 .modify_content>header li.left>span{ height: 20px; margin-right: 8px;  }

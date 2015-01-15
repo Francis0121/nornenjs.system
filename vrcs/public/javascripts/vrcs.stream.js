@@ -103,6 +103,10 @@ medical.stream = {
                 if($sthis.adaptiveOption.interval === null)
                     $sthis.adaptiveOption.interval = setInterval($sthis.adaptiveInterval, 1000);
 
+                // ~ browser touch event. Why code here? Not supported jquery touch event
+                if($.browser.mobile){
+                    medical.event.stream.touch();
+                }
             });
         });
     },
