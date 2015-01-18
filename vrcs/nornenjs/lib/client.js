@@ -1,152 +1,148 @@
 /**
  * Create by francis 15.01.17
  */
-
+var ENUMS = require('./enums');
 var logger = require('./logger');
 
-/**
- *  전역으로 해야되는 객체는 어따 두어야 좋을까?
- *  HashMap으로 생성되어지는데 이것들은 어떻게 할까
- *  Socket이 끊겼는지 어떻게 판단할까
- *  Log를 찍는데 각각의 log를 출력할 수있도록 하면 좋을 것 같은데 - winston 써보지 뭐
- */
-function NornenjsClient(clientId, cudaIntervalTime, compressIntervalTime){
-    this.clientId = clientId;
+function NornenjsClient(CudaRender, streamType, _socket){
+    this.streamType = streamType;
+    this.CudaRender = CudaRender;
+    this._socket = _socket;
 
     this.cudaInterval = null;
-    this.cudaIntervalTime = cudaIntervalTime;
-
+    this.cudaIntervalIndex = 5;
+    this.cudaBufQueue = [];
+    
     this.compressInterval = null;
-    this.compressIntervalTime = compressIntervalTime;
-}
+    this.compressIntervalIndex = 5;
+};
 
-/**
- * Client 초기화 할 때 쓰게 되는 부분
- * Cuda ptx 도 다시받게 끔 구현해야 된다다다다
- */
 NornenjsClient.prototype.initialize = function(){
     logger.debug('Nornenjs client initialize');
+
+    this.setCudaInterval();
+    this.setCompressInterval();
 };
 
-/**
- * Cuda interval을 생성해야 하는데 어떤 방식으로 생성할까
- */
 NornenjsClient.prototype.setCudaInterval = function(){
     logger.debug('set cuda interval - time [ ' + this.cudaIntervalTime + ' ]');
-    this.cudaInterval = setInterval(this.execCuda, this.cudaIntervalTime);
+    this.cudaInterval = setInterval(this.execCuda, 1000 / ENUMS.INTERVAL_TIME[this.cudaIntervalIndex]);
 };
 
-/**
- * 압축하는 인터벌 관리도 안되는데 어떻게하면 관리가 잘되려나??
- */
 NornenjsClient.prototype.setCompressInterval = function(){
     logger.debug('set compress interval - time [ ' + this.compressIntervalTime + ' ]');
-    this.cudaInterval = setInterval(this.execCompress, this.compressIntervalTime);
+    this.cudaInterval = setInterval(this.execCompress, 1000 / ENUMS.INTERVAL_TIME[this.compressIntervalIndex]);
 };
 
-/**
- * 하나의 hashmap에 client.id를 여기서 받으니까 해당되는 객체를 받으면 되지 않을까?
- * Cuda를 실행하여 하나씩 한프레임을 찍는데
- * 보통의 stream type일때는 PNG로 출력해주기 위해서 PNG 압축방식을 사용하는데 이때는 비동기적으로 stack에 쌓게됨.
- * event가 발생되어질때에는 Jpeg으로 하여 비동기가 아닌 동기적으로 출력한다.
- *
- * @param cudaRenderObj
- *  CudaRender에 대한 Object
- * @param compressObj
- *  압축을 쌓는 Object
- * @param streamObj
- *  스트림 Object
- */
-NornenjsClient.prototype.execCuda = function(cudaRenderObj, compressObj, streamObj){
+NornenjsClient.prototype.execCuda = function(){
 
-    var cudaRender = vrcsCudaMap.get(client.id);
-    if(cudaRender == undefined) return;
+    var _CudaRender = this.CudaRender;
+    //TODO confirm equal undefined
+    if(_cudaRender == undefined){ 
+        return;
+    }
 
-    var stack = vrcsBufMap.get(client.id);
-    if(stack == undefined) return;
+    if( this.streamType === ENUMS.STREAM_TYPE.START || this.streamType === ENUMS.STREAM_TYPE.ADAPTIVE ){
+        var start = new Date().getTime();
+        
+        _CudaRender.start();
+        this.cudaBufQueue.push(_CudaRender.hostOutputBuffer);
+        _CudaRender.end();
 
-    var obj = streamMap.get(client.id);
-    if(obj == undefined) return;
-
-    if(obj.type == REQUEST_TYPE.START || obj.type == REQUEST_TYPE.ADAPTIVE){
-        var hrstart = process.hrtime();
-        cudaRender.start();
-        stack.push(cudaRender.d_outputBuffer);
-        cudaRender.end();
-        hrend = process.hrtime(hrstart);
-        //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
+        var end = new Date().getTime();
+        logger.debug('Running time [ cuda renering time push hostOutputBuffer ] ' + (end - start) + 'ms');
     }else if(obj.type == REQUEST_TYPE.CHANGE){
-        var hrstart = process.hrtime();
-        cudaRender.start();
-        var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
+        this.cudaBufQueue = []; // clear before png buffer cuda queue
+        var start = new Date().getTime();
+        _CudaRender.start();
+        var jpeg = new Jpeg(_CudaRender.hostOutputBuffer, 512, 512, 'rgba');
         try {
-            if (client._socket._socket == undefined) {
-                console.log('[INFO] Connection already refused sync jpeg :: client id ', client.id);
+            if (this._socket == undefined) {
+                logger.debug('Connection already refused sync jpeg');
             } else {
                 client.send(jpeg.encodeSync());
             }
         }catch (error){
-            console.log('[ERROR] Connection refused sync jpeg ', error);
+            logger.warn('Connection refused sync jpeg ', error);
             closeCallback(client.id);
             return;
         }
-        cudaRender.end();
-        hrend = process.hrtime(hrstart);
-        //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
+        _CudaRender.end();
+        
+        var end = new Date().getTime();
+        logger.debug('Running time [ cuda rendering time jpeg compress ] ' + (end - start) + 'ms');
     }else{
-        console.log('[ERROR] Request type not defined');
+
+        logger.warn('Stream type not exist [' + this.streamType + ']');
+        
     }
 
 };
 
-/**
- *  Png 압축방식을 수행하는것 stack에 쌓인것을 압축을 통해출력한다.
- *  Stack을 이 객체에 넣어두면 좀 더 좋을것이라고 생가됨.
- */
 NornenjsClient.prototype.execCompress = function(){
-    var stack = vrcsBufMap.get(client.id);
-    if( stack == undefined) return;
+    var buf = this.cudaBufQueue.shift();
+    //TODO confirm equal undefined
+    if(buf == undefined){
+        return;
+    }
 
-    var buf = stack.shift();
-    if(buf == undefined) return;
-
-    var obj = streamMap.get(client.id);
-    if(obj == undefined) return;
-
-    if(obj.type == REQUEST_TYPE.START || obj.type == REQUEST_TYPE.ADAPTIVE) {
+    if(this.streamType === ENUMS.STREAM_TYPE.START || this.streamType === ENUMS.STREAM_TYPE.ADAPTIVE) {
         var png = new Png(buf, 512, 512, 'rgba');
-        png.encode(function (png_img) {
+        png.encode(function (pngImg) {
             try {
-                if (client._socket._socket == undefined) {
-                    console.log('[INFO] Connection already refused async png :: client id ', client.id);
+                if (this._socket == undefined) {
+                    logger.debug('Connection already refused async png');
                 } else {
-                    client.send(png_img);
+                    client.send(pngImg);
                 }
             } catch (error) {
-                console.log('[ERROR] Connection refused async png ', error);
-                closeCallback(client.id);
+                logger.warn('Connection refused async png ', error);
+                // TODO closeCallback(client.id);
                 return;
             }
         });
     }else if(obj.type == REQUEST_TYPE.CHANGE){
-        console.log('[INFO] Do nothing ');
+        logger.debug('ExecCompress do nothing [Cuda Buffer Queue size ' + this.cudaBufQueue.length + ']');
+        this.cudaBufQueue = [];
     }else{
-        console.log('[ERROR] Request type not defined');
+        logger.warn('Stream type not exist [' + this.streamType + ']');
     }
 };
 
-/**
- * 반응형 스트리밍이 될 경우 해당되는 함수
- */
 NornenjsClient.prototype.adaptive = function(){
 
+    clearInterval(this.compressInterval);
+    clearInterval(this.cudaInterval);
+
+    this.setCudaInterval();
+    this.setCompressInterval();
+    
 };
 
-/**
- * Client id가 destroy 되게 되면 해당되는 객체에 대한 모든것을 지운다.
- */
+NornenjsClient.prototype.event = function(param){
+
+    var _CudaRender = this.CudaRender;
+
+    _CudaRender.type = param.renderingType;
+    _CudaRender.positionZ = param.positionZ;
+    _CudaRender.brightness = param.brightness;
+    _CudaRender.transferOffset = param.transferOffset;
+    _CudaRender.transferScaleX = param.transferScaleX;
+    _CudaRender.transferScaleY = param.transferScaleY;
+    _CudaRender.transferScaleZ = param.transferScaleZ;
+    _CudaRender.rotationX = param.rotationX;
+    _CudaRender.rotationY = param.rotationY;
+    _CudaRender.mriType = param.mriType;
+    
+};
+
 NornenjsClient.prototype.destroy = function(){
 
+    clearInterval(this.compressInterval);
+    clearInterval(this.cudaInterval);
+    
+    // TODO cuModule memory 는 비우지 않아도 되나?
 };
+
 
 module.exports.NornenjsClient = NornenjsClient;

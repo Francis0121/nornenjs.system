@@ -28,7 +28,7 @@ var cuModule = cu.moduleLoad(path.join(__dirname, '../cuda/vrcs.ptx'));
 // ~ Wait for new user connections ( Implement Byte stream )
 //var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 var frameList = [ 5, 5 ];
-var streamMap = new HashMap();
+var streamMap = new HashMap();Vector
 var useMap = new HashMap();
 var vrcsCudaMap = new HashMap();
 var vrcsBufMap = new HashMap();
@@ -127,7 +127,7 @@ bs.on('connection', function(client){
                 transferScaleZ : buffer.readFloatLE(44),
                 mriType : buffer.readFloatLE(48)
             };
-            //console.log(obj);
+            //console.log(obj);var param = ;
             return obj;
         };
 
@@ -313,12 +313,8 @@ var server = server.listen(app.get('port'), function() {
 
 // ~ Make module
 
-var nornenjs = require('../nornenjs/lib/server');
-
-var NornenjsServer = nornenjs.NornenjsServer;
-var nornenServer = new NornenjsServer(10000);
-nornenServer.initialize();
-
-var NornenjsClient = nornenjs.NornenjsClient;
-var nornenClient = new NornenjsClient();
-nornenClient.initialize();
+//var nornenjs = require('../nornenjs/lib/server');
+//
+//var NornenjsServer = nornenjs.NornenjsServer;
+//var nornenServer = new NornenjsServer();
+//nornenServer.createServer(13000);

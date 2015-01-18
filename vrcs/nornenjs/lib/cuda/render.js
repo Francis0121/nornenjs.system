@@ -1,198 +1,208 @@
-var cu = require('./load');
+var ENUMS = require('../enums');
 var Buffer = require('buffer').Buffer;
+var cuda = require('./load');
+var logger = require('../logger');
 var mat4 = require('./../matrix/mat4');
 var vec3 = require('./../matrix/vec3');
 
-function CudaRender(type, textureFilePath, volume_width, volume_height, volume_depth, cuCtx, cuModule) {
-    this.type = type;
-    this.textureFilePath = textureFilePath;
-    this.volumewidth = volume_width;
-    this.volumeheight = volume_height;
-    this.volumedepth = volume_depth;
+function CudaRender(
+    cuCtx, textureFilePath, pthFilePath,
+    volumeWidth, volumeHeight, volumeDepth) {
+
     this.cuCtx = cuCtx;
-    this.cuModule = cuModule;
+    this.cuModule = null;
+    this.type = ENUMS.RENDERING_TYPE.VOLUME;
+    this.textureFilePath = textureFilePath;
+    this.ptxFilePath = ptxFilePath,
+    this.volumeWidth = volumeWidth;
+    this.volumeHeight = volumeHeight;
+    this.volumeDepth = volumeDepth;
+
+    this.imageWidth = 512;
+    this.imageHeight = 512, 
+    this.density = 0.05;
+    this.brightness = 1.0;
+    this.transferOffset = 0.0;
+    this.transferScaleX = 0.0;
+    this.transferScaleY = 0.0;
+    this.transferScaleZ = 0.0;
+    this.positionZ = 3.0;
+    this.rotationX = 0;
+    this.rotationY = 0;
+    this.mriType = ENUMS.MRI_TYPE.X;
+
+    this.deviceOutputBuffer = undefined;
+    this.deviceInvViewMatrix = undefined;
+    this.hostOutputBuffer = undefined;
 }
 
-CudaRender.prototype = {
-    constructor:CudaRender,
+CudaRender.prototype.exec = function(){
+    // ~ VolumeLoad & VolumeTexture & TextureBinding
+    this.cuModule = cuda.moduleLoad(this.ptxFilePath);
+    logger.error('[CUDA] _cuModule.memTextureAlloc ',
+        this.cuModule.memTextureAlloc(this.textureFilePath, this.volumeWidth, this.volumeHeight, this.volumeDepth));
+};
 
-    RENDERING_CUDA_TYPE : {
-        VOL : 1,
-        MIP : 2,
-        MRI : 3
-    },
-    MRI_TYPE : { X : 1, Y : 2, Z : 3 },
+CudaRender.prototype.start = function(){
 
-    //Option
-    imageWidth : 512,
-    imageHeight : 512,
-    density : 0.05,
-    brightness : 1.0,
-    transferOffset : 0.0,
-    transferScaleX : 0.0,
-    transferScaleY : 0.0,
-    transferScaleZ : 0.0,
-    positionZ: 3.0,
-    rotationX: 0,
-    rotationY: 0,
-    mriType:1,
+    // ~ 3D volume array
+    this.deviceOutputBuffer = cuda.memAlloc(this.imageWidth * this.imageHeight * 4);
+    logger.error('[CUDA] deviceOutputBuffer.memSet ',
+        this.deviceOutputBuffer.memSet(this.imageWidth * this.imageHeight * 4));
 
+    // ~ View Vector
+    this.makeViewVector();
 
-    d_output : undefined,
-    d_invViewMatrix : undefined,
-    d_outputBuffer : undefined,
+    // ~ rendering
+    this.render();
 
-    init : function(){
-        // ~ VolumeLoad & VolumeTexture & TextureBinding
-        var error = this.cuModule.memTextureAlloc(this.textureFilePath, this.volumewidth,this.volumeheight, this.volumedepth);
-        console.log('[INFO_CUDA] _cuModule.memTextureAlloc', error);
-    },
+};
 
-    start : function(){
+CudaRender.prototype.makeViewVector = function(){
+    var vec;
+    var modelMatrix = mat4.create();
+    if(this.type === ENUMS.RENDERING_TYPE.MRI ) {
+        
+        if (this.mriType === ENUMS.MRI_TYPE.X) {
 
-        // ~ 3D volume array
-        this.d_output = cu.memAlloc(this.imageWidth * this.imageHeight * 4);
-        var error = this.d_output.memSet(this.imageWidth * this.imageHeight * 4);
-        //console.log('[INFO_CUDA] d_output.memSet', error);
-
-        // ~ View Vector
-        this.makeViewVector();
-
-        // ~ rendering
-        this.render();
-
-    },
-
-    makeViewVector : function(){
-        var vec;
-        var model_matrix = mat4.create();
-        if(this.type == this.RENDERING_CUDA_TYPE.MRI ) {
-            if (this.mriType == this.MRI_TYPE.X) {
-
-                vec = vec3.fromValues(-1.0, 0.0, 0.0);
-                mat4.rotate(model_matrix, model_matrix, ( (270.0) * 3.14159265 / 180.0), vec);
-
-                vec = vec3.fromValues(0.0, 1.0, 0.0);
-                mat4.rotate(model_matrix, model_matrix, ( (- 90) * 3.14159265 / 180.0), vec);
-
-                vec = vec3.fromValues(0.0, 0.0, this.positionZ);
-                mat4.translate(model_matrix, model_matrix, vec)
-            }else if(this.mriType == this.MRI_TYPE.Y){
-                vec = vec3.fromValues(-1.0, 0.0, 0.0);
-                mat4.rotate(model_matrix, model_matrix, ( (270.0 ) * 3.14159265 / 180.0), vec);
-
-                vec = vec3.fromValues(0.0, 1.0, 0.0);
-                mat4.rotate(model_matrix, model_matrix, ( (0.0 ) * 3.14159265 / 180.0), vec);
-
-                vec = vec3.fromValues(0.0, 0.0, this.positionZ);
-                mat4.translate(model_matrix, model_matrix, vec)
-            }else if(this.mriType == this.MRI_TYPE.Z) {
-                vec = vec3.fromValues(-1.0, 0.0, 0.0);
-                mat4.rotate(model_matrix, model_matrix, ( (180 ) * 3.14159265 / 180.0), vec);
-
-                vec = vec3.fromValues(0.0, 1.0, 0.0);
-                mat4.rotate(model_matrix, model_matrix, ( (0.0 ) * 3.14159265 / 180.0), vec);
-
-                vec = vec3.fromValues(0.0, 0.0, this.positionZ);
-                mat4.translate(model_matrix, model_matrix, vec)
-            }
-        }else{
             vec = vec3.fromValues(-1.0, 0.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix, ( (270.0 + (this.rotationY * -1)) * 3.14159265 / 180.0), vec);
+            mat4.rotate(modelMatrix, modelMatrix, ( (270.0) * 3.14159265 / 180.0), vec);
 
             vec = vec3.fromValues(0.0, 1.0, 0.0);
-            mat4.rotate(model_matrix, model_matrix,( (0.0 + (this.rotationX*-1)) * 3.14159265 / 180.0), vec);
+            mat4.rotate(modelMatrix, modelMatrix, ( (- 90) * 3.14159265 / 180.0), vec);
 
             vec = vec3.fromValues(0.0, 0.0, this.positionZ);
-            mat4.translate(model_matrix, model_matrix,vec)
-        }
-        /*view vector*/
-        var c_invViewMatrix = new Buffer(12*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[0], 0*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[4], 1*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[8], 2*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[12], 3*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[1], 4*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[5], 5*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[9], 6*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[13], 7*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[2], 8*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[6], 9*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[10], 10*4);
-        c_invViewMatrix.writeFloatLE( model_matrix[14], 11*4);
+            mat4.translate(modelMatrix, modelMatrix, vec)
+            
+        }else if(this.mriType === ENUMS.MRI_TYPE.Y){
+            
+            vec = vec3.fromValues(-1.0, 0.0, 0.0);
+            mat4.rotate(modelMatrix, modelMatrix, ( (270.0 ) * 3.14159265 / 180.0), vec);
 
-        this.d_invViewMatrix = cu.memAlloc(12*4);
-        var error = this.d_invViewMatrix.copyHtoD(c_invViewMatrix);
-        //console.log('[INFO_CUDA] d_invViewMatrix.copyHtoD', error);
-    },
+            vec = vec3.fromValues(0.0, 1.0, 0.0);
+            mat4.rotate(modelMatrix, modelMatrix, ( (0.0 ) * 3.14159265 / 180.0), vec);
 
-    render : function(){
-        var _cuModule = this.cuModule;
+            vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+            mat4.translate(modelMatrix, modelMatrix, vec)
+            
+        }else if(this.mriType == ENUMS.MRI_TYPE.Z) {
 
-        // ~ Rendering
-        var cuFunction = undefined;
-        if(this.type == this.RENDERING_CUDA_TYPE.VOL){
-            cuFunction = _cuModule.getFunction('render_kernel_volume');
-        }else if(this.type == this.RENDERING_CUDA_TYPE.MIP){
-            cuFunction = _cuModule.getFunction('render_kernel_MIP');
-        }else if(this.type == this.RENDERING_CUDA_TYPE.MRI){
-            cuFunction = _cuModule.getFunction('render_kernel_MRI');
+            vec = vec3.fromValues(-1.0, 0.0, 0.0);
+            mat4.rotate(modelMatrix, modelMatrix, ( (180 ) * 3.14159265 / 180.0), vec);
+
+            vec = vec3.fromValues(0.0, 1.0, 0.0);
+            mat4.rotate(modelMatrix, modelMatrix, ( (0.0 ) * 3.14159265 / 180.0), vec);
+
+            vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+            mat4.translate(modelMatrix, modelMatrix, vec)
         }else{
-            //console.log('type not exist');
-            // ~ do default
-            cuFunction = _cuModule.getFunction('render_kernel_volume');
+            
+            logger.warn('[CUDA] Mri type not exist');
 
+            vec = vec3.fromValues(-1.0, 0.0, 0.0);
+            mat4.rotate(modelMatrix, modelMatrix, ( (270.0) * 3.14159265 / 180.0), vec);
+
+            vec = vec3.fromValues(0.0, 1.0, 0.0);
+            mat4.rotate(modelMatrix, modelMatrix, ( (- 90) * 3.14159265 / 180.0), vec);
+
+            vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+            mat4.translate(modelMatrix, modelMatrix, vec)
+            
         }
-        //console.log('[INFO_CUDA] cuFunction', cuFunction);
+            
+    } else {
+      
+        vec = vec3.fromValues(-1.0, 0.0, 0.0);
+        mat4.rotate(modelMatrix, modelMatrix, ( (270.0 + (this.rotationY * -1)) * 3.14159265 / 180.0), vec);
 
-        //cuLaunchKernel
-        var error = cu.launch(
-            cuFunction, [32, 32, 1], [16, 16, 1],
-            [
-                {
-                    type: 'DevicePtr',
-                    value: this.d_output.devicePtr
-                },{
-                type: 'DevicePtr',
-                value: this.d_invViewMatrix.devicePtr
-            },{
-                type: 'Uint32',
-                value: this.imageWidth
-            },{
-                type: 'Uint32',
-                value: this.imageHeight
-            },{
-                type: 'Float32',
-                value: this.density
-            },{
-                type: 'Float32',
-                value: this.brightness
-            },{
-                type: 'Float32',
-                value: this.transferOffset
-            },{
-                type: 'Float32',
-                value: this.transferScaleX
-            },{
-                type: 'Float32',
-                value: this.transferScaleY
-            },{
-                type: 'Float32',
-                value: this.transferScaleZ
-            }
-            ]
-        );
-        //console.log('[INFO_CUDA] cu.launch', error);
+        vec = vec3.fromValues(0.0, 1.0, 0.0);
+        mat4.rotate(modelMatrix, modelMatrix,( (0.0 + (this.rotationX*-1)) * 3.14159265 / 180.0), vec);
 
-        // cuMemcpyDtoH
-        this.d_outputBuffer = new Buffer(this.imageWidth * this.imageHeight * 4);
-        this.d_output.copyDtoH(this.d_outputBuffer, false);
-    },
-
-    end : function(){
-        this.d_output.free();
-        this.d_invViewMatrix.free();
+        vec = vec3.fromValues(0.0, 0.0, this.positionZ);
+        mat4.translate(modelMatrix, modelMatrix,vec);
+        
     }
+    
+    /*view vector*/
+    var hostInvViewMatrix = new Buffer(12*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[0], 0*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[4], 1*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[8], 2*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[12], 3*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[1], 4*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[5], 5*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[9], 6*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[13], 7*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[2], 8*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[6], 9*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[10], 10*4);
+    hostInvViewMatrix.writeFloatLE( modelMatrix[14], 11*4);
+
+    this.deviceInvViewMatrix = cuda.memAlloc(12*4);
+    logger.error('[CUDA] deviceInvViewMatrix.copyHtoD ', this.deviceInvViewMatrix.copyHtoD(hostInvViewMatrix));
+};
+
+CudaRender.prototype.render = function(){
+    var _cuModule = this.cuModule;
+
+    var cuFunction = undefined;
+    if(this.type == this.RENDERING_CUDA_TYPE.VOL){
+        cuFunction = _cuModule.getFunction('render_kernel_volume');
+    }else if(this.type == this.RENDERING_CUDA_TYPE.MIP){
+        cuFunction = _cuModule.getFunction('render_kernel_MIP');
+    }else if(this.type == this.RENDERING_CUDA_TYPE.MRI){
+        cuFunction = _cuModule.getFunction('render_kernel_MRI');
+    }else{
+        logger.warn('[CUDA] Rendering type not exist');
+        cuFunction = _cuModule.getFunction('render_kernel_volume');
+    }
+    logger.error('[CUDA] cuFunction ', cuFunction);
+    
+    var error = cuda.launch(
+        cuFunction, [32, 32, 1], [16, 16, 1],
+        [
+            {
+                type: 'DevicePtr',
+                value: this.deviceOutputBuffer.devicePtr
+            },{
+            type: 'DevicePtr',
+            value: this.deviceInvViewMatrix.devicePtr
+        },{
+            type: 'Uint32',
+            value: this.imageWidth
+        },{
+            type: 'Uint32',
+            value: this.imageHeight
+        },{
+            type: 'Float32',
+            value: this.density
+        },{
+            type: 'Float32',
+            value: this.brightness
+        },{
+            type: 'Float32',
+            value: this.transferOffset
+        },{
+            type: 'Float32',
+            value: this.transferScaleX
+        },{
+            type: 'Float32',
+            value: this.transferScaleY
+        },{
+            type: 'Float32',
+            value: this.transferScaleZ
+        }
+        ]
+    );
+    logger.error('[CUDA] cu.launch ', error);
+
+    this.hostOutputBuffer = new Buffer(this.imageWidth * this.imageHeight * 4);
+    this.deviceOutputBuffer.copyDtoH(this.hostOutputBuffer, false);
+};
+
+CudaRender.prototype.end = function(){
+    this.deviceOutputBuffer.free();
+    this.deviceInvViewMatrix.free();
 };
 
 exports.CudaRender = CudaRender;

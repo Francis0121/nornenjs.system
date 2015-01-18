@@ -20,8 +20,10 @@ var ENUMS = {
         START : 1,
         ADAPTIVE : 2,
         EVENT : 3
-    }
-      
+    },
+    
+    INTERVAL_TIME : [ 100, 80, 90, 70, 60, 50, 40, 30, 20, 10]
+    
 };
 
 module.exports = ENUMS;
