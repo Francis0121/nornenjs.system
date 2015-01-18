@@ -1,18 +1,8 @@
 /**
- * Using debugging module "https://www.npmjs.com/package/winston"
  * Create by francis 15.01.17
  */
-// ~ set logger winston
-var winston = require('winston');
-var logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.Console)({
-            level : 'debug',
-            colorize : true
-        })
-    ]
-});
-logger.setLevels(winston.config.syslog.levels);
+
+var logger = require('./logger');
 
 /**
  *  전역으로 해야되는 객체는 어따 두어야 좋을까?
@@ -35,7 +25,7 @@ function NornenjsClient(clientId, cudaIntervalTime, compressIntervalTime){
  * Cuda ptx 도 다시받게 끔 구현해야 된다다다다
  */
 NornenjsClient.prototype.initialize = function(){
-
+    logger.debug('Nornenjs client initialize');
 };
 
 /**

@@ -311,5 +311,14 @@ var server = server.listen(app.get('port'), function() {
 //    console.log('[INFO_CUDA] cuCtx.synchronize', error);
 //});
 
-var NornenjsClient = require('../nornenjs/client').NornenjsClient;
-var nornenClient = new NornenjsClient(1);
+// ~ Make module
+
+var nornenjs = require('../nornenjs/lib/server');
+
+var NornenjsServer = nornenjs.NornenjsServer;
+var nornenServer = new NornenjsServer(10000);
+nornenServer.initialize();
+
+var NornenjsClient = nornenjs.NornenjsClient;
+var nornenClient = new NornenjsClient();
+nornenClient.initialize();
