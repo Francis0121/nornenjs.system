@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var fs = require('fs-extra');//File System - for file manipulation
+var fs = require('fs-extra');
 var path = require('path');
-var sqlite = require('../sql/default');
 require('date-utils'); // Date util
+
+var sqlite = require('../nornenjs/lib/sqlite/default');
 
 // ~ Confirm sign in
 router.use(function(req, res, next) {
@@ -21,7 +22,6 @@ router.get('/', function(req, res) {
     };
 
     sqlite.db.all(sqlite.sql.volume.selectVolumeList, query, function(err, volumes){
-        console.log(volumes);
         res.render('volume/list', { volumes : volumes, user : req.session.user });
     });
 });

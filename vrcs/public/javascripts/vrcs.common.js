@@ -96,8 +96,8 @@ medical.event = {
                 $('#axis .ui-slider-range').css('width', '0');
                 $('#axis .ui-slider-handle').css('left', '0');
 
-                $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
-                $sthis.sendOption.rendering_type = type;
+                $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
+                $sthis.sendOption.renderingType = type;
 
                 $sthis.send();
             });
@@ -112,7 +112,7 @@ medical.event = {
                 $('.option_axis ul li').removeClass('option_select_wrap_active').addClass('option_select_wrap_none');
                 thiz.removeClass('option_select_wrap_none').addClass('option_select_wrap_active');
 
-                $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                 $sthis.sendOption.mriType = type;
 
                 $sthis.sendOption.transferScaleX = 0;
@@ -136,7 +136,7 @@ medical.event = {
                     orientation: 'horizontal',
                     slide: function( event, ui ) {
                         var $sthis = medical.stream;
-                        $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                         $sthis.sendOption.positionZ = ui.value/1000.0;
                         $sthis.send();
                     }
@@ -155,7 +155,7 @@ medical.event = {
                     orientation: 'horizontal',
                     slide: function( event, ui ) {
                         var $sthis = medical.stream;
-                        $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                         $sthis.sendOption.brightness = ui.value/100.0;
                         $sthis.send();
                     }
@@ -174,7 +174,7 @@ medical.event = {
                     orientation: 'horizontal',
                     slide: function( event, ui ) {
                         var $sthis = medical.stream;
-                        $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                         $sthis.sendOption.transferOffset = (ui.value-10000)/10000.0;
                         $sthis.send();
                     }
@@ -193,7 +193,7 @@ medical.event = {
                     orientation: 'horizontal',
                     slide: function( event, ui ) {
                         var $sthis = medical.stream;
-                        $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
 
                         if($sthis.sendOption.mriType == $sthis.MRI_TYPE.X){
                             $sthis.sendOption.transferScaleX = (ui.value)/10000.0;
@@ -224,7 +224,7 @@ medical.event = {
 
             $($cthis.selector).on('mousemove', function(event){
                 if($ethis.stream.isMouseOn){
-                    $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                    $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
 
                     $sthis.sendOption.rotationX += (event.pageX - $ethis.stream.beforeX)/5.0;
                     $sthis.sendOption.rotationY += (event.pageY - $ethis.stream.beforeY)/5.0;
@@ -271,7 +271,7 @@ medical.event = {
 
 
                 if($ethis.stream.isTouchOn){
-                    $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
+                    $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
 
                     $sthis.sendOption.rotationX += (touches[0].pageX - $ethis.stream.touchBeforeX)/100.0;
                     $sthis.sendOption.rotationY += (touches[0].pageY - $ethis.stream.touchBeforeY)/100.0;

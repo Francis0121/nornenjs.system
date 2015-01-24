@@ -6,7 +6,7 @@ var mat4 = require('./../matrix/mat4');
 var vec3 = require('./../matrix/vec3');
 
 function CudaRender(
-    cuCtx, textureFilePath, pthFilePath,
+    cuCtx, textureFilePath, ptxFilePath,
     volumeWidth, volumeHeight, volumeDepth) {
 
     this.cuCtx = cuCtx;
@@ -39,6 +39,7 @@ function CudaRender(
 CudaRender.prototype.exec = function(){
     // ~ VolumeLoad & VolumeTexture & TextureBinding
     this.cuModule = cuda.moduleLoad(this.ptxFilePath);
+    logger.debug('[CUDA] ' + this.cuModule)
     logger.error('[CUDA] _cuModule.memTextureAlloc ',
         this.cuModule.memTextureAlloc(this.textureFilePath, this.volumeWidth, this.volumeHeight, this.volumeDepth));
 };
@@ -146,11 +147,11 @@ CudaRender.prototype.render = function(){
     var _cuModule = this.cuModule;
 
     var cuFunction = undefined;
-    if(this.type == this.RENDERING_CUDA_TYPE.VOL){
+    if(this.type == ENUMS.RENDERING_TYPE.VOLUME){
         cuFunction = _cuModule.getFunction('render_kernel_volume');
-    }else if(this.type == this.RENDERING_CUDA_TYPE.MIP){
+    }else if(this.type == ENUMS.RENDERING_TYPE.MIP){
         cuFunction = _cuModule.getFunction('render_kernel_MIP');
-    }else if(this.type == this.RENDERING_CUDA_TYPE.MRI){
+    }else if(this.type == ENUMS.RENDERING_TYPE.MRI){
         cuFunction = _cuModule.getFunction('render_kernel_MRI');
     }else{
         logger.warn('[CUDA] Rendering type not exist');
@@ -205,4 +206,4 @@ CudaRender.prototype.end = function(){
     this.deviceInvViewMatrix.free();
 };
 
-exports.CudaRender = CudaRender;
+module.exports.CudaRender = CudaRender;

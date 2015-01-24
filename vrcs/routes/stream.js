@@ -1,10 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var sqlite = require('../sql/default');
 var HashMap = require('hashmap').HashMap;
-var ip = require("ip");
+var ip = require('ip');
 
-console.log(ip.address());
+var sqlite = require('../nornenjs/lib/sqlite/default');
 
 // Not sign in user don`t access this router
 router.use(function(req, res, next) {
@@ -24,7 +23,6 @@ var volumeMap = new HashMap();
 router.get('/volumepn/:pn', function(req, res) {
 
     sqlite.db.get(sqlite.sql.volume.selectVolumeOne, { $pn: req.params.pn }, function(err, volume){
-        console.log(volume);
         if(volume == undefined) {
             console.log('Fail select volume');
             res.redirect('/volume');

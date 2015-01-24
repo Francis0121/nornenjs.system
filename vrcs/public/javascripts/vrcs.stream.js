@@ -7,10 +7,10 @@ medical.stream = {
         positionZ : 3.0
     },
 
-    REQUEST_TYPE : {
+    STREAM_TYPE : {
         START : 1,
         ADAPTIVE : 2,
-        CHANGE : 3
+        EVENT : 3
     },
 
     RENDERING_TYPE : {
@@ -39,8 +39,8 @@ medical.stream = {
     run : function(){
         $sthis = this;
         $sthis.sendOption = {
-            request_type : $sthis.REQUEST_TYPE.START,
-            rendering_type : $sthis.RENDERING_TYPE.VOLUME,
+            streamType : $sthis.STREAM_TYPE.START,
+            renderingType : $sthis.RENDERING_TYPE.VOLUME,
             volumePn : accessInfo.volumePn,
             frame : 0,
             brightness : 1.0,
@@ -68,10 +68,10 @@ medical.stream = {
     makeBuffer : function(){
         $sthis.buffer = new ArrayBuffer(52);
         var x = new Float32Array($sthis.buffer);
-        x[0] = $sthis.sendOption.request_type;
+        x[0] = $sthis.sendOption.streamType;
         x[1] = $sthis.sendOption.volumePn;
         x[2] = $sthis.sendOption.frame;
-        x[3] = $sthis.sendOption.rendering_type;
+        x[3] = $sthis.sendOption.renderingType;
         x[4] = $sthis.sendOption.brightness;
         x[5] = $sthis.sendOption.positionZ;
         x[6] = $sthis.sendOption.transferOffset;
@@ -128,7 +128,7 @@ medical.stream = {
     },
 
     request : function(){
-        $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.START;
+        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.START;
         $sthis.send();
     },
 
@@ -140,7 +140,7 @@ medical.stream = {
     },
 
     adaptive : function(){
-        $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.ADAPTIVE;
+        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.ADAPTIVE;
         $sthis.sendOption.frame = $sthis.adaptiveOption.sum;
         $sthis.send();
     },

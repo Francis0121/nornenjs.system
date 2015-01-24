@@ -14,14 +14,13 @@ var stream = require('./routes/stream');
 
 var app = express();
 
-var sqlite3 = require('./sql/default');
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
+// TODO morgan logger
+//app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());

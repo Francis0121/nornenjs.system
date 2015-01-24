@@ -1,6 +1,7 @@
-var sqlite = require('../sql/default');
 var express = require('express');
 var router = express.Router();
+
+var sqlite = require('../nornenjs/lib/sqlite/default');
 
 // ~ signin get
 router.get('/', function(req, res) {
@@ -33,7 +34,6 @@ router.post('/', function(req, res){
             message.error = 'Wrong Password';
             res.render('signin/signin', { message : message, user : undefined });
         }else{
-            console.log('Success signin');
             user.password = '';
             req.session.user = user;
             message.success = 'Success sign in';

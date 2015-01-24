@@ -1,0 +1,318 @@
+//#######################################
+// ~ load module and start server
+var fs = require('fs-extra'); // FILE
+var path = require('path');
+var debug = require('debug')('vrcs');
+var HashMap = require('hashmap').HashMap;
+
+var Jpeg = require('jpeg').Jpeg; // JPEG
+var Png = require('png').Png; // PNG
+
+var app = require('../app');
+var http = require('http');
+var server = http.createServer(app);
+var BinaryServer = require('binaryjs').BinaryServer; // BinaryJs (Byte stream)
+var bs = BinaryServer({port : 9000}); // Start BinaryJs server
+var io = require('socket.io').listen(server); // Socket.io
+//#######################################
+
+var CudaRender = require('../cuda/cuda_render').CudaRender;
+
+var cu = require('../cuda/cuda');
+var cuCtx = new cu.Ctx(0, cu.Device(0));
+var cuModule = cu.moduleLoad(path.join(__dirname, '../cuda/vrcs.ptx'));
+
+//#######################################
+// ~ Wait for new user connections ( Implement Byte stream )
+//var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
+var frameList = [ 5, 5 ];
+var streamMap = new HashMap();Vector
+var useMap = new HashMap();
+var vrcsCudaMap = new HashMap();
+var vrcsBufMap = new HashMap();
+
+var REQUEST_TYPE = { START : 1, ADAPTIVE : 2, CHANGE : 3 };
+
+bs.on('connection', function(client){
+
+    client.on('stream', function(stream, meta){
+        //console.log('byte stream connect attempt ' + client.id);
+        var cudaInterval = function () {
+            var cudaRender = vrcsCudaMap.get(client.id);
+            if(cudaRender == undefined) return;
+
+            var stack = vrcsBufMap.get(client.id);
+            if(stack == undefined) return;
+
+            var obj = streamMap.get(client.id);
+            if(obj == undefined) return;
+
+            if(obj.type == REQUEST_TYPE.START || obj.type == REQUEST_TYPE.ADAPTIVE){
+                var hrstart = process.hrtime();
+                cudaRender.start();
+                stack.push(cudaRender.d_outputBuffer);
+                cudaRender.end();
+                hrend = process.hrtime(hrstart);
+                //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
+            }else if(obj.type == REQUEST_TYPE.CHANGE){
+                var hrstart = process.hrtime();
+                cudaRender.start();
+                var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
+                try {
+                    if (client._socket._socket == undefined) {
+                        console.log('[INFO] Connection already refused sync jpeg :: client id ', client.id);
+                    } else {
+                        client.send(jpeg.encodeSync());
+                    }
+                }catch (error){
+                    console.log('[ERROR] Connection refused sync jpeg ', error);
+                    closeCallback(client.id);
+                    return;
+                }
+                cudaRender.end();
+                hrend = process.hrtime(hrstart);
+                //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
+            }else{
+                console.log('[ERROR] Request type not defined');
+            }
+        };
+
+        var stackInterval = function(){
+            var stack = vrcsBufMap.get(client.id);
+            if( stack == undefined) return;
+
+            var buf = stack.shift();
+            if(buf == undefined) return;
+
+            var obj = streamMap.get(client.id);
+            if(obj == undefined) return;
+
+            if(obj.type == REQUEST_TYPE.START || obj.type == REQUEST_TYPE.ADAPTIVE) {
+                var png = new Png(buf, 512, 512, 'rgba');
+                png.encode(function (png_img) {
+                    try {
+                        if (client._socket._socket == undefined) {
+                            console.log('[INFO] Connection already refused async png :: client id ', client.id);
+                        } else {
+                            client.send(png_img);
+                        }
+                    } catch (error) {
+                        console.log('[ERROR] Connection refused async png ', error);
+                        closeCallback(client.id);
+                        return;
+                    }
+                });
+            }else if(obj.type == REQUEST_TYPE.CHANGE){
+                console.log('[INFO] Do nothing ');
+            }else{
+                console.log('[ERROR] Request type not defined');
+            }
+        };
+
+        var makeObject = function(buffer){
+            var obj = {
+                request_type : buffer.readFloatLE(0),
+                volumePn : buffer.readFloatLE(4),
+                frame : buffer.readFloatLE(8),
+                rendering_type : buffer.readFloatLE(12),
+                brightness : buffer.readFloatLE(16),
+                positionZ : buffer.readFloatLE(20),
+                transferOffset : buffer.readFloatLE(24),
+                rotationX : buffer.readFloatLE(28),
+                rotationY : buffer.readFloatLE(32),
+                transferScaleX : buffer.readFloatLE(36),
+                transferScaleY : buffer.readFloatLE(40),
+                transferScaleZ : buffer.readFloatLE(44),
+                mriType : buffer.readFloatLE(48)
+            };
+            //console.log(obj);var param = ;
+            return obj;
+        };
+
+        var part = [];
+
+        stream.on('data', function(data){
+            part.push(data);
+        });
+
+        stream.on('end', function(){
+            var param = makeObject(part[0]);
+            if(param.request_type == REQUEST_TYPE.START) {
+                var volumePn = param.volumePn;
+                var volume = app.volumeMap.get(volumePn);
+
+                if (volume == undefined) {
+                    //console.log('volume index not exist');
+                    return;
+                } else {
+                    var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
+                    useMap.set(volumePn, use);
+
+                    var obj = {
+                        volumePn: volumePn,
+                        cudaInterval: undefined,
+                        stackInterval : undefined,
+                        frame: 0,
+                        type: param.request_type };
+
+                    var cudaRender = new CudaRender(1, path.join(__dirname, '../public/upload/')+volume.save_name,
+                                                    volume.width, volume.height,volume.depth,cuCtx, cuModule);
+
+                    cudaRender.init();
+                    console.log('CudaRender', cudaRender);
+                    obj.cudaInterval = setInterval(cudaInterval, 10);
+                    obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
+                    streamMap.set(client.id, obj);
+                    vrcsCudaMap.set(client.id, cudaRender);
+                    vrcsBufMap.set(client.id, []);
+                }
+                //console.log('connect byte stream ' + client.id + ' volume use ' + use);
+
+            }else if(param.request_type == REQUEST_TYPE.ADAPTIVE){
+                var sum = param.frame;
+                var obj = streamMap.get(client.id);
+                var time = frameList[obj.frame];
+                obj.type = param.request_type;
+
+                if( time - 5 > sum / 3  ){
+                    var text = '[INFO] adaptive stream decrease frame from ' + frameList[obj.frame];
+                    obj.frame = obj.frame + 1 == frameList.length ? obj.frame : obj.frame + 1;
+                    text += ' to ' + frameList[obj.frame];
+                    console.log(text);
+                }else if( time - 1 < sum /3 ){
+                    var text = '[INFO] adaptive stream increase frame from ' + frameList[obj.frame];
+                    obj.frame = obj.frame-1 == -1 ? obj.frame : obj.frame - 1 ;
+                    text += ' to ' + frameList[obj.frame];
+                    console.log(text);
+                }else{
+                    //console.log('maintain frame');
+                }
+                //clearInterval(obj.cudaInterval);
+                clearInterval(obj.stackInterval);
+                //obj.cudaInterval = setInterval(cudaInterval, 1000 / frameList[obj.frame] );
+                obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
+                streamMap.set(client.id, obj);
+            }else if(param.request_type == REQUEST_TYPE.CHANGE){
+                var obj = streamMap.get(client.id);
+                obj.type = param.request_type;
+
+                //console.log(param);
+                var cudaRender = vrcsCudaMap.get(client.id);
+                cudaRender.type = param.rendering_type;
+
+                cudaRender.positionZ = param.positionZ;
+                cudaRender.brightness = param.brightness;
+                cudaRender.transferOffset = param.transferOffset;
+                cudaRender.transferScaleX = param.transferScaleX;
+                cudaRender.transferScaleY = param.transferScaleY;
+                cudaRender.transferScaleZ = param.transferScaleZ;
+                cudaRender.rotationX = param.rotationX;
+                cudaRender.rotationY = param.rotationY;
+                cudaRender.mriType = param.mriType;
+
+                vrcsBufMap.set(client.id, []);
+            }
+        });
+
+        stream.on('error', function(error){
+            //console.log(error);
+        });
+    });
+
+    client.on('close', function(stream, meta){
+        closeCallback(client.id);
+    });
+
+    var closeCallback = function(clientId){
+        var obj = streamMap.get(clientId);
+        if(obj != undefined) {
+            clearInterval(obj.cudaInterval);
+            clearInterval(obj.stackInterval);
+            streamMap.remove(client.id);
+
+            var use = useMap.get(obj.volumePn) - 1;
+            console.log('[INFO] Remove Interval and volume data ' + client.id + ' volume use ' + use);
+            if(use == 0){
+                app.volumeMap.remove(obj.volumePn);
+                useMap.remove(obj.volumePn);
+            }else{
+                useMap.set(obj.volumePn, use);
+            }
+        }
+        var cudaRender = vrcsCudaMap.get(clientId);
+        if(cudaRender != undefined){
+            vrcsCudaMap.remove(client.id);
+            vrcsBufMap.remove(client.id);
+            console.log('[INFO] Destroy and free cuda memory and buffer '+ client.id);
+        }
+    };
+
+});
+
+bs.on('error', function(error){
+    //console.log(error);
+});
+
+//#######################################
+
+
+
+//#######################################
+// ~ socket bind message ( Implement socket room )
+
+var socket_queue = [];
+var streamUserCount = 0;
+
+io.sockets.on('connection', function(socket){
+
+    socket.on('join', function(){
+        var clientId = socket.id;
+        var message = {
+            error : '',
+            success : false,
+            clientId : clientId
+        };
+
+        if(streamUserCount < 3){
+            streamUserCount++;
+            message.success = true;
+        }else{
+            socket_queue.push(clientId);
+            message.error = 'Visitor limit';
+        }
+
+        //console.log('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
+        socket.emit('message', message);
+    });
+
+    socket.on('disconnect', function () {
+        streamUserCount--;
+        var clientId = socket_queue.shift();
+        //console.log('disconnect total count[ ' + streamUserCount + ' ] , sockey id : ' + clientId);
+        if(clientId != undefined){
+            socket.broadcast.to(clientId).emit('user_disconnected');
+        }
+    });
+
+});
+//#######################################
+
+// ~ server start
+app.set('port', process.env.PORT || 3000);
+var server = server.listen(app.get('port'), function() {
+    debug('Express server listening on port ' + server.address().port);
+});
+
+//var _cuCtx = this.cuCtx;
+//_cuCtx.synchronize(function(error) {
+//    _cuCtx.destroy();
+//    console.log('[INFO_CUDA] cuCtx.synchronize', error);
+//});
+
+// ~ Make module
+
+//var nornenjs = require('../nornenjs/lib/server');
+//
+//var NornenjsServer = nornenjs.NornenjsServer;
+//var nornenServer = new NornenjsServer();
+//nornenServer.createServer(13000);
