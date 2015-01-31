@@ -1,25 +1,26 @@
 #!/usr/bin/env node
 
+var ENUMS = require('../nornenjs/lib/enums');
+var logger = require('../nornenjs/lib/logger');
+
 //#######################################
 // ~ load module and start server
-var fs = require('fs-extra'); // FILE
 var path = require('path');
 var debug = require('debug')('vrcs');
 var HashMap = require('hashmap').HashMap;
 
-var Jpeg = require('jpeg').Jpeg; // JPEG
-var Png = require('png').Png; // PNG
+var Jpeg = require('jpeg').Jpeg;
+var Png = require('png').Png;
 
 var app = require('../app');
 var http = require('http');
 var server = http.createServer(app);
-var BinaryServer = require('binaryjs').BinaryServer; // BinaryJs (Byte stream)
-var bs = BinaryServer({port : 9000}); // Start BinaryJs server
-var io = require('socket.io').listen(server); // Socket.io
+var BinaryServer = require('binaryjs').BinaryServer;
+var bs = BinaryServer({port : 9000});
+var io = require('socket.io').listen(server);
 //#######################################
 
 var CudaRender = require('../nornenjs/lib/render').CudaRender;
-
 var cu = require('../nornenjs/lib/load');
 var cuCtx = new cu.Ctx(0, cu.Device(0));
 var cuModule = cu.moduleLoad(path.join(__dirname, '../nornenjs/src-cuda/volume.ptx'));
@@ -32,8 +33,6 @@ var streamMap = new HashMap();
 var useMap = new HashMap();
 var vrcsCudaMap = new HashMap();
 var vrcsBufMap = new HashMap();
-
-var REQUEST_TYPE = { START : 1, ADAPTIVE : 2, CHANGE : 3 };
 
 bs.on('connection', function(client){
 
@@ -49,14 +48,14 @@ bs.on('connection', function(client){
             var obj = streamMap.get(client.id);
             if(obj == undefined) return;
 
-            if(obj.type == REQUEST_TYPE.START || obj.type == REQUEST_TYPE.ADAPTIVE){
+            if(obj.type == ENUMS.STREAM_TYPE.START || obj.type == ENUMS.STREAM_TYPE.ADAPTIVE){
                 var hrstart = process.hrtime();
                 cudaRender.start();
                 stack.push(cudaRender.d_outputBuffer);
                 cudaRender.end();
                 hrend = process.hrtime(hrstart);
                 //console.info(client.id, 'Execution time (hr): %ds %dms', hrend[0], hrend[1]/1000000);
-            }else if(obj.type == REQUEST_TYPE.CHANGE){
+            }else if(obj.type == ENUMS.STREAM_TYPE.EVENT){
                 var hrstart = process.hrtime();
                 cudaRender.start();
                 var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
@@ -89,7 +88,7 @@ bs.on('connection', function(client){
             var obj = streamMap.get(client.id);
             if(obj == undefined) return;
 
-            if(obj.type == REQUEST_TYPE.START || obj.type == REQUEST_TYPE.ADAPTIVE) {
+            if(obj.type == ENUMS.STREAM_TYPE.START || obj.type == ENUMS.STREAM_TYPE.ADAPTIVE) {
                 var png = new Png(buf, 512, 512, 'rgba');
                 png.encode(function (png_img) {
                     try {
@@ -104,7 +103,7 @@ bs.on('connection', function(client){
                         return;
                     }
                 });
-            }else if(obj.type == REQUEST_TYPE.CHANGE){
+            }else if(obj.type == ENUMS.STREAM_TYPE.EVENT){
                 console.log('[INFO] Do nothing ');
             }else{
                 console.log('[ERROR] Request type not defined');
@@ -139,7 +138,7 @@ bs.on('connection', function(client){
 
         stream.on('end', function(){
             var param = makeObject(part[0]);
-            if(param.request_type == REQUEST_TYPE.START) {
+            if(param.request_type == ENUMS.STREAM_TYPE.START) {
                 var volumePn = param.volumePn;
                 var volume = app.volumeMap.get(volumePn);
 
@@ -170,7 +169,7 @@ bs.on('connection', function(client){
                 }
                 //console.log('connect byte stream ' + client.id + ' volume use ' + use);
 
-            }else if(param.request_type == REQUEST_TYPE.ADAPTIVE){
+            }else if(param.request_type == ENUMS.STREAM_TYPE.ADAPTIVE){
                 var sum = param.frame;
                 var obj = streamMap.get(client.id);
                 var time = frameList[obj.frame];
@@ -194,7 +193,7 @@ bs.on('connection', function(client){
                 //obj.cudaInterval = setInterval(cudaInterval, 1000 / frameList[obj.frame] );
                 obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
                 streamMap.set(client.id, obj);
-            }else if(param.request_type == REQUEST_TYPE.CHANGE){
+            }else if(param.request_type == ENUMS.STREAM_TYPE.EVENT){
                 var obj = streamMap.get(client.id);
                 obj.type = param.request_type;
 
