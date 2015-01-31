@@ -21,7 +21,6 @@ var cuCtx = new cu.Ctx(0, cu.Device(0));
 
 //#######################################
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
-var frameList = [ 15, 10 ];
 
 var volumeMap = new HashMap();
 var useMap = new HashMap();
@@ -58,23 +57,65 @@ bs.on('connection', function(client){
                 return;
             }
 
-            if(status.steamType == ENUMS.STREAM_TYPE.START || status.steamType == ENUMS.STREAM_TYPE.ADAPTIVE){
+            if(status.streamType == ENUMS.STREAM_TYPE.START){
                 /**
                  * Stream type 이 처음 페이지를 접속했거나, Adaptive 인 경우에는 PNG 형식으로 압축하여 이미지 전송
                  */
+                logger.info('Frame queue size [ ' + frameQueue.length + ' ]');
                 var hrstart = process.hrtime();
 
                 cudaRender.start();
-                frameQueue.push(cudaRender.d_outputBuffer);
+                //frameQueue.push(cudaRender.d_outputBuffer);
+
+                var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
+                png.encode(function (png_img) {
+                    try {
+                        if (client._socket._socket == undefined) {
+                            logger.error('Connection already refused async png :: client id', client.id);
+                        } else {
+                            client.send(png_img);
+                        }
+                    } catch (error) {
+                        logger.error('Connection refused async png ', error);
+                        closeCallback(client.id);
+                        return;
+                    }
+                });
                 cudaRender.end();
 
                 hrend = process.hrtime(hrstart);
                 logger.debug('Make frame execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-            }else if(status.steamType == ENUMS.STREAM_TYPE.EVENT){
+            } else if(status.streamType == ENUMS.STREAM_TYPE.ADAPTIVE){
+                logger.info('Frame queue size [ ' + frameQueue.length + ' ]');
+                maintainInfo.frameQueue = [];
+                var hrstart = process.hrtime();
+
+                cudaRender.start();
+                //frameQueue.push(cudaRender.d_outputBuffer);
+                
+                var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
+                png.encode(function (png_img) {
+                    try {
+                        if (client._socket._socket == undefined) {
+                            logger.error('Connection already refused async png :: client id', client.id);
+                        } else {
+                            client.send(png_img);
+                        }
+                    } catch (error) {
+                        logger.error('Connection refused async png ', error);
+                        closeCallback(client.id);
+                        return;
+                    }
+                });
+                
+                cudaRender.end();
+
+                hrend = process.hrtime(hrstart);
+                logger.debug('Make frame adaptive time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
+            } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
                 /**
                  * Stream type 이 이벤트 인 경우에 JPEG으로 압축하여 이미지 전송하고, 이 경우 Stack에 넣는것이아닌 바로 이미지 전송
                  */
-
                 var hrstart = process.hrtime();
                 cudaRender.start();
                 var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
@@ -96,7 +137,7 @@ bs.on('connection', function(client){
 
                 logger.debug('Make frame and jpeg compress execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
             }else{
-                logger.error('Request type not defined');
+                logger.error('Request type not defined cuda' + status.streamType);
             }
         };
 
@@ -130,7 +171,7 @@ bs.on('connection', function(client){
                 return;
             }
 
-            if(status.steamType == ENUMS.STREAM_TYPE.START || status.steamType == ENUMS.STREAM_TYPE.ADAPTIVE) {
+            if(status.streamType == ENUMS.STREAM_TYPE.START || status.streamType == ENUMS.STREAM_TYPE.ADAPTIVE) {
                 var png = new Png(frame, 512, 512, 'rgba');
                 png.encode(function (png_img) {
                     try {
@@ -145,10 +186,10 @@ bs.on('connection', function(client){
                         return;
                     }
                 });
-            }else if(obj.steamType == ENUMS.STREAM_TYPE.EVENT){
+            }else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
                 logger.debug('Do nothing');
             }else{
-                logger.error('Request type not defined');
+                logger.error('Request type not defined queue');
             }
 
         };
@@ -208,13 +249,13 @@ bs.on('connection', function(client){
                     var status = {
                         frame : 0,
                         volumePn : volumePn,
-                        steamType : param.streamType,
+                        streamType : param.streamType,
                         cudaInterval : null,
                         stackInterval : null
                     };
 
-                    status.cudaInterval = setInterval(cudaInterval, 10);
-                    status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
+                    //status.cudaInterval = setInterval(cudaInterval, 10);
+                    //status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
 
                     var maintainInfo = {
                         status : status,
@@ -224,6 +265,8 @@ bs.on('connection', function(client){
 
                     maintainInfoMap.set(client.id, maintainInfo);
 
+                    cudaInterval();
+                    
                     logger.debug('Connect byte stream ' + client.id + ' volume use ' + use);
                 };
                 
@@ -263,7 +306,7 @@ bs.on('connection', function(client){
                 }
 
                 var time = frameList[status.frame];
-                status.steamType = param.streamType;
+                status.streamType = param.streamType;
 
                 if( time - 5 > sum / 3 ){
 
@@ -284,15 +327,20 @@ bs.on('connection', function(client){
                     logger.debug('Maintain frame');
 
                 }
-
-                //clearInterval(status.cudaInterval);
-                clearInterval(status.stackInterval);
+            
+                if(status.cudaInterval != null ){
+                    clearInterval(status.cudaInterval);
+                    status.cudaInterval = null;
+                }
+                //clearInterval(status.stackInterval);
                 //status.cudaInterval = setInterval(cudaInterval, 1000 / frameList[status.frame] );
-                status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
+                //status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
 
                 maintainInfo.status = status;
-                maintainInfoMap.set(client.id, maintainInfo);//
-
+                maintainInfoMap.set(client.id, maintainInfo);
+                
+                cudaInterval();
+                
             }else if(param.streamType == ENUMS.STREAM_TYPE.EVENT){
 
                 var maintainInfo = maintainInfoMap.get(client.id);
@@ -305,7 +353,7 @@ bs.on('connection', function(client){
                     return;
                 }
 
-                status.steamType = param.streamType;
+                status.streamType = param.streamType;
 
                 var cudaRender = maintainInfo.cudaRender;
                 if(cudaRender == undefined || cudaRender == null){
@@ -331,6 +379,12 @@ bs.on('connection', function(client){
                  */
                 maintainInfo.frameQueue = [];
                 maintainInfoMap.set(client.id, maintainInfo);
+
+                if(status.cudaInterval == null){
+                    status.cudaInterval = setInterval(cudaInterval, 5);
+                    maintainInfo.status = status;
+                    maintainInfoMap.set(client.id, maintainInfo);
+                }
             }
 
         });
