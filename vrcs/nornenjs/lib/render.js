@@ -1,3 +1,4 @@
+var logger = require('./logger');
 var Buffer = require('buffer').Buffer;
 var cu = require('./load');
 var mat4 = require('./mat/mat4');
@@ -58,7 +59,7 @@ var vec3 = require('./mat/vec3');
         init : function(){
             // ~ VolumeLoad & VolumeTexture & TextureBinding
             var error = this.cuModule.memTextureAlloc(this.textureFilePath, this.volumewidth,this.volumeheight, this.volumedepth);
-            console.log('[INFO_CUDA] _cuModule.memTextureAlloc', error);
+            logger.debug('[INFO_CUDA] _cuModule.memTextureAlloc', error);
         },
 
         start : function(){
@@ -66,7 +67,7 @@ var vec3 = require('./mat/vec3');
             // ~ 3D volume array
             this.d_output = cu.memAlloc(this.imageWidth * this.imageHeight * 4);
             var error = this.d_output.memSet(this.imageWidth * this.imageHeight * 4);
-            //console.log('[INFO_CUDA] d_output.memSet', error);
+            logger.debug('[INFO_CUDA] d_output.memSet', error);
 
             // ~ View Vector
             this.makeViewVector();
@@ -136,7 +137,7 @@ var vec3 = require('./mat/vec3');
 
             this.d_invViewMatrix = cu.memAlloc(12*4);
             var error = this.d_invViewMatrix.copyHtoD(c_invViewMatrix);
-            //console.log('[INFO_CUDA] d_invViewMatrix.copyHtoD', error);
+            logger.debug('[INFO_CUDA] d_invViewMatrix.copyHtoD', error);
         },
 
         render : function(){
@@ -151,12 +152,12 @@ var vec3 = require('./mat/vec3');
             }else if(this.type == this.RENDERING_CUDA_TYPE.MRI){
                 cuFunction = _cuModule.getFunction('render_kernel_MRI');
             }else{
-                //console.log('type not exist');
+                logger.debug('type not exist');
                 // ~ do default
                 cuFunction = _cuModule.getFunction('render_kernel_volume');
 
             }
-            //console.log('[INFO_CUDA] cuFunction', cuFunction);
+            logger.debug('[INFO_CUDA] cuFunction', cuFunction);
 
             //cuLaunchKernel
             var error = cu.launch(
@@ -195,7 +196,7 @@ var vec3 = require('./mat/vec3');
                 }
                 ]
             );
-            //console.log('[INFO_CUDA] cu.launch', error);
+            logger.debug('[INFO_CUDA] cu.launch', error);
 
             // cuMemcpyDtoH
             this.d_outputBuffer = new Buffer(this.imageWidth * this.imageHeight * 4);
