@@ -18,11 +18,11 @@ var bs = BinaryServer({port : 9000}); // Start BinaryJs server
 var io = require('socket.io').listen(server); // Socket.io
 //#######################################
 
-var CudaRender = require('../cuda/cuda_render').CudaRender;
+var CudaRender = require('../nornenjs/lib/render').CudaRender;
 
-var cu = require('../cuda/cuda');
+var cu = require('../nornenjs/lib/load');
 var cuCtx = new cu.Ctx(0, cu.Device(0));
-var cuModule = cu.moduleLoad(path.join(__dirname, '../cuda/vrcs.ptx'));
+var cuModule = cu.moduleLoad(path.join(__dirname, '../nornenjs/src-cuda/volume.ptx'));
 
 //#######################################
 // ~ Wait for new user connections ( Implement Byte stream )

@@ -1,7 +1,7 @@
 {
-  "name": "cuda",
-  "version": "0.1.0",
-  "description": "NVIDIA CUDA™ bindings for Node.js",
+  "name": "nornenjs",
+  "version": "0.0.1",
+  "description": "NVIDIA CUDA™ bindings for Node.js and volume Rendering",
   "keywords": [
     "NVIDIA",
     "CUDA",

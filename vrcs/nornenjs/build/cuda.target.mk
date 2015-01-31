@@ -69,12 +69,12 @@ INCS_Release := \
 	-I/usr/local/cuda/include
 
 OBJS := \
-	$(obj).target/$(TARGET)/src/bindings.o \
-	$(obj).target/$(TARGET)/src/ctx.o \
-	$(obj).target/$(TARGET)/src/device.o \
-	$(obj).target/$(TARGET)/src/function.o \
-	$(obj).target/$(TARGET)/src/mem.o \
-	$(obj).target/$(TARGET)/src/module.o
+	$(obj).target/$(TARGET)/src-cpp/bindings.o \
+	$(obj).target/$(TARGET)/src-cpp/ctx.o \
+	$(obj).target/$(TARGET)/src-cpp/device.o \
+	$(obj).target/$(TARGET)/src-cpp/function.o \
+	$(obj).target/$(TARGET)/src-cpp/mem.o \
+	$(obj).target/$(TARGET)/src-cpp/module.o
 
 # Add to the list of files we specially track dependencies for.
 all_deps += $(OBJS)

@@ -1,7 +1,7 @@
 var Buffer = require('buffer').Buffer;
-var cu = require('./cuda');
-var mat4 = require('./matrix_mat4');
-var vec3 = require('./matrix_vec3');
+var cu = require('./load');
+var mat4 = require('./mat/mat4');
+var vec3 = require('./mat/vec3');
 
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
