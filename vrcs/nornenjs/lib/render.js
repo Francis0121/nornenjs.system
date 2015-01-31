@@ -1,4 +1,5 @@
 var logger = require('./logger');
+var ENUMS = require('./enums');
 var Buffer = require('buffer').Buffer;
 var cu = require('./load');
 var mat4 = require('./mat/mat4');
@@ -29,13 +30,6 @@ var vec3 = require('./mat/vec3');
 
     CudaRender.prototype = {
         constructor:CudaRender,
-
-        RENDERING_CUDA_TYPE : {
-            VOL : 1,
-            MIP : 2,
-            MRI : 3
-        },
-        MRI_TYPE : { X : 1, Y : 2, Z : 3 },
 
         //Option
         imageWidth : 512,
@@ -80,8 +74,8 @@ var vec3 = require('./mat/vec3');
         makeViewVector : function(){
             var vec;
             var model_matrix = mat4.create();
-            if(this.type == this.RENDERING_CUDA_TYPE.MRI ) {
-                if (this.mriType == this.MRI_TYPE.X) {
+            if(this.type == ENUMS.RENDERING_TYPE.MRI ) {
+                if (this.mriType == ENUMS.MRI_TYPE.X) {
 
                     vec = vec3.fromValues(-1.0, 0.0, 0.0);
                     mat4.rotate(model_matrix, model_matrix, ( (270.0) * 3.14159265 / 180.0), vec);
@@ -91,7 +85,7 @@ var vec3 = require('./mat/vec3');
 
                     vec = vec3.fromValues(0.0, 0.0, this.positionZ);
                     mat4.translate(model_matrix, model_matrix, vec)
-                }else if(this.mriType == this.MRI_TYPE.Y){
+                }else if(this.mriType == ENUMS.MRI_TYPE.Y){
                     vec = vec3.fromValues(-1.0, 0.0, 0.0);
                     mat4.rotate(model_matrix, model_matrix, ( (270.0 ) * 3.14159265 / 180.0), vec);
 
@@ -100,7 +94,7 @@ var vec3 = require('./mat/vec3');
 
                     vec = vec3.fromValues(0.0, 0.0, this.positionZ);
                     mat4.translate(model_matrix, model_matrix, vec)
-                }else if(this.mriType == this.MRI_TYPE.Z) {
+                }else if(this.mriType == ENUMS.MRI_TYPE.Z) {
                     vec = vec3.fromValues(-1.0, 0.0, 0.0);
                     mat4.rotate(model_matrix, model_matrix, ( (180 ) * 3.14159265 / 180.0), vec);
 
@@ -145,17 +139,16 @@ var vec3 = require('./mat/vec3');
 
             // ~ Rendering
             var cuFunction = undefined;
-            if(this.type == this.RENDERING_CUDA_TYPE.VOL){
+            if(this.type == ENUMS.RENDERING_TYPE.VOLUME){
                 cuFunction = _cuModule.getFunction('render_kernel_volume');
-            }else if(this.type == this.RENDERING_CUDA_TYPE.MIP){
+            }else if(this.type == ENUMS.RENDERING_TYPE.MIP){
                 cuFunction = _cuModule.getFunction('render_kernel_MIP');
-            }else if(this.type == this.RENDERING_CUDA_TYPE.MRI){
+            }else if(this.type == ENUMS.RENDERING_TYPE.MRI){
                 cuFunction = _cuModule.getFunction('render_kernel_MRI');
             }else{
                 logger.debug('type not exist');
                 // ~ do default
                 cuFunction = _cuModule.getFunction('render_kernel_volume');
-
             }
             logger.debug('[INFO_CUDA] cuFunction', cuFunction);
 
