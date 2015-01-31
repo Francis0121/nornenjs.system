@@ -30,6 +30,7 @@ medical.stream = {
     client : null,
     buffer : null,
     sendOption : null,
+    firstEvent : false,
 
     run : function(){
         $sthis = this;
@@ -103,6 +104,11 @@ medical.stream = {
                 if($sthis.adaptiveOption.interval === null)
                     $sthis.adaptiveOption.interval = setInterval($sthis.adaptiveInterval, 1000);
 
+                // ~ browser touch event. Why code here? Not supported jquery touch event
+                if(!$sthis.firstEvent && $.browser.mobile){
+                    firstEvent = true;
+                    medical.event.stream.touch();
+                }
             });
         });
     },

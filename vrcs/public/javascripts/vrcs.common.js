@@ -240,6 +240,75 @@ medical.event = {
             $('body').on('mouseup', function(event){
                 $ethis.stream.isMouseOn = false;
             });
+        },
+
+        isTouchOn : false,
+        touchBeforeX : null,
+        touchBeforeY : null,
+        touch : function(){
+            var el = document.getElementsByTagName('canvas')[0];
+
+            el.addEventListener('touchstart', function(evt){
+                evt.preventDefault();
+                var el = document.getElementsByTagName('canvas')[0];
+                var ctx = el.getContext('2d');
+                var touches = evt.changedTouches;
+
+                if(touches.length == 1){
+                    $ethis.stream.isTouchOn = true;
+                    $ethis.stream.touchBeforeX = touches[0].pageX;
+                    $ethis.stream.touchBeforeY = touches[0].pageY;
+                    console.log('x ', $ethis.stream.touchBeforeX, 'y : ', $ethis.stream.touchBeforeY);
+                }
+
+            });
+
+            el.addEventListener('touchmove', function(evt){
+                evt.preventDefault();
+                var el = document.getElementsByTagName('canvas')[0];
+                var ctx = el.getContext('2d');
+                var touches = evt.changedTouches;
+                var $sthis = medical.stream;
+
+
+                if($ethis.stream.isTouchOn){
+                    $sthis.sendOption.streamType = $sthis.REQUEST_TYPE.CHANGE;
+
+                    $sthis.sendOption.rotationX += (touches[0].pageX - $ethis.stream.touchBeforeX)/100.0;
+                    $sthis.sendOption.rotationY += (touches[0].pageY - $ethis.stream.touchBeforeY)/100.0;
+
+                    $ethis.stream.beforeX = touches[0].pageX;
+                    $ethis.stream.beforeY = touches[0].pageY;
+
+                    $sthis.queue = [];
+                    $sthis.send();
+                }
+
+            });
+
+            el.addEventListener('touchend', function(evt){
+                evt.preventDefault();
+                var el = document.getElementsByTagName('canvas')[0];
+                var ctx = el.getContext('2d');
+                var touches = evt.changedTouches;
+
+                $ethis.stream.isTouchOn = false;
+            });
+
+            el.addEventListener('touchcancel', function handleCancel(evt) {
+                evt.preventDefault();
+                $ethis.stream.isTouchOn = false;
+            });
+
+            el.addEventListener('touchleave', function(evt){
+                evt.preventDefault();
+                var el = document.getElementsByTagName('canvas')[0];
+                var ctx = el.getContext('2d');
+                var touches = evt.changedTouches;
+
+                $ethis.stream.isTouchOn = false;
+            });
+
         }
 
     }
