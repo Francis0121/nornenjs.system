@@ -14,8 +14,6 @@ var stream = require('./routes/stream');
 
 var app = express();
 
-var sqlite3 = require('./sql/default');
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

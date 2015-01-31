@@ -1,4 +1,4 @@
-var sqlite = require('../sql/default');
+var sqlite = require('../nornenjs/lib/sql/default');
 var express = require('express');
 var router = express.Router();
 

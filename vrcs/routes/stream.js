@@ -1,10 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var sqlite = require('../sql/default');
+var sqlite = require('../nornenjs/lib/sql/default');
 var HashMap = require('hashmap').HashMap;
-var ip = require("ip");
-
-console.log(ip.address());
+var ip = require('ip');
 
 // Not sign in user don`t access this router
 router.use(function(req, res, next) {

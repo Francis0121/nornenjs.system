@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs-extra');//File System - for file manipulation
 var path = require('path');
-var sqlite = require('../sql/default');
+var sqlite = require('../nornenjs/lib/sql/default');
 require('date-utils'); // Date util
 
 // ~ Confirm sign in
