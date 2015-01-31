@@ -29,10 +29,9 @@ var cuModule = cu.moduleLoad(path.join(__dirname, '../nornenjs/src-cuda/volume.p
 // ~ Wait for new user connections ( Implement Byte stream )
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 var frameList = [ 15, 10 ];
-var streamMap = new HashMap();
+
 var useMap = new HashMap();
-var vrcsCudaMap = new HashMap();
-var vrcsBufMap = new HashMap();
+var maintainInfoMap = new HashMap();
 
 bs.on('connection', function(client){
 
@@ -44,29 +43,40 @@ bs.on('connection', function(client){
          * Cuda ptx 파일을 이용하여 이미지 Frame을 생성하는 함수
          */
         var cudaInterval = function () {
-        
-            var cudaRender = vrcsCudaMap.get(client.id);
-            if(cudaRender == undefined) return;
 
-            var stack = vrcsBufMap.get(client.id);
-            if(stack == undefined) return;
-
-            var obj = streamMap.get(client.id);
-            if(obj == undefined) return;
+            var maintainInfo = maintainInfoMap.get(client.id);
+            if(maintainInfo == undefined || maintainInfo == null){
+                return;
+            }
             
-            if(obj.type == ENUMS.STREAM_TYPE.START || obj.type == ENUMS.STREAM_TYPE.ADAPTIVE){
+            var status = maintainInfo.status;
+            if(status == undefined || status == null){
+                return;
+            }
+            
+            var cudaRender = maintainInfo.cudaRender;
+            if(cudaRender == undefined || cudaRender == null){
+                return;
+            }
+
+            var frameQueue = maintainInfo.frameQueue;
+            if(frameQueue == undefined || frameQueue == null){
+                return;
+            }
+            
+            if(status.steamType == ENUMS.STREAM_TYPE.START || status.steamType == ENUMS.STREAM_TYPE.ADAPTIVE){
                 /**
                  * Stream type 이 처음 페이지를 접속했거나, Adaptive 인 경우에는 PNG 형식으로 압축하여 이미지 전송
                  */
                 var hrstart = process.hrtime();
                 
                 cudaRender.start();
-                stack.push(cudaRender.d_outputBuffer);
+                frameQueue.push(cudaRender.d_outputBuffer);
                 cudaRender.end();
                 
                 hrend = process.hrtime(hrstart);
                 logger.debug('Make frame execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-            }else if(obj.type == ENUMS.STREAM_TYPE.EVENT){
+            }else if(status.steamType == ENUMS.STREAM_TYPE.EVENT){
                 /**
                  * Stream type 이 이벤트 인 경우에 JPEG으로 압축하여 이미지 전송하고, 이 경우 Stack에 넣는것이아닌 바로 이미지 전송
                  */
@@ -100,17 +110,34 @@ bs.on('connection', function(client){
          * Stack Interval 로 Event가 존재하지 않은 정지상태인 경우 PNG로 압축하여 이미지를 보내도록 하는 interval이다.
          */
         var stackInterval = function(){
-            var stack = vrcsBufMap.get(client.id);
-            if( stack == undefined) return;
 
-            var buf = stack.shift();
-            if(buf == undefined) return;
+            var maintainInfo = maintainInfoMap.get(client.id);
+            if(maintainInfo == undefined || maintainInfo == null){
+                return;
+            }
 
-            var obj = streamMap.get(client.id);
-            if(obj == undefined) return;
+            var status = maintainInfo.status;
+            if(status == undefined || status == null){
+                return;
+            }
 
-            if(obj.type == ENUMS.STREAM_TYPE.START || obj.type == ENUMS.STREAM_TYPE.ADAPTIVE) {
-                var png = new Png(buf, 512, 512, 'rgba');
+            var cudaRender = maintainInfo.cudaRender;
+            if(cudaRender == undefined || cudaRender == null){
+                return;
+            }
+
+            var frameQueue = maintainInfo.frameQueue;
+            if(frameQueue == undefined || frameQueue == null) {
+                return;
+            }
+
+            var frame = frameQueue.shift();
+            if(frame == undefined || frameQueue == null){
+                return;
+            }
+
+            if(status.steamType == ENUMS.STREAM_TYPE.START || status.steamType == ENUMS.STREAM_TYPE.ADAPTIVE) {
+                var png = new Png(frame, 512, 512, 'rgba');
                 png.encode(function (png_img) {
                     try {
                         if (client._socket._socket == undefined) {
@@ -124,7 +151,7 @@ bs.on('connection', function(client){
                         return;
                     }
                 });
-            }else if(obj.type == ENUMS.STREAM_TYPE.EVENT){
+            }else if(obj.steamType == ENUMS.STREAM_TYPE.EVENT){
                 logger.debug('Do nothing');
             }else{
                 logger.error('Request type not defined');
@@ -180,13 +207,6 @@ bs.on('connection', function(client){
                     var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
                     useMap.set(volumePn, use);
 
-                    var obj = {
-                        volumePn: volumePn,
-                        cudaInterval: undefined,
-                        stackInterval : undefined,
-                        frame: 0,
-                        type: param.streamType };
-
                     var cudaRender = new CudaRender(1, path.join(__dirname, '../public/upload/')+volume.save_name,
                                                     volume.width, volume.height,volume.depth, cuCtx, cuModule);
 
@@ -194,13 +214,29 @@ bs.on('connection', function(client){
                     logger.debug('CudaRedner ', cudaRender);
                     
                     // TODO 여기서 문제점 CudaInterval 은 10ms 마다 찍고 있음.
+
+                    var status = {
+                        frame : 0,
+                        volumePn : volumePn,
+                        steamType : param.streamType,
+                        cudaInterval : null,
+                        stackInterval : null
+                    };
                     
-                    obj.cudaInterval = setInterval(cudaInterval, 10); 
-                    obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
+                    status.cudaInterval = setInterval(cudaInterval, 10);
+                    status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
                     
-                    streamMap.set(client.id, obj);
-                    vrcsCudaMap.set(client.id, cudaRender);
-                    vrcsBufMap.set(client.id, []);
+                    var maintainInfo = {
+                        status : status,
+                        cudaRender : cudaRender,
+                        frameQueue : []
+                    };
+                    
+                    maintainInfoMap.set(client.id, maintainInfo);
+                    
+                    //streamMap.set(client.id, status);
+                    //vrcsCudaMap.set(client.id, cudaRender);
+                    //vrcsBufMap.set(client.id, []);
                 }
                 
                 logger.debug('Connect byte stream ' + client.id + ' volume use ' + use);;
@@ -208,37 +244,71 @@ bs.on('connection', function(client){
             }else if(param.streamType == ENUMS.STREAM_TYPE.ADAPTIVE){
                 
                 var sum = param.frame;
-                var obj = streamMap.get(client.id);
-                var time = frameList[obj.frame];
-                obj.type = param.streamType;
-
-                if( time - 5 > sum / 3  ){
-                    var text = '[INFO] adaptive stream decrease frame from ' + frameList[obj.frame];
-                    obj.frame = obj.frame + 1 == frameList.length ? obj.frame : obj.frame + 1;
-                    text += ' to ' + frameList[obj.frame];
-                    console.log(text);
-                }else if( time - 1 < sum /3 ){
-                    var text = '[INFO] adaptive stream increase frame from ' + frameList[obj.frame];
-                    obj.frame = obj.frame-1 == -1 ? obj.frame : obj.frame - 1 ;
-                    text += ' to ' + frameList[obj.frame];
-                    console.log(text);
-                }else{
-                    //console.log('maintain frame');
+                
+                var maintainInfo = maintainInfoMap.get(client.id);
+                if(maintainInfo == undefined || maintainInfo == null){
+                    return;
                 }
-                //clearInterval(obj.cudaInterval);
-                clearInterval(obj.stackInterval);
-                //obj.cudaInterval = setInterval(cudaInterval, 1000 / frameList[obj.frame] );
-                obj.stackInterval = setInterval(stackInterval, 1000 / frameList[obj.frame] );
-                streamMap.set(client.id, obj);
+                
+                var status = maintainInfo.status;
+                if(status == undefined || status == null){
+                    return;
+                }
+                
+                var time = frameList[status.frame];
+                status.steamType = param.streamType;
+
+                if( time - 5 > sum / 3 ){
+                    
+                    var text = 'Adaptive stream decrease frame from ' + frameList[status.frame];
+                    status.frame = status.frame + 1 == frameList.length ? status.frame : status.frame + 1;
+                    text += ' to ' + frameList[status.frame];
+                    logger.debug(text);
+                    
+                }else if( time - 1 < sum /3 ){
+                    
+                    var text = 'Adaptive stream increase frame from ' + frameList[status.frame];
+                    status.frame = status.frame-1 == -1 ? status.frame : status.frame - 1 ;
+                    text += ' to ' + frameList[status.frame];
+                    logger.debug(text);
+                    
+                }else{
+                    
+                    logger.debug('Maintain frame');
+                    
+                }
+                
+                //clearInterval(status.cudaInterval);
+                clearInterval(status.stackInterval);
+                //status.cudaInterval = setInterval(cudaInterval, 1000 / frameList[status.frame] );
+                status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
+                
+                maintainInfo.status = status;
+                maintainInfoMap.set(client.id, maintainInfo);
                 
             }else if(param.streamType == ENUMS.STREAM_TYPE.EVENT){
-                var obj = streamMap.get(client.id);
-                obj.type = param.streamType;
 
-                //console.log(param);
-                var cudaRender = vrcsCudaMap.get(client.id);
+                var maintainInfo = maintainInfoMap.get(client.id);
+                if(maintainInfo == undefined || maintainInfo == null){
+                    return;
+                }
+
+                var status = maintainInfo.status;
+                if(status == undefined || status == null){
+                    return;
+                }
+
+                status.steamType = param.streamType;
+                
+                var cudaRender = maintainInfo.cudaRender;
+                if(cudaRender == undefined || cudaRender == null){
+                    return;
+                }
+
+                /**
+                 * Cuda rendering에 전달하는 parameter
+                 */
                 cudaRender.type = param.renderingType;
-
                 cudaRender.positionZ = param.positionZ;
                 cudaRender.brightness = param.brightness;
                 cudaRender.transferOffset = param.transferOffset;
@@ -249,13 +319,18 @@ bs.on('connection', function(client){
                 cudaRender.rotationY = param.rotationY;
                 cudaRender.mriType = param.mriType;
 
-                vrcsBufMap.set(client.id, []);
+                /**
+                 * Fraem queue 초기화
+                 */
+                maintainInfo.frameQueue = [];
+                maintainInfoMap.set(client.id, maintainInfo);
             }
+            
         });
 
         stream.on('error', function(error){
             
-            logger.error('Stream occur error', error);
+            logger.error('Stream occur errorvar maintainInfo = maintainInfoMap.get(client.id)', error);
             
         });
     });
@@ -268,27 +343,31 @@ bs.on('connection', function(client){
      * 종료시에 뒤 처리를 해주는 함수
      */
     var closeCallback = function(clientId){
-        var obj = streamMap.get(clientId);
-        if(obj != undefined) {
-            clearInterval(obj.cudaInterval);
-            clearInterval(obj.stackInterval);
-            streamMap.remove(client.id);
 
-            var use = useMap.get(obj.volumePn) - 1;
+        var maintainInfo = maintainInfoMap.get(client.id);
+        if(maintainInfo == undefined || maintainInfo == null){
+            return;
+        }
+
+        var status = maintainInfo.status;
+
+        if(status != undefined) {
+            clearInterval(status.cudaInterval);
+            clearInterval(status.stackInterval);
+
+            var use = useMap.get(status.volumePn) - 1;
             logger.debug('Remove Interval and volume data ' + client.id + ' volume use ' + use);
+            
             if(use == 0){
-                app.volumeMap.remove(obj.volumePn);
-                useMap.remove(obj.volumePn);
+                app.volumeMap.remove(status.volumePn);
+                useMap.remove(status.volumePn);
             }else{
-                useMap.set(obj.volumePn, use);
+                useMap.set(status.volumePn, use);
             }
         }
-        var cudaRender = vrcsCudaMap.get(clientId);
-        if(cudaRender != undefined){
-            vrcsCudaMap.remove(client.id);
-            vrcsBufMap.remove(client.id);
-            logger.debug('[INFO] Destroy and free cuda memory and buffer '+ client.id);
-        }
+
+        maintainInfoMap.remove(client.id);
+        logger.debug('Destroy and free cuda memory and buffer '+ client.id);
     };
 
 });
