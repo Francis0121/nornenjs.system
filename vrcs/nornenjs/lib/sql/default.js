@@ -1,7 +1,8 @@
 /**
  * Created by pi on 14. 11. 23.
  */
-// ~ connect sqlite3
+var logger = require('../logger');
+
 var sql = require('./sql');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(':memory:');
@@ -20,7 +21,7 @@ db.serialize(function() {
     stmt.finalize();
 
     db.get(sql.user.select, function(err, uData) {
-        console.log(uData);
+        logger.debug(uData);
         var volume = [{
             $userpn : uData.pn,
             $title : 'Skull',
@@ -44,7 +45,7 @@ db.serialize(function() {
             stmt = db.prepare(sql.volume.insert);
             stmt.run(volume[1], function(){
                 db.each(sql.volume.selectVolumeList, { $userpn : uData.pn }, function(err, vData){
-                    console.log(vData);
+                    logger.debug(vData);
                 });
             });
         });

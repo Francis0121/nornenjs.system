@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-var debug = require('debug')('vrcs');
 var app = require('../app');
 var http = require('http');
 var server = http.createServer(app);
@@ -53,7 +52,7 @@ io.sockets.on('connection', function(socket){
 // ~ server start
 app.set('port', process.env.PORT || 3000);
 var server = server.listen(app.get('port'), function() {
-    debug('Express server listening on port ' + server.address().port);
+    logger.debug('Express server listening on port ' + server.address().port);
 });
 
 //var _cuCtx = this.cuCtx;
