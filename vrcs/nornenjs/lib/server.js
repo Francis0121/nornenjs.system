@@ -5,6 +5,7 @@ var logger = require('./logger');
 var sqlite = require('./sql/default');
 
 var path = require('path');
+var exec = require('child_process').exec;
 var HashMap = require('hashmap').HashMap;
 
 var Jpeg = require('jpeg').Jpeg;
@@ -17,7 +18,6 @@ var bs = BinaryServer({port : 9000});
 var CudaRender = require('./render').CudaRender;
 var cu = require('./load');
 var cuCtx = new cu.Ctx(0, cu.Device(0));
-var cuModule = cu.moduleLoad(path.join(__dirname, '../src-cuda/volume.ptx'));
 
 //#######################################
 var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
@@ -196,6 +196,7 @@ bs.on('connection', function(client){
                     var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
                     useMap.set(volumePn, use);
 
+                    var cuModule = cu.moduleLoad(path.join(__dirname, '../src-cuda/volume.ptx'));
                     var cudaRender = new CudaRender(1, path.join(__dirname, '../../public/upload/')+volume.save_name,
                         volume.width, volume.height,volume.depth, cuCtx, cuModule);
 
@@ -290,7 +291,7 @@ bs.on('connection', function(client){
                 status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
 
                 maintainInfo.status = status;
-                maintainInfoMap.set(client.id, maintainInfo);
+                maintainInfoMap.set(client.id, maintainInfo);//
 
             }else if(param.streamType == ENUMS.STREAM_TYPE.EVENT){
 

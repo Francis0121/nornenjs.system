@@ -1,23 +1,17 @@
 #!/usr/bin/env node
 
-var ENUMS = require('../nornenjs/lib/enums');
-var logger = require('../nornenjs/lib/logger');
-
-//#######################################
-// ~ load module and start server
-
 var debug = require('debug')('vrcs');
 var app = require('../app');
 var http = require('http');
 var server = http.createServer(app);
 
-var io = require('socket.io').listen(server);
-//#######################################
+var ENUMS = require('../nornenjs/lib/enums');
+var logger = require('../nornenjs/lib/logger');
 
 require('../nornenjs/lib/server');
 
 //#######################################
-// ~ socket bind message ( Implement socket room )
+var io = require('socket.io').listen(server);
 
 var socket_queue = [];
 var streamUserCount = 0;
