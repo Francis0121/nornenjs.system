@@ -34,14 +34,14 @@ io.sockets.on('connection', function(socket){
             message.error = 'Visitor limit';
         }
 
-        //console.log('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
+        logger.debug('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
         socket.emit('message', message);
     });
 
     socket.on('disconnect', function () {
         streamUserCount--;
         var clientId = socket_queue.shift();
-        //console.log('disconnect total count[ ' + streamUserCount + ' ] , sockey id : ' + clientId);
+        logger.debug('disconnect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
         if(clientId != undefined){
             socket.broadcast.to(clientId).emit('user_disconnected');
         }
