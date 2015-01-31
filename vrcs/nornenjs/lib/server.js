@@ -195,57 +195,36 @@ bs.on('connection', function(client){
                      */
                     var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
                     useMap.set(volumePn, use);
-
-                    var ptxPath = path.join(__dirname, '../ptx/'+process.hrtime()+'.ptx');
-                    var cudaPath =  path.join(__dirname, './volume.cu');
-                    logger.debug(cudaPath, ptxPath, process.env.PATH );
-                    exec('nvcc -ptx -o '+ptxPath+ ' '+cudaPath,
-                        {
-                            env : {
-                                'PATH' : '/usr/local/cuda/bin:'+process.env.PATH,
-                                'LD_LIBRARY_PATH' : '/usr/local/cuda/lib:/lib:$LD_LIBRARY_PATH'
-                            }
-                        },
-                        function (error, stdout, stderr) {
-                        if (error !== null) {
-                            logger.error('exec error: ' + error);
-                        } else {
-                            
-                            logger.debug('Make exec file');
-                            var cuModule = cu.moduleLoad(ptxPath);
-                            var cudaRender = new CudaRender(1, path.join(__dirname, '../../public/upload/')+volume.save_name,
-                                volume.width, volume.height,volume.depth, cuCtx, cuModule);
-
-                            cudaRender.init();
-                            logger.debug('CudaRedner ', cudaRender);
-
-                            // TODO 여기서 문제점 CudaInterval 은 10ms 마다 찍고 있음.
-
-                            var status = {
-                                frame : 0,
-                                ptxPath : ptxPath,
-                                volumePn : volumePn,
-                                steamType : param.streamType,
-                                cudaInterval : null,
-                                stackInterval : null
-                            };
-
-                            status.cudaInterval = setInterval(cudaInterval, 10);
-                            status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
-
-                            var maintainInfo = {
-                                status : status,
-                                cudaRender : cudaRender,
-                                frameQueue : []
-                            };
-
-                            maintainInfoMap.set(client.id, maintainInfo);
-
-                            logger.debug('Connect byte stream ' + client.id + ' volume use ' + use);
-                        }
-                    });
                     
-                    
+                    var cuModule = cu.moduleLoad(path.join(__dirname, '../ptx/volume.ptx'));
+                    var cudaRender = new CudaRender(1, path.join(__dirname, '../../public/upload/')+volume.save_name,
+                        volume.width, volume.height,volume.depth, cuCtx, cuModule);
+
+                    cudaRender.init();
+                    logger.debug('CudaRedner ', cudaRender);
+
+                    // TODO 여기서 문제점 CudaInterval 은 10ms 마다 찍고 있음.
+
+                    var status = {
+                        frame : 0,
+                        volumePn : volumePn,
+                        steamType : param.streamType,
+                        cudaInterval : null,
+                        stackInterval : null
+                    };
+
+                    status.cudaInterval = setInterval(cudaInterval, 10);
+                    status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
+
+                    var maintainInfo = {
+                        status : status,
+                        cudaRender : cudaRender,
+                        frameQueue : []
+                    };
+
+                    maintainInfoMap.set(client.id, maintainInfo);
+
+                    logger.debug('Connect byte stream ' + client.id + ' volume use ' + use);
                 };
                 
                 
