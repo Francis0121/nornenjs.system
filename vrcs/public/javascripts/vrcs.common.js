@@ -272,7 +272,7 @@ medical.event = {
 
 
                 if($ethis.stream.isTouchOn){
-                    $sthis.sendOption.streamType = $sthis.REQUEST_TYPE.CHANGE;
+                    $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.CHANGE;
 
                     $sthis.sendOption.rotationX += (touches[0].pageX - $ethis.stream.touchBeforeX)/100.0;
                     $sthis.sendOption.rotationY += (touches[0].pageY - $ethis.stream.touchBeforeY)/100.0;

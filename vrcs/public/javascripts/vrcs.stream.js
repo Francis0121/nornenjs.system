@@ -64,6 +64,7 @@ medical.stream = {
     makeBuffer : function(){
         $sthis.buffer = new ArrayBuffer(52);
         var x = new Float32Array($sthis.buffer);
+        
         x[0] = $sthis.sendOption.request_type;
         x[1] = $sthis.sendOption.volumePn;
         x[2] = $sthis.sendOption.frame;

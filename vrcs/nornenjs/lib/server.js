@@ -381,7 +381,7 @@ bs.on('connection', function(client){
                 maintainInfoMap.set(client.id, maintainInfo);
 
                 if(status.cudaInterval == null){
-                    status.cudaInterval = setInterval(cudaInterval, 5);
+                    status.cudaInterval = setInterval(cudaInterval, 1000/7);
                     maintainInfo.status = status;
                     maintainInfoMap.set(client.id, maintainInfo);
                 }
