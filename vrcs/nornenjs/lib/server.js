@@ -124,10 +124,7 @@ bs.on('connection', function(client){
                 logger.error('Request type not defined cuda' + status.streamType);
             }
         };
-
-        /**
-         * Client에서 요청받은 Byte Data를 버퍼로 변경해주는 함수
-         */
+        
         var returnParameter = function(buffer){
             var parameter = {
                 streamType : buffer.readFloatLE(0),
