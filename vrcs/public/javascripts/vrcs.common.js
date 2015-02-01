@@ -104,6 +104,8 @@ medical.event = {
                 $sthis.sendOption.renderingType = type;
 
                 $sthis.send();
+                
+                setTimeout($sthis.sendTimeout, 1000);
             });
         },
 
@@ -126,6 +128,8 @@ medical.event = {
                 $('#axis .ui-slider-handle').css('left', '0');
 
                 $sthis.send();
+                
+                setTimeout($sthis.sendTimeout, 1000);
             });
         },
 
@@ -143,6 +147,10 @@ medical.event = {
                         $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                         $sthis.sendOption.positionZ = ui.value/1000.0;
                         $sthis.send();
+                    },
+                    stop : function(event, ui){
+                        var $sthis = medical.stream;
+                        setTimeout($sthis.sendTimeout, 1000);
                     }
                 });
             });
@@ -162,6 +170,10 @@ medical.event = {
                         $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                         $sthis.sendOption.brightness = ui.value/100.0;
                         $sthis.send();
+                    },
+                    stop : function(event, ui){
+                        var $sthis = medical.stream;
+                        setTimeout($sthis.sendTimeout, 1000);
                     }
                 });
             });
@@ -181,6 +193,10 @@ medical.event = {
                         $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
                         $sthis.sendOption.transferOffset = (ui.value-10000)/10000.0;
                         $sthis.send();
+                    },
+                    stop : function(event, ui){
+                        var $sthis = medical.stream;
+                        setTimeout($sthis.sendTimeout, 1000);
                     }
                 });
             });
@@ -208,6 +224,10 @@ medical.event = {
                         }
 
                         $sthis.send();
+                    },
+                    stop : function(event, ui){
+                        var $sthis = medical.stream;
+                        setTimeout($sthis.sendTimeout, 1000);
                     }
                 });
             });
@@ -242,6 +262,7 @@ medical.event = {
 
             $('body').on('mouseup', function(event){
                 $ethis.stream.isMouseOn = false;
+                setTimeout($sthis.sendTimeout, 1000);
             });
         },
 
@@ -296,11 +317,13 @@ medical.event = {
                 var touches = evt.changedTouches;
 
                 $ethis.stream.isTouchOn = false;
+                setTimeout($sthis.sendTimeout, 1000);
             });
 
             el.addEventListener('touchcancel', function handleCancel(evt) {
                 evt.preventDefault();
                 $ethis.stream.isTouchOn = false;
+                setTimeout($sthis.sendTimeout, 1000);
             });
 
             el.addEventListener('touchleave', function(evt){
@@ -310,6 +333,7 @@ medical.event = {
                 var touches = evt.changedTouches;
 
                 $ethis.stream.isTouchOn = false;
+                setTimeout($sthis.sendTimeout, 1000);
             });
 
         }

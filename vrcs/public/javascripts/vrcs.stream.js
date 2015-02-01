@@ -55,6 +55,11 @@ medical.stream = {
 
         $sthis.debug.run();
     },
+    
+    sendTimeout : function(){
+        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.ADAPTIVE;
+        $sthis.send();
+    },
 
     send : function(){
         $sthis.makeBuffer();

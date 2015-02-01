@@ -246,6 +246,7 @@ bs.on('connection', function(client){
                 maintainInfoMap.set(client.id, maintainInfo);
                 
                 cudaInterval();
+                logger.debug('Cuda Interval finish ' + client.id);
                 
             }else if(param.streamType == ENUMS.STREAM_TYPE.EVENT){
 
