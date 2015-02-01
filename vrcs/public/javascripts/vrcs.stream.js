@@ -38,7 +38,6 @@ medical.stream = {
             streamType : $sthis.STREAM_TYPE.START,
             renderingType : $sthis.RENDERING_TYPE.VOLUME,
             volumePn : accessInfo.volumePn,
-            frame : 0,
             brightness : 1.0,
             positionZ : 3.0,
             transferOffset : 0.0,
@@ -63,23 +62,22 @@ medical.stream = {
     },
 
     makeBuffer : function(){
-        $sthis.buffer = new ArrayBuffer(56);
+        $sthis.buffer = new ArrayBuffer(52);
         var x = new Float32Array($sthis.buffer);
         
         x[0] = $sthis.sendOption.streamType;
         x[1] = $sthis.sendOption.volumePn;
-        x[2] = $sthis.sendOption.frame;
-        x[3] = $sthis.sendOption.renderingType;
-        x[4] = $sthis.sendOption.brightness;
-        x[5] = $sthis.sendOption.positionZ;
-        x[6] = $sthis.sendOption.transferOffset;
-        x[7] = $sthis.sendOption.rotationX;
-        x[8] = $sthis.sendOption.rotationY;
-        x[9] = $sthis.sendOption.transferScaleX;
-        x[10] = $sthis.sendOption.transferScaleY;
-        x[11] = $sthis.sendOption.transferScaleZ;
-        x[12] = $sthis.sendOption.mriType;
-        x[13] = $sthis.sendOption.isMobile;
+        x[2] = $sthis.sendOption.renderingType;
+        x[3] = $sthis.sendOption.brightness;
+        x[4] = $sthis.sendOption.positionZ;
+        x[5] = $sthis.sendOption.transferOffset;
+        x[6] = $sthis.sendOption.rotationX;
+        x[7] = $sthis.sendOption.rotationY;
+        x[8] = $sthis.sendOption.transferScaleX;
+        x[9] = $sthis.sendOption.transferScaleY;
+        x[10] = $sthis.sendOption.transferScaleZ;
+        x[11] = $sthis.sendOption.mriType;
+        x[12] = $sthis.sendOption.isMobile;
     },
 
     on : function(){
@@ -103,15 +101,10 @@ medical.stream = {
                 };
                 img.src = url;
 
-                $sthis.adaptiveOption.frame++;
-                if($sthis.adaptiveOption.interval === null)
-                    $sthis.adaptiveOption.interval = setInterval($sthis.adaptiveInterval, 1000);
-
                 // ~ browser touch event. Why code here? Not supported jquery touch event
                 if(!$sthis.firstEvent && $.browser.mobile){
                     $sthis.firstEvent = true;
                     medical.event.stream.touch();
-                    console.log('dodododdodododododdodododod');
                 }
             });
         });
@@ -120,50 +113,6 @@ medical.stream = {
     request : function(){
         $sthis.sendOption.streamType = $sthis.STREAM_TYPE.START;
         $sthis.send();
-    },
-
-    adaptiveOption : {
-        interval : null,
-        frame : 0,
-        sum : 0,
-        elapsedTime : 0
-    },
-
-    adaptive : function(){
-        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.ADAPTIVE;
-        $sthis.sendOption.frame = $sthis.adaptiveOption.sum;
-        $sthis.send();
-    },
-
-    adaptiveInterval : function(){
-
-        if($sthis.adaptiveOption.frame === 0){
-            clearInterval($sthis.adaptiveOption.interval);
-            $sthis.adaptiveOption.interval = null;
-        }
-
-        // ~ adaptive stream
-        $sthis.adaptiveOption.elapsedTime += 1;
-        $sthis.adaptiveOption.sum += $sthis.adaptiveOption.frame;
-
-        var text = 'second: ' + $sthis.adaptiveOption.elapsedTime + ' frame: ' +  $sthis.adaptiveOption.frame;
-        $sthis.debug.text($sthis.debug.LEVEL.DEBUG, text);
-
-        if( ( $sthis.adaptiveOption.elapsedTime % 3 === 0 ) && medical.connect.isConnect) {
-            $sthis.adaptive();
-            $sthis.adaptiveOption.sum = 0;
-        }
-
-        medical.connect.document.fps.text('FPS : ' + $sthis.adaptiveOption.frame);
-
-        // ~ send debug
-        var $dthis = $sthis.debug;
-        var $option = $dthis.option;
-        if( $option.isAccess === true ){
-            $dthis.statistic();
-        }
-        $sthis.adaptiveOption.frame = 0;
-
     },
 
     debug : {
@@ -264,8 +213,7 @@ medical.stream = {
                 platform : $.browser.platform,
                 version : $.browser.version,
                 versionNumber : $.browser.versionNumber,
-                isMobile : $.browser.desktop ? 1 : 0,
-                frameCount : $sthis.adaptiveOption.frame
+                isMobile : $.browser.desktop ? 1 : 0
             };
 
             $.postJSON(url, json, function(stats_pn){

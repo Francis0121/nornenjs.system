@@ -139,18 +139,17 @@ bs.on('connection', function(client){
             var parameter = {
                 streamType : buffer.readFloatLE(0),
                 volumePn : buffer.readFloatLE(4),
-                frame : buffer.readFloatLE(8),
-                renderingType : buffer.readFloatLE(12),
-                brightness : buffer.readFloatLE(16),
-                positionZ : buffer.readFloatLE(20),
-                transferOffset : buffer.readFloatLE(24),
-                rotationX : buffer.readFloatLE(28),
-                rotationY : buffer.readFloatLE(32),
-                transferScaleX : buffer.readFloatLE(36),
-                transferScaleY : buffer.readFloatLE(40),
-                transferScaleZ : buffer.readFloatLE(44),
-                mriType : buffer.readFloatLE(48),
-                isMobile : buffer.readFloatLE(52)
+                renderingType : buffer.readFloatLE(8),
+                brightness : buffer.readFloatLE(12),
+                positionZ : buffer.readFloatLE(16),
+                transferOffset : buffer.readFloatLE(20),
+                rotationX : buffer.readFloatLE(24),
+                rotationY : buffer.readFloatLE(28),
+                transferScaleX : buffer.readFloatLE(32),
+                transferScaleY : buffer.readFloatLE(36),
+                transferScaleZ : buffer.readFloatLE(40),
+                mriType : buffer.readFloatLE(44),
+                isMobile : buffer.readFloatLE(48)
             };
             logger.debug('Request parameter : ', parameter);
             return parameter;
@@ -227,7 +226,6 @@ bs.on('connection', function(client){
 
             }else if(param.streamType == ENUMS.STREAM_TYPE.ADAPTIVE){
 
-                var sum = param.frame;
 
                 var maintainInfo = maintainInfoMap.get(client.id);
                 if(maintainInfo == undefined || maintainInfo == null){
