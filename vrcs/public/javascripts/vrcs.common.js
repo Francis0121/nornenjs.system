@@ -58,9 +58,8 @@ medical.event = {
                 var $sthis = medical.stream;
                 $cthis.document.canvas.attr('width', $($cthis.selector).width()+'px');
                 $cthis.document.canvas.attr('height', $($cthis.selector).width()+'px');
-                
-                $sthis.sendOption.streamType = $sthis.STREAM_TYPE.ADAPTIVE;
-                $sthis.send();
+
+                $sthis.setTimeout();
             });
         },
 

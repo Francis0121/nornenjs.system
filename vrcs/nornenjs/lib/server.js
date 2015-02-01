@@ -77,7 +77,7 @@ bs.on('connection', function(client){
 
                 hrend = process.hrtime(hrstart);
                 logger.debug('Make frame execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-            } else if(status.streamType == ENUMS.STREAM_TYPE.ADAPTIVE){
+            } else if(status.streamType == ENUMS.STREAM_TYPE.FINISH){
 
                 var hrstart = process.hrtime();
 
@@ -224,7 +224,7 @@ bs.on('connection', function(client){
                     initStream(volumePn, volumeData);
                 }
 
-            }else if(param.streamType == ENUMS.STREAM_TYPE.ADAPTIVE){
+            }else if(param.streamType == ENUMS.STREAM_TYPE.FINISH){
 
 
                 var maintainInfo = maintainInfoMap.get(client.id);

@@ -17,7 +17,7 @@ var ENUMS = {
     
     STREAM_TYPE : {
         START : 1,
-        ADAPTIVE : 2,
+        FINISH : 2,
         EVENT : 3
     }
 };

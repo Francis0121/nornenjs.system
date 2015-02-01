@@ -9,7 +9,7 @@ medical.stream = {
 
     STREAM_TYPE : {
         START : 1,
-        ADAPTIVE : 2,
+        FINISH : 2,
         EVENT : 3
     },
 
@@ -57,7 +57,7 @@ medical.stream = {
     },
     
     sendTimeout : function(){
-        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.ADAPTIVE;
+        $sthis.sendOption.streamType = $sthis.STREAM_TYPE.FINISH;
         $sthis.send();
     },
 
