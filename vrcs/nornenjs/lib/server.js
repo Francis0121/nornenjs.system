@@ -26,14 +26,11 @@ var volumeMap = new HashMap();
 var useMap = new HashMap();
 var maintainInfoMap = new HashMap();
 
-var tempCount = 0;
-
 bs.on('connection', function(client){
 
     client.on('stream', function(stream, meta){
 
         logger.debug('Byte stream connection attempt ' + client.id);
-        tempCount++;
         
         /**
          * Cuda ptx 파일을 이용하여 이미지 Frame을 생성하는 함수
@@ -115,9 +112,7 @@ bs.on('connection', function(client){
 
                 hrend = process.hrtime(hrstart);
                 logger.debug('Make frame adaptive time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-                
-                console.log('######## tempCount ' + tempCount);
-                tempCount = 0;
+
             } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
                 /**
                  * Stream type 이 이벤트 인 경우에 JPEG으로 압축하여 이미지 전송하고, 이 경우 Stack에 넣는것이아닌 바로 이미지 전송
