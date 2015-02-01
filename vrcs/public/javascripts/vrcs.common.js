@@ -249,6 +249,7 @@ medical.event = {
         isTouchOn : false,
         touchBeforeX : null,
         touchBeforeY : null,
+        tempCount : 0,
         touch : function(){
             var el = document.getElementsByTagName('canvas')[0];
 
@@ -263,6 +264,7 @@ medical.event = {
                     $ethis.stream.touchBeforeX = touches[0].pageX;
                     $ethis.stream.touchBeforeY = touches[0].pageY;
                     console.log('x ', $ethis.stream.touchBeforeX, 'y : ', $ethis.stream.touchBeforeY);
+                    this.tempCount = 0;
                 }
 
             });
@@ -277,7 +279,7 @@ medical.event = {
 
                 if($ethis.stream.isTouchOn){
                     $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
-
+                    
                     $sthis.sendOption.rotationX += (touches[0].pageX - $ethis.stream.touchBeforeX)/100.0;
                     $sthis.sendOption.rotationY += (touches[0].pageY - $ethis.stream.touchBeforeY)/100.0;
 
@@ -286,6 +288,7 @@ medical.event = {
 
                     $sthis.queue = [];
                     $sthis.send();
+                    this.tempCount++;
                 }
 
             });
@@ -297,11 +300,13 @@ medical.event = {
                 var touches = evt.changedTouches;
 
                 $ethis.stream.isTouchOn = false;
+                console.log('tempCount : '  + this.tempCount);
             });
 
             el.addEventListener('touchcancel', function handleCancel(evt) {
                 evt.preventDefault();
                 $ethis.stream.isTouchOn = false;
+                console.log('tempCount : '  + this.tempCount);
             });
 
             el.addEventListener('touchleave', function(evt){
@@ -311,6 +316,7 @@ medical.event = {
                 var touches = evt.changedTouches;
 
                 $ethis.stream.isTouchOn = false;
+                console.log('tempCount : '  + this.tempCount);
             });
 
         }

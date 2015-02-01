@@ -99,7 +99,7 @@ medical.stream = {
 
                 var img = new Image(512, 512);
                 img.onload = function(){
-                    ctx.drawImage(img, 0, 0, 512, 512, 0, 0,$(medical.connect.selector).width(), $(medical.connect.selector).width()); // Or at whatever offset you like
+                    ctx.drawImage(img, 0, 0, 512, 512, 0, 0,$(medical.connect.selector).width(), $(medical.connect.selector).width());
                 };
                 img.src = url;
 
@@ -109,8 +109,9 @@ medical.stream = {
 
                 // ~ browser touch event. Why code here? Not supported jquery touch event
                 if(!$sthis.firstEvent && $.browser.mobile){
-                    firstEvent = true;
+                    $sthis.firstEvent = true;
                     medical.event.stream.touch();
+                    console.log('dodododdodododododdodododod');
                 }
             });
         });
