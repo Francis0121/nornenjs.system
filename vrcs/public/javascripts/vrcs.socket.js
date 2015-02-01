@@ -5,7 +5,6 @@ medical.connect = {
     $cthis : null,
     selector : '#view_port',
     document : {
-        fps : $('<span>'),
         canvas : $('<canvas>'),
         loading : $('<div>')
     },
@@ -34,7 +33,6 @@ medical.connect = {
      */
     start : function(){
 
-        $cthis.document.fps = $('<span>').addClass('fps').text('FPS : 0');
 
         $cthis.document.canvas.attr('id', $cthis.selector+'_canvas');
         $cthis.document.canvas.attr('width', $($cthis.selector).width()+'px');
@@ -45,7 +43,7 @@ medical.connect = {
             .append($('<br>'))
             .append($('<span>').text('Please wait for the exit to other users'));
 
-        $($cthis.selector).append($cthis.document.fps)
+        $($cthis.selector)
             .append($cthis.document.canvas)
             .append($cthis.document.loading);
     },

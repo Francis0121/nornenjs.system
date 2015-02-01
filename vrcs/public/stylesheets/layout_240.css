@@ -210,8 +210,7 @@ body{ background: #231f20; }
 #view_port>.loading{ text-align: center; z-index: 5; width: 100%; position: relative; margin-top: -300px;}
 #view_port>.loading>img{ }
 #view_port>.loading>span{ color: #fff; font-size: 75%; }
-#view_port>.fps{ padding: 10px; font-size: 75%; color: #fff; position: relative; z-index: 3; display: block; height: 30px;}
-#view_port>canvas{ margin-top: -50px; }
+#view_port>canvas{ }
 
 .option_wrap{ float: left; width: 80%; padding: 30px 10%;}
 .option_wrap>.option_default{ float:left; width: 100%; padding: 10px 0;}
