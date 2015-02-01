@@ -25,7 +25,7 @@ io.sockets.on('connection', function(socket){
             clientId : clientId
         };
 
-        if(streamUserCount < 3){
+        if(streamUserCount < 4){
             streamUserCount++;
             message.success = true;
         }else{

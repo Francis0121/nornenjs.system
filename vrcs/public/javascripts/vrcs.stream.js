@@ -47,7 +47,8 @@ medical.stream = {
             transferScaleX : 0.0,
             transferScaleY : 0.0,
             transferScaleZ : 0.0,
-            mriType : $sthis.MRI_TYPE.X
+            mriType : $sthis.MRI_TYPE.X,
+            isMobile : $.browser.desktop ? 0 : 1
         };
 
         $sthis.client = new BinaryClient($sthis.url);
@@ -62,7 +63,7 @@ medical.stream = {
     },
 
     makeBuffer : function(){
-        $sthis.buffer = new ArrayBuffer(52);
+        $sthis.buffer = new ArrayBuffer(56);
         var x = new Float32Array($sthis.buffer);
         
         x[0] = $sthis.sendOption.request_type;
@@ -78,6 +79,7 @@ medical.stream = {
         x[10] = $sthis.sendOption.transferScaleY;
         x[11] = $sthis.sendOption.transferScaleZ;
         x[12] = $sthis.sendOption.mriType;
+        x[13] = $sthis.sendOption.isMobile;
     },
 
     on : function(){

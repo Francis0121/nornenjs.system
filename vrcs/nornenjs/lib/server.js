@@ -11,7 +11,7 @@ var HashMap = require('hashmap').HashMap;
 var Jpeg = require('jpeg').Jpeg;
 var Png = require('png').Png;
 var BinaryServer = require('binaryjs').BinaryServer;
-var bs = BinaryServer({port : 9000});
+var bs = BinaryServer({port : 9000, chunkSize : 512});
 
 //#######################################
 
@@ -211,7 +211,8 @@ bs.on('connection', function(client){
                 transferScaleX : buffer.readFloatLE(36),
                 transferScaleY : buffer.readFloatLE(40),
                 transferScaleZ : buffer.readFloatLE(44),
-                mriType : buffer.readFloatLE(48)
+                mriType : buffer.readFloatLE(48),
+                isMobile : buffer.readFloatLE(52)
             };
             logger.debug('Request parameter : ', parameter);
             return parameter;
@@ -254,7 +255,7 @@ bs.on('connection', function(client){
                         stackInterval : null
                     };
 
-                    //status.cudaInterval = setInterval(cudaInterval, 10);
+                    //status.cudaInterval = setInterval(cudaInterval, 1000);
                     //status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
 
                     var maintainInfo = {
@@ -381,7 +382,12 @@ bs.on('connection', function(client){
                 maintainInfoMap.set(client.id, maintainInfo);
 
                 if(status.cudaInterval == null){
-                    status.cudaInterval = setInterval(cudaInterval, 1000/60);
+                    if(param.isMobile){
+                        status.cudaInterval = setInterval(cudaInterval, 1000/7);    
+                    } else {
+                        status.cudaInterval = setInterval(cudaInterval, 1000/60);
+                    }
+                    
                     maintainInfo.status = status;
                     maintainInfoMap.set(client.id, maintainInfo);
                 }
