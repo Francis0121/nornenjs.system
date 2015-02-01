@@ -5,7 +5,6 @@ var logger = require('./logger');
 var sqlite = require('./sql/default');
 
 var path = require('path');
-var exec = require('child_process').exec;
 var HashMap = require('hashmap').HashMap;
 
 var Jpeg = require('jpeg').Jpeg;
@@ -48,7 +47,7 @@ bs.on('connection', function(client){
                 return;
             }
 
-            if(status.streamType == ENUMS.STREAM_TYPE.START){
+            if(status.streamType == ENUMS.STREAM_TYPE.START || status.streamType == ENUMS.STREAM_TYPE.FINISH){
 
                 var hrstart = process.hrtime();
 
@@ -71,38 +70,17 @@ bs.on('connection', function(client){
                 cudaRender.end();
 
                 hrend = process.hrtime(hrstart);
-                logger.debug('Make frame execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-            } else if(status.streamType == ENUMS.STREAM_TYPE.FINISH){
-
-                var hrstart = process.hrtime();
-
-                cudaRender.start();
                 
-                var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
-                png.encode(function (png_img) {
-                    try {
-                        if (client._socket._socket == undefined) {
-                            logger.error('Connection already refused async png :: client id', client.id);
-                        } else {
-                            client.send(png_img);
-                        }
-                    } catch (error) {
-                        logger.error('Connection refused async png ', error);
-                        closeCallback(client.id);
-                        return;
-                    }
-                });
+                logger.debug('Make start finish frame png compress execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
                 
-                cudaRender.end();
-
-                hrend = process.hrtime(hrstart);
-                logger.debug('Make frame adaptive time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-
             } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
 
                 var hrstart = process.hrtime();
+                
                 cudaRender.start();
+                
                 var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
+                
                 try {
 
                     if (client._socket._socket == undefined) {
@@ -116,10 +94,13 @@ bs.on('connection', function(client){
                     closeCallback(client.id);
                     return;
                 }
+                
                 cudaRender.end();
+                
                 hrend = process.hrtime(hrstart);
 
-                logger.debug('Make frame and jpeg compress execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
+                logger.debug('Make event frame jpeg compress execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
+                
             }else{
                 logger.error('Request type not defined cuda' + status.streamType);
             }
@@ -227,10 +208,13 @@ bs.on('connection', function(client){
                     status.cudaInterval = null;
                 }
 
+                status.streamType = param.streamType;
+                
                 maintainInfo.status = status;
                 maintainInfoMap.set(client.id, maintainInfo);
                 
                 cudaInterval();
+                
                 logger.debug('Cuda Interval finish ' + client.id);
                 
             }else if(param.streamType == ENUMS.STREAM_TYPE.EVENT){

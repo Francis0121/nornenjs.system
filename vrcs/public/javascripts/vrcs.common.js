@@ -59,7 +59,7 @@ medical.event = {
                 $cthis.document.canvas.attr('width', $($cthis.selector).width()+'px');
                 $cthis.document.canvas.attr('height', $($cthis.selector).width()+'px');
 
-                $sthis.setTimeout();
+                $sthis.sendTimeout();
             });
         },
 
