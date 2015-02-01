@@ -55,8 +55,12 @@ medical.event = {
         resize : function(){
             $(window).resize(function(){
                 var $cthis = medical.connect;
+                var $sthis = medical.stream;
                 $cthis.document.canvas.attr('width', $($cthis.selector).width()+'px');
                 $cthis.document.canvas.attr('height', $($cthis.selector).width()+'px');
+                
+                $sthis.sendOption.request_type = $sthis.REQUEST_TYPE.ADAPTIVE;
+                $sthis.send();
             });
         },
 
