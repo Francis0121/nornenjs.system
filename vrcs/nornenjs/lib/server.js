@@ -30,10 +30,7 @@ bs.on('connection', function(client){
     client.on('stream', function(stream, meta){
 
         logger.debug('Byte stream connection attempt ' + client.id);
-        
-        /**
-         * Cuda ptx 파일을 이용하여 이미지 Frame을 생성하는 함수
-         */
+
         var cudaInterval = function () {
 
             var maintainInfo = maintainInfoMap.get(client.id);
@@ -52,9 +49,7 @@ bs.on('connection', function(client){
             }
 
             if(status.streamType == ENUMS.STREAM_TYPE.START){
-                /**
-                 * Stream type 이 처음 페이지를 접속했거나, Adaptive 인 경우에는 PNG 형식으로 압축하여 이미지 전송
-                 */
+
                 var hrstart = process.hrtime();
 
                 cudaRender.start();
@@ -104,9 +99,7 @@ bs.on('connection', function(client){
                 logger.debug('Make frame adaptive time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
 
             } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
-                /**
-                 * Stream type 이 이벤트 인 경우에 JPEG으로 압축하여 이미지 전송하고, 이 경우 Stack에 넣는것이아닌 바로 이미지 전송
-                 */
+
                 var hrstart = process.hrtime();
                 cudaRender.start();
                 var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
@@ -168,10 +161,7 @@ bs.on('connection', function(client){
             if(param.streamType == ENUMS.STREAM_TYPE.START) {
                 
                 var initStream = function(volumePn, volume){
-                    /**
-                     * 처음 들어온 상태라면 CudaRender Object를 생성하는 ptx 파일을 생성하여 연결해준다.
-                     * 이과정에서 nvcc 를 통해서 새로 ptx를 컴파일한다.
-                     */
+
                     var use = useMap.get(volumePn) == undefined ? 1 : useMap.get(volumePn) + 1;
                     useMap.set(volumePn, use);
                     
@@ -181,8 +171,6 @@ bs.on('connection', function(client){
 
                     cudaRender.init();
                     logger.debug('CudaRedner ', cudaRender);
-
-                    // TODO 여기서 문제점 CudaInterval 은 10ms 마다 찍고 있음.
 
                     var status = {
                         frame : 0,
@@ -267,9 +255,6 @@ bs.on('connection', function(client){
                     return;
                 }
 
-                /**
-                 * Cuda rendering에 전달하는 parameter
-                 */
                 cudaRender.type = param.renderingType;
                 cudaRender.positionZ = param.positionZ;
                 cudaRender.brightness = param.brightness;
@@ -306,9 +291,6 @@ bs.on('connection', function(client){
         closeCallback(client.id);
     });
 
-    /**
-     * 종료시에 뒤 처리를 해주는 함수
-     */
     var closeCallback = function(clientId){
 
         var maintainInfo = maintainInfoMap.get(client.id);
