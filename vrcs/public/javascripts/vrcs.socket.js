@@ -77,7 +77,7 @@ medical.connect = {
      * Other client disconnect response from server
      */
     disconnected : function(){
-        $cthis.socket.on('user_disconnected', function(data){
+        $cthis.socket.on('disconnected', function(data){
             $cthis.join();
         });
     }

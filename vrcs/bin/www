@@ -42,7 +42,7 @@ io.sockets.on('connection', function(socket){
         var clientId = socket_queue.shift();
         logger.debug('disconnect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
         if(clientId != undefined){
-            socket.broadcast.to(clientId).emit('user_disconnected');
+            socket.broadcast.to(clientId).emit('disconnected');
         }
     });
 
