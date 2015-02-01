@@ -101,7 +101,7 @@ medical.event = {
                 $('#axis .ui-slider-handle').css('left', '0');
 
                 $sthis.sendOption.streamType = $sthis.STREAM_TYPE.EVENT;
-                $sthis.sendOption.rendering_type = type;
+                $sthis.sendOption.renderingType = type;
 
                 $sthis.send();
             });
