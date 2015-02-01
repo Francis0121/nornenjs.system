@@ -21,3 +21,4 @@ testing
 test.js
 .idea
 public/upload/
+*.iml
