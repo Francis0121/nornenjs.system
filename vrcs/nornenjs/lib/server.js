@@ -20,7 +20,6 @@ var cu = require('./load');
 var cuCtx = new cu.Ctx(0, cu.Device(0));
 
 //#######################################
-var frameList = [ 60, 50, 40, 30, 25, 20, 15, 10 ];
 
 var volumeMap = new HashMap();
 var useMap = new HashMap();
@@ -52,20 +51,13 @@ bs.on('connection', function(client){
                 return;
             }
 
-            var frameQueue = maintainInfo.frameQueue;
-            if(frameQueue == undefined || frameQueue == null){
-                return;
-            }
-
             if(status.streamType == ENUMS.STREAM_TYPE.START){
                 /**
                  * Stream type 이 처음 페이지를 접속했거나, Adaptive 인 경우에는 PNG 형식으로 압축하여 이미지 전송
                  */
-                logger.info('Frame queue size [ ' + frameQueue.length + ' ]');
                 var hrstart = process.hrtime();
 
                 cudaRender.start();
-                //frameQueue.push(cudaRender.d_outputBuffer);
 
                 var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
                 png.encode(function (png_img) {
@@ -86,12 +78,10 @@ bs.on('connection', function(client){
                 hrend = process.hrtime(hrstart);
                 logger.debug('Make frame execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
             } else if(status.streamType == ENUMS.STREAM_TYPE.ADAPTIVE){
-                logger.info('Frame queue size [ ' + frameQueue.length + ' ]');
-                maintainInfo.frameQueue = [];
+
                 var hrstart = process.hrtime();
 
                 cudaRender.start();
-                //frameQueue.push(cudaRender.d_outputBuffer);
                 
                 var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
                 png.encode(function (png_img) {
@@ -140,59 +130,6 @@ bs.on('connection', function(client){
             }else{
                 logger.error('Request type not defined cuda' + status.streamType);
             }
-        };
-
-        /**
-         * Stack Interval 로 Event가 존재하지 않은 정지상태인 경우 PNG로 압축하여 이미지를 보내도록 하는 interval이다.
-         */
-        var stackInterval = function(){
-
-            var maintainInfo = maintainInfoMap.get(client.id);
-            if(maintainInfo == undefined || maintainInfo == null){
-                return;
-            }
-
-            var status = maintainInfo.status;
-            if(status == undefined || status == null){
-                return;
-            }
-
-            var cudaRender = maintainInfo.cudaRender;
-            if(cudaRender == undefined || cudaRender == null){
-                return;
-            }
-
-            var frameQueue = maintainInfo.frameQueue;
-            if(frameQueue == undefined || frameQueue == null) {
-                return;
-            }
-
-            var frame = frameQueue.shift();
-            if(frame == undefined || frameQueue == null){
-                return;
-            }
-
-            if(status.streamType == ENUMS.STREAM_TYPE.START || status.streamType == ENUMS.STREAM_TYPE.ADAPTIVE) {
-                var png = new Png(frame, 512, 512, 'rgba');
-                png.encode(function (png_img) {
-                    try {
-                        if (client._socket._socket == undefined) {
-                            logger.error('Connection already refused async png :: client id', client.id);
-                        } else {
-                            client.send(png_img);
-                        }
-                    } catch (error) {
-                        logger.error('Connection refused async png ', error);
-                        closeCallback(client.id);
-                        return;
-                    }
-                });
-            }else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
-                logger.debug('Do nothing');
-            }else{
-                logger.error('Request type not defined queue');
-            }
-
         };
 
         /**
@@ -252,17 +189,12 @@ bs.on('connection', function(client){
                         frame : 0,
                         volumePn : volumePn,
                         streamType : param.streamType,
-                        cudaInterval : null,
-                        stackInterval : null
+                        cudaInterval : null
                     };
-
-                    //status.cudaInterval = setInterval(cudaInterval, 1000);
-                    //status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
 
                     var maintainInfo = {
                         status : status,
-                        cudaRender : cudaRender,
-                        frameQueue : []
+                        cudaRender : cudaRender
                     };
 
                     maintainInfoMap.set(client.id, maintainInfo);
@@ -307,36 +239,10 @@ bs.on('connection', function(client){
                     return;
                 }
 
-                var time = frameList[status.frame];
-                status.streamType = param.streamType;
-
-                if( time - 5 > sum / 3 ){
-
-                    var text = 'Adaptive stream decrease frame from ' + frameList[status.frame];
-                    status.frame = status.frame + 1 == frameList.length ? status.frame : status.frame + 1;
-                    text += ' to ' + frameList[status.frame];
-                    logger.debug(text);
-
-                }else if( time - 1 < sum /3 ){
-
-                    var text = 'Adaptive stream increase frame from ' + frameList[status.frame];
-                    status.frame = status.frame-1 == -1 ? status.frame : status.frame - 1 ;
-                    text += ' to ' + frameList[status.frame];
-                    logger.debug(text);
-
-                }else{
-
-                    logger.debug('Maintain frame');
-
-                }
-            
                 if(status.cudaInterval != null ){
                     clearInterval(status.cudaInterval);
                     status.cudaInterval = null;
                 }
-                //clearInterval(status.stackInterval);
-                //status.cudaInterval = setInterval(cudaInterval, 1000 / frameList[status.frame] );
-                //status.stackInterval = setInterval(stackInterval, 1000 / frameList[status.frame] );
 
                 maintainInfo.status = status;
                 maintainInfoMap.set(client.id, maintainInfo);
@@ -375,12 +281,6 @@ bs.on('connection', function(client){
                 cudaRender.rotationX = param.rotationX;
                 cudaRender.rotationY = param.rotationY;
                 cudaRender.mriType = param.mriType;
-
-                /**
-                 * Fraem queue 초기화
-                 */
-                maintainInfo.frameQueue = [];
-                maintainInfoMap.set(client.id, maintainInfo);
 
                 if(status.cudaInterval == null){
                     if(param.isMobile){
@@ -421,7 +321,6 @@ bs.on('connection', function(client){
 
         if(status != undefined) {
             clearInterval(status.cudaInterval);
-            clearInterval(status.stackInterval);
 
             var use = useMap.get(status.volumePn) - 1;
             logger.debug('Remove Interval and volume data ' + client.id + ' volume use ' + use);
