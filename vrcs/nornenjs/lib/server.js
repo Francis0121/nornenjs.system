@@ -213,7 +213,9 @@ bs.on('connection', function(client){
                 maintainInfo.status = status;
                 maintainInfoMap.set(client.id, maintainInfo);
                 
-                cudaInterval();
+                if(!param.isMobile){
+                    cudaInterval();
+                }
                 
                 logger.debug('Cuda Interval finish ' + client.id);
                 
