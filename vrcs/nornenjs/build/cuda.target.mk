@@ -28,9 +28,9 @@ CFLAGS_CC_Debug := \
 	-fno-exceptions
 
 INCS_Debug := \
-	-I/home/pi/.node-gyp/0.10.35/src \
-	-I/home/pi/.node-gyp/0.10.35/deps/uv/include \
-	-I/home/pi/.node-gyp/0.10.35/deps/v8/include \
+	-I/home/russa/.node-gyp/0.10.33/src \
+	-I/home/russa/.node-gyp/0.10.33/deps/uv/include \
+	-I/home/russa/.node-gyp/0.10.33/deps/v8/include \
 	-I/usr/local/include \
 	-I/usr/local/cuda-6.0/include \
 	-I/usr/local/cuda/include
@@ -61,9 +61,9 @@ CFLAGS_CC_Release := \
 	-fno-exceptions
 
 INCS_Release := \
-	-I/home/pi/.node-gyp/0.10.35/src \
-	-I/home/pi/.node-gyp/0.10.35/deps/uv/include \
-	-I/home/pi/.node-gyp/0.10.35/deps/v8/include \
+	-I/home/russa/.node-gyp/0.10.33/src \
+	-I/home/russa/.node-gyp/0.10.33/deps/uv/include \
+	-I/home/russa/.node-gyp/0.10.33/deps/v8/include \
 	-I/usr/local/include \
 	-I/usr/local/cuda-6.0/include \
 	-I/usr/local/cuda/include
