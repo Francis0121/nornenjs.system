@@ -154,7 +154,7 @@ Handle<Value> Module::TextureAlloc(const Arguments& args) {
    unsigned int height = args[2]->Uint32Value();
    unsigned int depth = args[3]->Uint32Value();
 
-   unsigned int otf_start = 80;
+   unsigned int otf_start = 60;
    unsigned int otf_end = 120;
    unsigned int otf_size = 256;
 
