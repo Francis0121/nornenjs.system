@@ -10,7 +10,7 @@ namespace NodeCuda {
     public:
       static void Initialize(Handle<Object> target);
       static Handle<Value> GetFunction(const Arguments& args);
-      
+      CUmodule m_module;
     protected:
       static Persistent<FunctionTemplate> constructor_template;
       static Handle<Value> TextureAlloc(const Arguments& args);
@@ -23,7 +23,7 @@ namespace NodeCuda {
     private:
       static Handle<Value> New(const Arguments& args);
 
-      CUmodule m_module;
+
   };
 
 }

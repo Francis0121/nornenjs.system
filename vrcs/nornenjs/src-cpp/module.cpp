@@ -46,6 +46,100 @@ Handle<Value> Module::Load(const Arguments& args) {
    
   return scope.Close(result);
 }
+void volumeTextureLoad(unsigned int width, unsigned int height, unsigned int depth, char * filename, Module *pmodule){
+
+   size_t size = width * height *depth * sizeof(unsigned char);
+
+   FILE *fp = fopen(filename, "rb");
+   void *h_data = (void *) malloc(size);
+
+   size_t read = fread(h_data, 1, size, fp);
+   fclose(fp);
+
+   CUarray cu_array;
+   CUDA_ARRAY3D_DESCRIPTOR desc;
+   desc.Format = CU_AD_FORMAT_UNSIGNED_INT8;
+   desc.NumChannels = 1;
+   desc.Width = width;
+   desc.Height = height;
+   desc.Depth = depth;
+   desc.Flags=0;
+
+   cuArray3DCreate(&cu_array, &desc);
+
+   CUDA_MEMCPY3D copyParam;
+   memset(&copyParam, 0, sizeof(copyParam));
+   copyParam.srcMemoryType = CU_MEMORYTYPE_HOST;
+   copyParam.srcHost = h_data;
+   copyParam.srcPitch = width * sizeof(unsigned char);
+   copyParam.srcHeight = height;
+   copyParam.dstMemoryType = CU_MEMORYTYPE_ARRAY;
+   copyParam.dstArray = cu_array;
+   copyParam.dstHeight=height;
+   copyParam.WidthInBytes = width * sizeof(unsigned char);
+   copyParam.Height = height;
+   copyParam.Depth = depth;
+
+   cuMemcpy3D(&copyParam);
+
+   CUtexref cu_texref;
+   cuModuleGetTexRef(&cu_texref, pmodule->m_module, "tex");
+   cuTexRefSetArray(cu_texref, cu_array, CU_TRSA_OVERRIDE_FORMAT);
+   cuTexRefSetAddressMode(cu_texref, 0, CU_TR_ADDRESS_MODE_BORDER);
+   cuTexRefSetAddressMode(cu_texref, 1, CU_TR_ADDRESS_MODE_BORDER);
+   cuTexRefSetFilterMode(cu_texref, CU_TR_FILTER_MODE_LINEAR);
+   cuTexRefSetFlags(cu_texref, CU_TRSF_NORMALIZED_COORDINATES);
+   cuTexRefSetFormat(cu_texref, CU_AD_FORMAT_UNSIGNED_INT8, 1);
+
+   free(h_data);
+}
+void otfTableTextureLoad(float4 *input_float_1D, unsigned int otf_size, Module *pmodule){
+   // Create the array on the device
+   CUarray otf_array;
+   CUDA_ARRAY_DESCRIPTOR ad;
+   ad.Format = CU_AD_FORMAT_FLOAT;
+   ad.Width = otf_size;
+   ad.Height = 1;
+   ad.NumChannels = 4;
+   cuArrayCreate(&otf_array, &ad);
+
+   // Copy the host input to the array
+   cuMemcpyHtoA(otf_array,0,input_float_1D,otf_size*sizeof(float4));
+
+   // Texture Binding
+   CUtexref otf_texref;
+   cuModuleGetTexRef(&otf_texref, pmodule->m_module, "texture_float_1D");
+   cuTexRefSetFilterMode(otf_texref, CU_TR_FILTER_MODE_LINEAR);
+   cuTexRefSetAddressMode(otf_texref, 0, CU_TR_ADDRESS_MODE_CLAMP );
+   cuTexRefSetFlags(otf_texref, CU_TRSF_NORMALIZED_COORDINATES);
+   cuTexRefSetFormat(otf_texref, CU_AD_FORMAT_FLOAT, 4);
+   cuTexRefSetArray(otf_texref, otf_array, CU_TRSA_OVERRIDE_FORMAT);
+}
+float4 *getOTFtable(int otf_start, int otf_end, int otf_size){
+
+    float4 *otf_table= (float4 *)malloc(sizeof(float4)*otf_size);
+
+    for(int i=0; i<=otf_start; i++){    //alpha
+		 otf_table[i].x = 0.0f;
+		 otf_table[i].y = 0.0f;
+		 otf_table[i].z = 0.0f;
+		 otf_table[i].w = 0.0f;
+	}
+	for(int i=otf_start+1; i<=otf_end; i++){
+		otf_table[i].x = (1.0f / ((float)otf_end-(float)otf_start)) * ( i - (float)otf_start);
+		otf_table[i].y = (1.0f / ((float)otf_end-(float)otf_start)) * ( i - (float)otf_start);
+		otf_table[i].z = (1.0f / ((float)otf_end-(float)otf_start)) * ( i - (float)otf_start);
+		otf_table[i].w = (1.0f / ((float)otf_end-(float)otf_start)) * ( i - (float)otf_start);
+
+	}
+	for(int i=otf_end+1; i<otf_size; i++){
+		otf_table[i].x =1.0f;
+		otf_table[i].y =1.0f;
+		otf_table[i].z =1.0f;
+		otf_table[i].w =1.0f;
+	}
+    return otf_table;
+}
 Handle<Value> Module::TextureAlloc(const Arguments& args) {
   
    HandleScope scope;
@@ -60,94 +154,16 @@ Handle<Value> Module::TextureAlloc(const Arguments& args) {
    unsigned int height = args[2]->Uint32Value();
    unsigned int depth = args[3]->Uint32Value();
 
-   size_t size = width * height *depth * sizeof(unsigned char);  
+   unsigned int otf_start = 80;
+   unsigned int otf_end = 120;
+   unsigned int otf_size = 256;
 
-   FILE *fp = fopen(filename, "rb");
-   void *h_data = (void *) malloc(size);
-   
-   size_t read = fread(h_data, 1, size, fp);
-   fclose(fp);
+   float4 *input_float_1D = NULL;
+   input_float_1D =getOTFtable(otf_start,otf_end, otf_size);
 
-   CUarray cu_array;
-   CUDA_ARRAY3D_DESCRIPTOR desc;
-   desc.Format = CU_AD_FORMAT_UNSIGNED_INT8;
-   desc.NumChannels = 1;
-   desc.Width = width;
-   desc.Height = height;
-   desc.Depth = depth;
-   desc.Flags=0;
-   
-   CUresult error3 =cuArray3DCreate(&cu_array, &desc);
-   
-   CUDA_MEMCPY3D copyParam;
-   memset(&copyParam, 0, sizeof(copyParam));
-   copyParam.srcMemoryType = CU_MEMORYTYPE_HOST;
-   copyParam.srcHost = h_data;
-   copyParam.srcPitch = width * sizeof(unsigned char);
-   copyParam.srcHeight = height;
-   copyParam.dstMemoryType = CU_MEMORYTYPE_ARRAY;
-   copyParam.dstArray = cu_array;
-   copyParam.dstHeight=height;
-   copyParam.WidthInBytes = width * sizeof(unsigned char);
-   copyParam.Height = height;
-   copyParam.Depth = depth;
-    
-   CUresult error4 = cuMemcpy3D(&copyParam);
-   
-   CUtexref cu_texref;
-   CUresult error5 = cuModuleGetTexRef(&cu_texref, pmodule->m_module, "tex");
-   CUresult error6 = cuTexRefSetArray(cu_texref, cu_array, CU_TRSA_OVERRIDE_FORMAT);
-   CUresult error7 = cuTexRefSetAddressMode(cu_texref, 0, CU_TR_ADDRESS_MODE_BORDER);
-   CUresult error8 = cuTexRefSetAddressMode(cu_texref, 1, CU_TR_ADDRESS_MODE_BORDER);
-   CUresult error10 =cuTexRefSetFilterMode(cu_texref, CU_TR_FILTER_MODE_LINEAR);
-   CUresult error11 =cuTexRefSetFlags(cu_texref, CU_TRSF_NORMALIZED_COORDINATES);
-   CUresult error12 =cuTexRefSetFormat(cu_texref, CU_AD_FORMAT_UNSIGNED_INT8, 1);
-  
-  
-  /* Transfer Function  */
-    float4 *input_float_1D = (float4 *)malloc(sizeof(float4)*256);
-    for(int i=0; i<=80; i++){    //alpha
-		 input_float_1D[i].x = 0.0f;
-		 input_float_1D[i].y = 0.0f;
-		 input_float_1D[i].z = 0.0f;
-		 input_float_1D[i].w = 0.0f;
-	}
-	for(int i=80+1; i<=120; i++){
-		input_float_1D[i].x = (1.0f / (120.0f-80.0f)) * ( i - 80.0f);
-		input_float_1D[i].y = (1.0f / (120.0f-80.0f)) * ( i - 80.0f);
-		input_float_1D[i].z = (1.0f / (120.0f-80.0f)) * ( i - 80.0f);
-		input_float_1D[i].w = (1.0f / (120.0f-80.0f)) * ( i - 80.0f);
-		
-	}
-	for(int i=120+1; i<256; i++){
-		input_float_1D[i].x =1.0f;
-		input_float_1D[i].y =1.0f;
-		input_float_1D[i].z =1.0f;
-		input_float_1D[i].w =1.0f;
-	}
-	
-   // Create the array on the device
-   CUarray otf_array;
-   CUDA_ARRAY_DESCRIPTOR ad;
-   ad.Format = CU_AD_FORMAT_FLOAT;
-   ad.Width = 256;
-   ad.Height = 1;
-   ad.NumChannels = 4;
-   CUresult error13 = cuArrayCreate(&otf_array, &ad);
-   
-   // Copy the host input to the array
-   CUresult error14 = cuMemcpyHtoA(otf_array,0,input_float_1D,256*sizeof(float4));
-   
-   // Texture Binding
-   CUtexref otf_texref;
-   CUresult error15 =cuModuleGetTexRef(&otf_texref, pmodule->m_module, "texture_float_1D");
-   CUresult error16 =cuTexRefSetFilterMode(otf_texref, CU_TR_FILTER_MODE_LINEAR);
-   CUresult error17 =cuTexRefSetAddressMode(otf_texref, 0, CU_TR_ADDRESS_MODE_CLAMP );
-   CUresult error18 =cuTexRefSetFlags(otf_texref, CU_TRSF_NORMALIZED_COORDINATES);
-   CUresult error19 =cuTexRefSetFormat(otf_texref, CU_AD_FORMAT_FLOAT, 4);
-   CUresult error20 =cuTexRefSetArray(otf_texref, otf_array, CU_TRSA_OVERRIDE_FORMAT);
-  
-   free(h_data);
+   volumeTextureLoad(width, height, depth, filename, pmodule);   //volume Texture 생성
+   otfTableTextureLoad(input_float_1D, otf_size, pmodule);  //otf 생성.
+
    free(input_float_1D);
   
    return scope.Close(result);
