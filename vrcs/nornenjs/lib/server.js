@@ -27,6 +27,7 @@ var NornenjsServer = function(server, port, chunkSize){
     this.debug = {
         active : true,
         option : {
+            type : ENUMS.COMPRESS_TYPE.PNG,
             cudaTime : 0,
             compressTime : 0
         },
@@ -52,6 +53,7 @@ NornenjsServer.prototype.socketIoEvent = function(){
     var $this = this;
     var socket_queue = [];
     var streamUserCount = 0;
+    var debugMap = new HashMap();
     
     this.io.sockets.on('connection', function(socket){
         
@@ -73,6 +75,11 @@ NornenjsServer.prototype.socketIoEvent = function(){
 
             logger.debug('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
             socket.emit('message', message);
+
+            if($this.debug.active){
+                var interval = setInterval($this.debug.callback, 2000);
+                debugMap.set(socket.id, interval);
+            }
         });
 
         socket.on('disconnect', function () {
@@ -82,12 +89,13 @@ NornenjsServer.prototype.socketIoEvent = function(){
             if(clientId != undefined){
                 socket.broadcast.to(clientId).emit('disconnected');
             }
+            debugMap.remove(socket.id);
         });
 
         $this.debug.callback = function(){
-            if($this.debug.active){
-                socket.emit('debug', $this.debug.option);
-            }
+            socket.emit('debug', $this.debug.option);
+            $this.debug.option.cudaTime = 0;
+            $this.debug.option.compressTime = 0;
         };
         
     });
@@ -124,7 +132,7 @@ NornenjsServer.prototype.streamEvent = function(){
                 }
 
                 if(status.streamType == ENUMS.STREAM_TYPE.START || status.streamType == ENUMS.STREAM_TYPE.FINISH){
-
+                    $this.debug.option.type = ENUMS.COMPRESS_TYPE.PNG;
                     var hrStart = process.hrtime();
 
                     cudaRender.start();
@@ -149,11 +157,11 @@ NornenjsServer.prototype.streamEvent = function(){
                     cudaRender.end();
 
                     var hrEnd = process.hrtime(hrStart);
-                    $this.debug.option.compressTime  = hrEnd[1]/1000000;
+                    $this.debug.option.compressTime = hrEnd[1]/1000000;
                     logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrEnd[1]/1000000);
                     
                 } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
-
+                    $this.debug.option.type = ENUMS.COMPRESS_TYPE.JPEG;
                     var hrStart = process.hrtime();
 
                     cudaRender.start();
@@ -187,8 +195,6 @@ NornenjsServer.prototype.streamEvent = function(){
                 }else{
                     logger.error('Request type not defined cuda' + status.streamType);
                 }
-
-                $this.debug.callback();
             };
 
             var returnParameter = function(buffer){

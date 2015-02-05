@@ -19,6 +19,11 @@ var ENUMS = {
         START : 1,
         FINISH : 2,
         EVENT : 3
+    },
+    
+    COMPRESS_TYPE : {
+        PNG : 1,
+        JPEG : 2
     }
 };
 
