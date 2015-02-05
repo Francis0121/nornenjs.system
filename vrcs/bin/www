@@ -8,7 +8,7 @@ var ENUMS = require('../nornenjs/lib/enums');
 var logger = require('../nornenjs/lib/logger');
 
 var NornenjsServer = require('../nornenjs/lib/server').NornenjsServer;
-var nornenjsServer = new NornenjsServer(server);
+var nornenjsServer = new NornenjsServer(server, 9000, 512 );
 nornenjsServer.connect();
 
 // ~ server start
