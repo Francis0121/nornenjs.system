@@ -23,6 +23,16 @@ var NornenjsServer = function(server, port, chunkSize){
     
     this.port = port == undefined ? 9000 : port;
     this.chunkSize = chunkSize == undefined ? 512 : chunkSize;
+
+    this.debug = {
+        active : true,
+        option : {
+            cudaTime : 0,
+            compressTime : 0
+        },
+        callback : null
+    };
+
 };
 
 NornenjsServer.prototype.connect = function(){
@@ -39,11 +49,12 @@ NornenjsServer.prototype.connect = function(){
 };
 
 NornenjsServer.prototype.socketIoEvent = function(){
+    var $this = this;
     var socket_queue = [];
     var streamUserCount = 0;
     
     this.io.sockets.on('connection', function(socket){
-
+        
         socket.on('join', function(){
             var clientId = socket.id;
             var message = {
@@ -73,11 +84,18 @@ NornenjsServer.prototype.socketIoEvent = function(){
             }
         });
 
+        $this.debug.callback = function(){
+            if($this.debug.active){
+                socket.emit('debug', $this.debug.option);
+            }
+        };
+        
     });
+    
 };
 
 NornenjsServer.prototype.streamEvent = function(){
-
+    var $this = this;
     var volumeMap = new HashMap();
     var useMap = new HashMap();
     var maintainInfoMap = new HashMap();
@@ -107,10 +125,13 @@ NornenjsServer.prototype.streamEvent = function(){
 
                 if(status.streamType == ENUMS.STREAM_TYPE.START || status.streamType == ENUMS.STREAM_TYPE.FINISH){
 
-                    var hrstart = process.hrtime();
+                    var hrStart = process.hrtime();
 
                     cudaRender.start();
-
+                    var hrCuda = process.hrtime(hrStart);
+                    $this.debug.option.cudaTime  = hrCuda[1]/1000000;
+                    logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrCuda[1]/1000000);
+                    
                     var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
                     png.encode(function (png_img) {
                         try {
@@ -127,16 +148,20 @@ NornenjsServer.prototype.streamEvent = function(){
                     });
                     cudaRender.end();
 
-                    hrend = process.hrtime(hrstart);
-
-                    logger.debug('Make start finish frame png compress execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
-
+                    var hrEnd = process.hrtime(hrStart);
+                    $this.debug.option.compressTime  = hrEnd[1]/1000000;
+                    logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrEnd[1]/1000000);
+                    
                 } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
 
-                    var hrstart = process.hrtime();
+                    var hrStart = process.hrtime();
 
                     cudaRender.start();
 
+                    var hrCuda = process.hrtime(hrStart);
+                    $this.debug.option.cudaTime  = hrCuda[1]/1000000;
+                    logger.debug('Make start finish frame jpeg compress execution time (hr) : %dms', hrCuda[1]/1000000);
+                    
                     var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
 
                     try {
@@ -146,7 +171,7 @@ NornenjsServer.prototype.streamEvent = function(){
                         } else {
                             client.send(jpeg.encodeSync());
                         }
-
+                        
                     }catch (error){
                         logger.error('Connection refused sync jpeg', error);
                         closeCallback(client.id);
@@ -155,13 +180,15 @@ NornenjsServer.prototype.streamEvent = function(){
 
                     cudaRender.end();
 
-                    hrend = process.hrtime(hrstart);
-
-                    logger.debug('Make event frame jpeg compress execution time (hr) : %ds %dms', hrend[0], hrend[1]/1000000);
+                    var hrEnd = process.hrtime(hrStart);
+                    $this.debug.option.compressTime  = hrEnd[1]/1000000;
+                    logger.debug('Make start finish frame jpeg compress execution time (hr) : %dms', hrEnd[1]/1000000);
 
                 }else{
                     logger.error('Request type not defined cuda' + status.streamType);
                 }
+
+                $this.debug.callback();
             };
 
             var returnParameter = function(buffer){
