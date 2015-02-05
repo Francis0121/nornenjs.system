@@ -77,7 +77,7 @@ NornenjsServer.prototype.socketIoEvent = function(){
             socket.emit('message', message);
 
             if($this.debug.active){
-                var interval = setInterval($this.debug.callback, 2000);
+                var interval = setInterval($this.debug.callback, 1000);
                 debugMap.set(socket.id, interval);
             }
         });
