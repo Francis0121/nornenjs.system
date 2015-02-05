@@ -7,47 +7,9 @@ var server = http.createServer(app);
 var ENUMS = require('../nornenjs/lib/enums');
 var logger = require('../nornenjs/lib/logger');
 
-require('../nornenjs/lib/server');
-
-//#######################################
-var io = require('socket.io').listen(server);
-
-var socket_queue = [];
-var streamUserCount = 0;
-
-io.sockets.on('connection', function(socket){
-
-    socket.on('join', function(){
-        var clientId = socket.id;
-        var message = {
-            error : '',
-            success : false,
-            clientId : clientId
-        };
-
-        if(streamUserCount < 10){
-            streamUserCount++;
-            message.success = true;
-        }else{
-            socket_queue.push(clientId);
-            message.error = 'Visitor limit';
-        }
-
-        logger.debug('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
-        socket.emit('message', message);
-    });
-
-    socket.on('disconnect', function () {
-        streamUserCount--;
-        var clientId = socket_queue.shift();
-        logger.debug('disconnect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
-        if(clientId != undefined){
-            socket.broadcast.to(clientId).emit('disconnected');
-        }
-    });
-
-});
-//#######################################
+var NornenjsServer = require('../nornenjs/lib/server').NornenjsServer;
+var nornenjsServer = new NornenjsServer(server);
+nornenjsServer.connect();
 
 // ~ server start
 app.set('port', process.env.PORT || 3000);

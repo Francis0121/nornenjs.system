@@ -12,6 +12,8 @@ var Png = require('png').Png;
 var BinaryServer = require('binaryjs').BinaryServer;
 var bs = BinaryServer({port : 9000, chunkSize : 512});
 
+var socketIo = require('socket.io');
+
 //#######################################
 
 var CudaRender = require('./render').CudaRender;
@@ -309,3 +311,51 @@ bs.on('error', function(error){
 
 });
 
+//#######################################
+
+var NornenjsServer = function(server){
+    this.server = server;
+};
+
+NornenjsServer.prototype.connect = function(){
+    var io = socketIo.listen(this.server);
+    var socket_queue = [];
+    var streamUserCount = 0;
+
+    io.sockets.on('connection', function(socket){
+
+        socket.on('join', function(){
+            var clientId = socket.id;
+            var message = {
+                error : '',
+                success : false,
+                clientId : clientId
+            };
+
+            if(streamUserCount < 10){
+                streamUserCount++;
+                message.success = true;
+            }else{
+                socket_queue.push(clientId);
+                message.error = 'Visitor limit';
+            }
+
+            logger.debug('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
+            socket.emit('message', message);
+        });
+
+        socket.on('disconnect', function () {
+            streamUserCount--;
+            var clientId = socket_queue.shift();
+            logger.debug('disconnect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
+            if(clientId != undefined){
+                socket.broadcast.to(clientId).emit('disconnected');
+            }
+        });
+
+    });
+    
+};
+//#######################################
+
+module.exports.NornenjsServer = NornenjsServer;
