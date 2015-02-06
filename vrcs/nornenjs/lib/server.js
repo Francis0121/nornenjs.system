@@ -30,8 +30,7 @@ var NornenjsServer = function(server, port, chunkSize){
             type : ENUMS.COMPRESS_TYPE.PNG,
             cudaTime : 0,
             compressTime : 0
-        },
-        callback : null
+        }
     };
 
 };
@@ -77,7 +76,9 @@ NornenjsServer.prototype.socketIoEvent = function(){
             socket.emit('message', message);
 
             if($this.debug.active){
-                var interval = setInterval($this.debug.callback, 1000);
+                var room = 'nornenjs_'+socket.id;
+                socket.join(room);
+                var interval = setInterval($this.debugCallback, 1000, room, socket.id, $this);
                 debugMap.set(socket.id, interval);
             }
         });
@@ -89,18 +90,22 @@ NornenjsServer.prototype.socketIoEvent = function(){
             if(clientId != undefined){
                 socket.broadcast.to(clientId).emit('disconnected');
             }
-            debugMap.remove(socket.id);
+             debugMap.remove(socket.id);
         });
-
-        $this.debug.callback = function(){
-            socket.emit('debug', $this.debug.option);
-            $this.debug.option.cudaTime = 0;
-            $this.debug.option.compressTime = 0;
-        };
-        
+        socket.join('nornenjs');
     });
     
 };
+
+NornenjsServer.prototype.debugCallback = function(room, clientId, $this){
+//    logger.debug(room, $this.debug.option);
+
+    $this.io.to(room).to(clientId).emit('debug', $this.debug.option);
+
+    $this.debug.option.cudaTime = 0;
+    $this.debug.option.compressTime = 0;
+};
+
 
 NornenjsServer.prototype.streamEvent = function(){
     var $this = this;
@@ -139,7 +144,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     var hrCuda = process.hrtime(hrStart);
                     $this.debug.option.cudaTime  = hrCuda[1]/1000000;
                     logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrCuda[1]/1000000);
-                    
+
                     var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
                     png.encode(function (png_img) {
                         try {
@@ -159,7 +164,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     var hrEnd = process.hrtime(hrStart);
                     $this.debug.option.compressTime = hrEnd[1]/1000000;
                     logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrEnd[1]/1000000);
-                    
+
                 } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
                     $this.debug.option.type = ENUMS.COMPRESS_TYPE.JPEG;
                     var hrStart = process.hrtime();
@@ -169,7 +174,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     var hrCuda = process.hrtime(hrStart);
                     $this.debug.option.cudaTime  = hrCuda[1]/1000000;
                     logger.debug('Make start finish frame jpeg compress execution time (hr) : %dms', hrCuda[1]/1000000);
-                    
+
                     var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
 
                     try {
@@ -179,7 +184,7 @@ NornenjsServer.prototype.streamEvent = function(){
                         } else {
                             client.send(jpeg.encodeSync());
                         }
-                        
+
                     }catch (error){
                         logger.error('Connection refused sync jpeg', error);
                         closeCallback(client.id);
@@ -211,8 +216,10 @@ NornenjsServer.prototype.streamEvent = function(){
                     transferScaleY : buffer.readFloatLE(36),
                     transferScaleZ : buffer.readFloatLE(40),
                     mriType : buffer.readFloatLE(44),
-                    isMobile : buffer.readFloatLE(48)
+                    isMobile : buffer.readFloatLE(48),
+                    uuid : buffer.toString('utf8', 52)
                 };
+                
                 logger.debug('Request parameter : ', parameter);
                 return parameter;
             };
@@ -399,7 +406,7 @@ NornenjsServer.prototype.streamEvent = function(){
         logger.error('Binaryjs Server occuer error ', error);
 
     });
-    
+
 };
 
 module.exports.NornenjsServer = NornenjsServer;
