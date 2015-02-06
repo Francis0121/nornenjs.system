@@ -26,14 +26,21 @@ var NornenjsServer = function(server, port, chunkSize){
 
     this.debug = {
         active : true,
-        option : {
-            type : ENUMS.COMPRESS_TYPE.PNG,
-            cudaTime : 0,
-            compressTime : 0
-        }
+        map : new HashMap()
     };
-
 };
+
+var DebugOption = function(){
+    this.uuid = null;
+    this.socketId  = null;
+    this.streamId = null;
+    
+    this.type = ENUMS.COMPRESS_TYPE.PNG;
+    this.cudaTime = 0;
+    this.compressTime = 0;
+    
+    this.interval = null;
+}
 
 NornenjsServer.prototype.connect = function(){
     
@@ -52,11 +59,11 @@ NornenjsServer.prototype.socketIoEvent = function(){
     var $this = this;
     var socket_queue = [];
     var streamUserCount = 0;
-    var debugMap = new HashMap();
+    var socketMap = new HashMap();
     
     this.io.sockets.on('connection', function(socket){
         
-        socket.on('join', function(){
+        socket.on('join', function(param){
             var clientId = socket.id;
             var message = {
                 error : '',
@@ -75,12 +82,22 @@ NornenjsServer.prototype.socketIoEvent = function(){
             logger.debug('connect total count[ ' + streamUserCount + ' ] , socket id : ' + clientId);
             socket.emit('message', message);
 
+            // ~ set Debug
             if($this.debug.active){
-                var room = 'nornenjs_'+socket.id;
-                socket.join(room);
-                var interval = setInterval($this.debugCallback, 1000, room, socket.id, $this);
-                debugMap.set(socket.id, interval);
+                socket.join(param.uuid);
+                var debugOption = $this.debug.map.get(param.uuid);
+                
+                if(debugOption == undefined){
+                    debugOption = new DebugOption();
+                }
+                
+                debugOption.socketId = socket.id;
+                debugOption.uuid = param.uuid;
+                debugOption.interval = setInterval($this.debugCallback, 1000, $this, param.uuid);
+                $this.debug.map.set(param.uuid, debugOption);
             }
+            
+            socketMap.set(socket.id, param.uuid);
         });
 
         socket.on('disconnect', function () {
@@ -90,20 +107,38 @@ NornenjsServer.prototype.socketIoEvent = function(){
             if(clientId != undefined){
                 socket.broadcast.to(clientId).emit('disconnected');
             }
-             debugMap.remove(socket.id);
+            
+            // ~ remove debug
+            var uuid = socketMap.get(socket.id);
+            if(uuid != undefined){
+                var debugOption = $this.debug.map.get(uuid);
+                if(debugOption != undefined){
+                    clearInterval(debugOption.interval);
+                    $this.debug.map.remove(uuid);
+                }
+            }
         });
         socket.join('nornenjs');
     });
     
 };
 
-NornenjsServer.prototype.debugCallback = function(room, clientId, $this){
-//    logger.debug(room, $this.debug.option);
+NornenjsServer.prototype.debugCallback = function($this, uuid){
+    var debugOption = $this.debug.map.get(uuid);
+    
+    if(debugOption == undefined){
+        return;
+    }
+    var option = {
+        type :  debugOption.type,
+        cudaTime : debugOption.cudaTime,
+        compressTime : debugOption.compressTime
+    }
 
-    $this.io.to(room).to(clientId).emit('debug', $this.debug.option);
-
-    $this.debug.option.cudaTime = 0;
-    $this.debug.option.compressTime = 0;
+    $this.io.to(uuid).to(debugOption.socketId).emit('debug', option);
+    
+    debugOption.cudaTime = 0;
+    debugOption.compressTime = 0;
 };
 
 
@@ -119,7 +154,7 @@ NornenjsServer.prototype.streamEvent = function(){
 
             logger.debug('Byte stream connection attempt ' + client.id);
 
-            var cudaInterval = function () {
+            var cudaInterval = function (uuid) {
 
                 var maintainInfo = maintainInfoMap.get(client.id);
                 if(maintainInfo == undefined || maintainInfo == null){
@@ -137,12 +172,10 @@ NornenjsServer.prototype.streamEvent = function(){
                 }
 
                 if(status.streamType == ENUMS.STREAM_TYPE.START || status.streamType == ENUMS.STREAM_TYPE.FINISH){
-                    $this.debug.option.type = ENUMS.COMPRESS_TYPE.PNG;
                     var hrStart = process.hrtime();
 
                     cudaRender.start();
                     var hrCuda = process.hrtime(hrStart);
-                    $this.debug.option.cudaTime  = hrCuda[1]/1000000;
                     logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrCuda[1]/1000000);
 
                     var png = new Png(cudaRender.d_outputBuffer, 512, 512, 'rgba');
@@ -162,17 +195,23 @@ NornenjsServer.prototype.streamEvent = function(){
                     cudaRender.end();
 
                     var hrEnd = process.hrtime(hrStart);
-                    $this.debug.option.compressTime = hrEnd[1]/1000000;
                     logger.debug('Make start finish frame png compress execution time (hr) : %dms', hrEnd[1]/1000000);
 
+                    if($this.debug.active){
+                        var debugOption = $this.debug.map.get(uuid);
+                        if(debugOption == undefined){
+                            return;
+                        }
+                        debugOption.type = ENUMS.COMPRESS_TYPE.PNG;
+                        debugOption.cudaTime = hrCuda[1]/1000000;
+                        debugOption.compressTime = hrEnd[1]/1000000;
+                    }
                 } else if(status.streamType == ENUMS.STREAM_TYPE.EVENT){
-                    $this.debug.option.type = ENUMS.COMPRESS_TYPE.JPEG;
                     var hrStart = process.hrtime();
 
                     cudaRender.start();
 
                     var hrCuda = process.hrtime(hrStart);
-                    $this.debug.option.cudaTime  = hrCuda[1]/1000000;
                     logger.debug('Make start finish frame jpeg compress execution time (hr) : %dms', hrCuda[1]/1000000);
 
                     var jpeg = new Jpeg(cudaRender.d_outputBuffer, 512, 512, 'rgba');
@@ -194,9 +233,17 @@ NornenjsServer.prototype.streamEvent = function(){
                     cudaRender.end();
 
                     var hrEnd = process.hrtime(hrStart);
-                    $this.debug.option.compressTime  = hrEnd[1]/1000000;
                     logger.debug('Make start finish frame jpeg compress execution time (hr) : %dms', hrEnd[1]/1000000);
 
+                    if($this.debug.active){
+                        var debugOption = $this.debug.map.get(uuid);
+                        if(debugOption == undefined){
+                            return;
+                        }
+                        debugOption.type = ENUMS.COMPRESS_TYPE.JPEG;
+                        debugOption.cudaTime = hrCuda[1]/1000000;
+                        debugOption.compressTime = hrEnd[1]/1000000;
+                    }
                 }else{
                     logger.error('Request type not defined cuda' + status.streamType);
                 }
@@ -217,7 +264,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     transferScaleZ : buffer.readFloatLE(40),
                     mriType : buffer.readFloatLE(44),
                     isMobile : buffer.readFloatLE(48),
-                    uuid : buffer.toString('utf8', 52)
+                    uuid : buffer.toString('utf-8', 52)
                 };
                 
                 logger.debug('Request parameter : ', parameter);
@@ -262,7 +309,20 @@ NornenjsServer.prototype.streamEvent = function(){
 
                         maintainInfoMap.set(client.id, maintainInfo);
 
-                        cudaInterval();
+                        // ~ set Debug
+                        if($this.debug.active){
+                            var debugOption = $this.debug.map.get(param.uuid);
+
+                            if(debugOption == undefined){
+                                debugOption = new DebugOption();
+                            }
+                            
+                            debugOption.streamId = client.id;
+                            debugOption.uuid = param.uuid;
+                            $this.debug.map.set(param.uuid, debugOption);
+                        }
+                        
+                        cudaInterval(param.uuid);
 
                         logger.debug('Connect byte stream ' + client.id + ' volume use ' + use);
                     };
@@ -312,7 +372,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     maintainInfoMap.set(client.id, maintainInfo);
 
                     if(!param.isMobile){
-                        cudaInterval();
+                        cudaInterval(param.uuid);
                     }
 
                     logger.debug('Cuda Interval finish ' + client.id);
@@ -349,9 +409,9 @@ NornenjsServer.prototype.streamEvent = function(){
 
                     if(status.cudaInterval == null){
                         if(param.isMobile){
-                            status.cudaInterval = setInterval(cudaInterval, 1000/20);
+                            status.cudaInterval = setInterval(cudaInterval, 1000/20, param.uuid);
                         } else {
-                            status.cudaInterval = setInterval(cudaInterval, 1000/60);
+                            status.cudaInterval = setInterval(cudaInterval, 1000/60, param.uuid);
                         }
 
                         maintainInfo.status = status;
