@@ -21,7 +21,6 @@ router.get('/', function(req, res) {
     };
 
     sqlite.db.all(sqlite.sql.volume.selectVolumeList, query, function(err, volumes){
-        console.log(volumes);
         res.render('volume/list', { volumes : volumes, user : req.session.user });
     });
 });

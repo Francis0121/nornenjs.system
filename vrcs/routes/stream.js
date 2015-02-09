@@ -18,11 +18,9 @@ router.param('pn', function (req, res, next, pn) {
 });
 
 var volumeMap = new HashMap();
-/* GET home page. */
-router.get('/volumepn/:pn', function(req, res) {
 
+router.get('/volumepn/:pn', function(req, res) {
     sqlite.db.get(sqlite.sql.volume.selectVolumeOne, { $pn: req.params.pn }, function(err, volume){
-        console.log(volume);
         if(volume == undefined) {
             console.log('Fail select volume');
             res.redirect('/volume');
