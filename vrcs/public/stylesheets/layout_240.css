@@ -239,10 +239,57 @@ body{ background: #231f20; }
 .error_page{ width: 100%; margin: 0 auto; display: block;}
 .error_page>img{ width: 100%;}
 
-/** debug */
-._stream_debug_wrap{ }
-._stream_debug_wrap>.content{  }
-._stream_debug_wrap>.content>p{ }
-._stream_debug_wrap>.content>p.info{ }
-._stream_debug_wrap>.content>p.debug{ }
-._stream_debug_wrap>.content>p.error{ }
+
+/* netslider start */
+.is_clickable {
+    cursor: hand;
+    cursor: pointer;
+}
+.nstSlider {
+    cursor: hand;
+    cursor: pointer;
+    position: relative;
+    width: 78%;
+    border: 1px solid #e6ecec;
+    height: 36px;
+    margin: 10px 20% 10px 0;
+}
+.nstSlider .leftGrip.gripHighlighted {
+    background: #113344;
+}
+.nstSlider .rightGrip.gripHighlighted {
+    background: #113344;
+}
+.nstSlider .rightGrip,
+.nstSlider .leftGrip {
+    position: absolute;
+    top: -1px;
+    width: 20px;
+    height: 37px;
+    background: #34495e;
+    border: 1px solid #808080;
+    opacity: .6;
+}
+.nstSlider .bar {
+    position: absolute;
+    background: url("../image/slider.png") repeat-x;
+    height: 37px;
+    opacity: .7;
+    left: 0 !important;
+}
+
+.nstSlider .highlightPanel {
+    -webkit-transition: all 500ms ease-in-out;
+    -moz-transition: all 500ms ease-in-out;
+    -ms-transition: all 500ms ease-in-out;
+    -o-transition: all 500ms ease-in-out;
+    transition: all 500ms ease-in-out;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    position: absolute;
+    background: #e87722;
+    height: 20px;
+    top: 0;
+}
+/* netslider finish */

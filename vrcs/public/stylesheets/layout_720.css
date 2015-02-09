@@ -224,11 +224,3 @@
 /** error*/
 .error_page{ width: 600px;}
 .error_page>img{ }
-
-/** debug */
-._stream_debug_wrap{ }
-._stream_debug_wrap>.content{  }
-._stream_debug_wrap>.content>p{ }
-._stream_debug_wrap>.content>p.info{ }
-._stream_debug_wrap>.content>p.debug{ }
-._stream_debug_wrap>.content>p.error{ }
