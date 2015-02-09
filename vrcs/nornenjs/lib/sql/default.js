@@ -23,32 +23,26 @@ db.serialize(function() {
     db.get(sql.user.select, function(err, uData) {
         logger.debug(uData);
         var volume = [{
-            $userpn : uData.pn,
-            $title : 'Skull',
-            $saveName : '[2014-11-27 20:00:00]_head.den',
-            $fileName : 'head.den',
-            $width : 256,
-            $height : 256,
-            $depth : 225
+            $userpn : uData.pn, $title : 'Skull', $saveName : 'head.den', $fileName : 'head.den', $width : 256, $height : 256, $depth : 225
         },{
-            $userpn : uData.pn,
-            $title : 'Abdomen',
-            $saveName : '[2014-11-27 20:00:00]_abdomen.den',
-            $fileName : '_abdomen.den',
-            $width : 512,
-            $height : 512,
-            $depth : 300
+            $userpn : uData.pn, $title : 'Abdomen', $saveName : 'abdomen.den', $fileName : 'abdomen.den', $width : 512, $height : 512, $depth : 300
+        },{
+            $userpn : uData.pn, $title : 'Aneurism', $saveName : 'aneurism.raw', $fileName : 'aneurism.raw', $width : 256, $height : 256, $depth : 256
+        },{
+            $userpn : uData.pn, $title : 'Bonsai', $saveName : 'bonsai.raw', $fileName : 'bonsai.raw', $width : 256, $height : 256, $depth : 256
+        },{
+            $userpn : uData.pn, $title : 'Foot', $saveName : 'foot.raw', $fileName : 'foot.raw', $width : 256, $height : 256, $depth : 256
+        },{
+            $userpn : uData.pn, $title : 'Skull', $saveName : 'skull.raw', $fileName : 'skull.raw', $width : 256, $height : 256, $depth : 256
+        },{
+            $userpn : uData.pn, $title : 'Engine', $saveName : 'engine.raw', $fileName : 'engine.raw', $width : 256, $height : 256, $depth : 128
         }];
-
-        stmt = db.prepare(sql.volume.insert);
-        stmt.run(volume[0], function(){
+        
+        for(var i=0; i<volume.length; i++){
             stmt = db.prepare(sql.volume.insert);
-            stmt.run(volume[1], function(){
-                db.each(sql.volume.selectVolumeList, { $userpn : uData.pn }, function(err, vData){
-                    logger.debug(vData);
-                });
-            });
-        });
+            stmt.run(volume[i]);
+        }
+        
         stmt.finalize();
     });
 
