@@ -208,10 +208,7 @@
 
 .option_axis{ }
 
-.slider_len{ width: 240px !important; margin: 10px 20px; height: 10px !important; }
-.slider_len .ui-slider-range{ }
-.slider_len .ui-slider-handle{ width: 20px !important; height: 20px !important; border-radius:10px; }
-
 /** error*/
 .error_page{ width: 900px; }
 .error_page>img{ }
+

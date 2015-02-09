@@ -50,7 +50,6 @@ $(function(){
         'left_grip_selector' : '.leftGrip',
         'value_bar_selector' : '.bar',
         'value_changed_callback': function(cause, leftValue, rightValue) {
-            $(this).find('.bar').css('background', 'url(/image/slider.png)' );
 
             if(nornenjs.isConnect) {
                 if (this.attr('data-type') == 'scale') {

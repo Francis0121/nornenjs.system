@@ -202,8 +202,8 @@ body{ background: #231f20; height: 100%; overflow-y: scroll;}
 .option_wrap{ float: left; }
 .option_wrap>.option_default{ float: left; }
 .option_wrap>.option_default>h6{ }
-.option_wrap>.option_default>h6>span.mark{}
-.option_wrap>.option_default>h6>span.text{ color: #fff;}
+.option_wrap>.option_default>h6>img{ float: left; margin-bottom: 5px;}
+.option_wrap>.option_default>h6>span.text{ float: left; margin: 3px 5px 0 3px; color: #fff;}
 .option_select_wrap{ float: left; }
 .option_select_wrap>li{ float: left; text-align: center; color: #fff; cursor: pointer;}
 .option_select_wrap>li:hover{ background-color: #25a4a0; }
@@ -217,6 +217,8 @@ body{ background: #231f20; height: 100%; overflow-y: scroll;}
 .error_page{ margin: 0 auto; display: block;}
 .error_page>img{ width: 100%; }
 
+.slider_wrap{width: 90%; float: left; padding: 0 5%;}
+
 /* netslider start */
 .is_clickable {
     cursor: hand;
@@ -226,10 +228,10 @@ body{ background: #231f20; height: 100%; overflow-y: scroll;}
     cursor: hand;
     cursor: pointer;
     position: relative;
-    width: 78%;
-    border: 1px solid #e6ecec;
+    width: 100%;
+    border: 1px solid #fff;
     height: 36px;
-    margin: 10px 20% 10px 0;
+    margin: 10px 0 0 0;
 }
 .nstSlider .leftGrip.gripHighlighted {
     background: #113344;
@@ -242,16 +244,15 @@ body{ background: #231f20; height: 100%; overflow-y: scroll;}
     position: absolute;
     top: -1px;
     width: 20px;
-    height: 37px;
-    background: #34495e;
-    border: 1px solid #808080;
-    opacity: .6;
+    height: 36px;
+    background: #2eb3ae;
+    border: 1px solid #fff;
 }
 .nstSlider .bar {
     position: absolute;
-    background: url("../image/slider.png") repeat-x;
-    height: 37px;
-    opacity: .7;
+    background: #fff;
+    height: 36px;
+    opacity: .3;
     left: 0 !important;
 }
 
