@@ -15,9 +15,9 @@ $(function(){
     $('.option_rendering>ul>li').on('click', function(){
         var type = $(this).attr('data-type');
         nornenjs.type(type);
-        
+
         $('.option_rendering>ul>li').removeClass('option_select_wrap_active').addClass('option_select_wrap_none');
-        $(this).addClass('option_select_wrap_active');
+        $(this).removeClass('option_select_wrap_none').addClass('option_select_wrap_active');
 
         if(type == ENUMS.RENDERING_TYPE.MRI){
             $('.option_zoom').hide();
@@ -43,6 +43,10 @@ $(function(){
 
     $('.option_axis>ul>li').on('click', function(){
         var type = $(this).attr('data-type');
+
+        $('.option_axis>ul>li').removeClass('option_select_wrap_active').addClass('option_select_wrap_none');
+        $(this).removeClass('option_select_wrap_none').addClass('option_select_wrap_active');
+        
         nornenjs.axisType(type);
     });
 
