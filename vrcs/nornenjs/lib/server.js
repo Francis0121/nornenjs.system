@@ -63,6 +63,10 @@ NornenjsServer.prototype.socketIoEvent = function(){
     
     this.io.sockets.on('connection', function(socket){
         
+        socket.on('isConnect', function(data){
+            socket.emit('isConnect', { isConnect : data.isConnect });
+        });
+        
         socket.on('join', function(param){
             var clientId = socket.id;
             var message = {
