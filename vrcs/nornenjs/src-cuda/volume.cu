@@ -82,7 +82,8 @@ __global__ void render_kernel_volume(uint *d_output,
 								  float transferOffset,
 								  float transferScaleX,
 								  float transferScaleY,
-								  float transferScaleZ)
+								  float transferScaleZ,
+								  unsigned int quality)
 {
 	
 		const int maxSteps = 500;
@@ -121,37 +122,39 @@ __global__ void render_kernel_volume(uint *d_output,
 				float sample = tex3D(tex,pos.x*0.5f+0.5f, pos.y*0.5f+0.5f, pos.z*0.5f+0.5f);
 				
 				float4 col = tex1D(texture_float_1D, (sample-transferOffset));
-     
-     			/*float3 nV = {0.0, 0.0, 0.0};
-				float3 lV = {0.0, 0.0, 0.0};
-
-				lV.x = eyeRay.d.x;
-				lV.y = eyeRay.d.y;
-				lV.z = eyeRay.d.z;
-
-				float x_plus = tex3D(tex, pos.x*0.5f+0.5+(step.x*0.5), pos.y*0.5f+0.5f, pos.z*0.5f+0.5f);
-				float x_minus = tex3D(tex,pos.x*0.5f+0.5-(step.x*0.5), pos.y*0.5f+0.5f, pos.z*0.5f+0.5f);
-
-				float y_plus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f +(step.y*0.5), pos.z*0.5f+0.5f);
-				float y_minus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f-(step.y*0.5),pos.z*0.5f+0.5f);
-
-				float z_plus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f, pos.z*0.5f+0.5f+(step.z*0.5));
-				float z_minus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f, pos.z*0.5f+0.5f-(step.z*0.5));
-
-				nV.x = (x_plus - x_minus)/2.0f;
-				nV.y = (y_plus - y_minus)/2.0f;
-				nV.z = (z_plus - z_minus)/2.0f;
-
-				//nV = cudaNormalize(nV);
-
-				float NL = 0.0f;
-				NL = lV.x*nV.x + lV.y*nV.y + lV.z*nV.z;
-
-				if(NL < 0.0f) NL = 0.0f;
-				float localShading = 0.2 + 0.8*NL;
-
-				col *= localShading;
-     			*/
+     			
+     			if(quality == 1){
+     			
+					float3 nV = {0.0, 0.0, 0.0};
+					float3 lV = {0.0, 0.0, 0.0};
+	
+					lV.x = eyeRay.d.x;
+					lV.y = eyeRay.d.y;
+					lV.z = eyeRay.d.z;
+	
+					float x_plus = tex3D(tex, pos.x*0.5f+0.5+(step.x*0.5), pos.y*0.5f+0.5f, pos.z*0.5f+0.5f);
+					float x_minus = tex3D(tex,pos.x*0.5f+0.5-(step.x*0.5), pos.y*0.5f+0.5f, pos.z*0.5f+0.5f);
+	
+					float y_plus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f +(step.y*0.5), pos.z*0.5f+0.5f);
+					float y_minus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f-(step.y*0.5),pos.z*0.5f+0.5f);
+	
+					float z_plus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f, pos.z*0.5f+0.5f+(step.z*0.5));
+					float z_minus = tex3D(tex, pos.x*0.5f+0.5, pos.y*0.5f+0.5f, pos.z*0.5f+0.5f-(step.z*0.5));
+	
+					nV.x = (x_plus - x_minus)/2.0f;
+					nV.y = (y_plus - y_minus)/2.0f;
+					nV.z = (z_plus - z_minus)/2.0f;
+	
+					//nV = cudaNormalize(nV);
+	
+					float NL = 0.0f;
+					NL = lV.x*nV.x + lV.y*nV.y + lV.z*nV.z;
+	
+					if(NL < 0.0f) NL = 0.0f;
+					float localShading = 0.2 + 0.8*NL;
+	
+					col *= localShading;
+     			}
 				col.x *= col.w;
 				col.y *= col.w;
 				col.z *= col.w;
@@ -183,7 +186,8 @@ __global__ void render_kernel_MIP(uint *d_output,
 								  float transferOffset,
 								  float transferScaleX,
 								  float transferScaleY,
-								  float transferScaleZ)
+								  float transferScaleZ,
+                                  unsigned int quality)
 {
 	
 		const int maxSteps = 500;
@@ -237,7 +241,7 @@ __global__ void render_kernel_MIP(uint *d_output,
 	}
 }
 extern "C" {
-__global__ void render_kernel_MRI(uint *d_output, 
+__global__ void render_kernel_MPR(uint *d_output,
 								  float *d_invViewMatrix, 
 								  unsigned int imageW,
 								  unsigned int imageH,
@@ -246,7 +250,8 @@ __global__ void render_kernel_MRI(uint *d_output,
 								  float transferOffset,
 								  float transferScaleX,
 								  float transferScaleY,
-								  float transferScaleZ)
+								  float transferScaleZ,
+                                  unsigned int quality)
 	{
 		const int maxSteps = 500;
 		const float tstep = 0.01f;

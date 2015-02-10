@@ -4,7 +4,7 @@
 	// nvopencc 4.1 built on 2014-03-13
 
 	//-----------------------------------------------------------
-	// Compiling /tmp/tmpxft_00002de0_00000000-9_volume.cpp3.i (/tmp/ccBI#.Mnhq1Y)
+	// Compiling /tmp/tmpxft_000013c4_00000000-9_volume.cpp3.i (/tmp/ccBI#.QVUGOI)
 	//-----------------------------------------------------------
 
 	//-----------------------------------------------------------
@@ -17,7 +17,7 @@
 	//-----------------------------------------------------------
 
 	.file	1	"<command-line>"
-	.file	2	"/tmp/tmpxft_00002de0_00000000-8_volume.cudafe2.gpu"
+	.file	2	"/tmp/tmpxft_000013c4_00000000-8_volume.cudafe2.gpu"
 	.file	3	"volume.cu"
 	.file	4	"/usr/lib/gcc/i686-linux-gnu/4.6/include/stddef.h"
 	.file	5	"/usr/local/cuda/bin/..//include/crt/device_runtime.h"
@@ -65,14 +65,15 @@
 		.param .f32 __cudaparm_render_kernel_volume_transferOffset,
 		.param .f32 __cudaparm_render_kernel_volume_transferScaleX,
 		.param .f32 __cudaparm_render_kernel_volume_transferScaleY,
-		.param .f32 __cudaparm_render_kernel_volume_transferScaleZ)
+		.param .f32 __cudaparm_render_kernel_volume_transferScaleZ,
+		.param .u32 __cudaparm_render_kernel_volume_quality)
 	{
 	.reg .u16 %rh<6>;
-	.reg .u32 %r<38>;
-	.reg .f32 %f<173>;
-	.reg .f64 %fd<5>;
-	.reg .pred %p<8>;
-	.loc	3	85	0
+	.reg .u32 %r<76>;
+	.reg .f32 %f<235>;
+	.reg .f64 %fd<32>;
+	.reg .pred %p<10>;
+	.loc	3	86	0
 $LDWbegin_render_kernel_volume:
 	mov.u16 	%rh1, %ctaid.x;
 	mov.u16 	%rh2, %ntid.x;
@@ -93,9 +94,9 @@ $LDWbegin_render_kernel_volume:
 	or.b32 	%r13, %r10, %r12;
 	mov.u32 	%r14, 0;
 	setp.eq.s32 	%p1, %r13, %r14;
-	@%p1 bra 	$Lt_0_4610;
-	bra.uni 	$LBB13_render_kernel_volume;
-$Lt_0_4610:
+	@%p1 bra 	$Lt_0_6146;
+	bra.uni 	$LBB21_render_kernel_volume;
+$Lt_0_6146:
 	.loc	3	57	0
 	ld.param.u32 	%r15, [__cudaparm_render_kernel_volume_d_invViewMatrix];
 	ld.global.f32 	%f1, [%r15+0];
@@ -130,11 +131,11 @@ $Lt_0_4610:
 	ld.global.f32 	%f28, [%r15+44];
 	mov.f32 	%f29, 0f3f800000;    	// 1
 	mad.f32 	%f30, %f28, %f29, %f27;
-	.loc	3	85	0
+	.loc	3	86	0
 	ld.param.u32 	%r7, [__cudaparm_render_kernel_volume_imageH];
 	.loc	3	45	0
 	cvt.rn.f32.u32 	%f31, %r7;
-	.loc	3	85	0
+	.loc	3	86	0
 	ld.param.u32 	%r8, [__cudaparm_render_kernel_volume_imageW];
 	.loc	3	45	0
 	cvt.rn.f32.u32 	%f32, %r8;
@@ -171,7 +172,7 @@ $Lt_0_4610:
 	mul.f32 	%f61, %f60, %f48;
 	mad.f32 	%f62, %f21, %f49, %f61;
 	mad.f32 	%f63, %f22, %f51, %f62;
-	.loc	3	108	0
+	.loc	3	109	0
 	rcp.approx.f32 	%f64, %f55;
 	mov.f32 	%f65, 0f3f800000;    	// 1
 	sub.f32 	%f66, %f65, %f10;
@@ -206,16 +207,16 @@ $Lt_0_4610:
 	max.f32 	%f95, %f91, %f93;
 	min.f32 	%f96, %f92, %f94;
 	setp.lt.f32 	%p2, %f95, %f96;
-	@%p2 bra 	$Lt_0_5122;
-	bra.uni 	$LBB13_render_kernel_volume;
-$Lt_0_5122:
-	.loc	3	115	0
+	@%p2 bra 	$Lt_0_6658;
+	bra.uni 	$LBB21_render_kernel_volume;
+$Lt_0_6658:
+	.loc	3	116	0
 	mov.f32 	%f97, 0f00000000;    	// 0
 	setp.lt.f32 	%p3, %f95, %f97;
 	mov.f32 	%f98, 0f00000000;    	// 0
 	selp.f32 	%f99, %f98, %f95, %p3;
 	mov.f32 	%f100, %f99;
-	.loc	3	116	0
+	.loc	3	117	0
 	mad.f32 	%f101, %f55, %f99, %f10;
 	mad.f32 	%f102, %f59, %f99, %f20;
 	mad.f32 	%f103, %f63, %f99, %f30;
@@ -225,37 +226,40 @@ $Lt_0_5122:
 	mul.f32 	%f107, %f59, %f106;
 	mov.f32 	%f108, 0f3c23d70a;   	// 0.01
 	mul.f32 	%f109, %f63, %f108;
+	ld.param.u32 	%r16, [__cudaparm_render_kernel_volume_quality];
+	mov.u32 	%r17, 1;
+	setp.eq.u32 	%p4, %r16, %r17;
 	ld.param.f32 	%f110, [__cudaparm_render_kernel_volume_transferOffset];
 	mov.f32 	%f111, 0f00000000;   	// 0
 	mov.f32 	%f112, 0f00000000;   	// 0
 	mov.f32 	%f113, 0f00000000;   	// 0
 	mov.f32 	%f114, 0f00000000;   	// 0
 	mov.f32 	%f115, 0f00000000;   	// 0
-$Lt_0_6146:
- //<loop> Loop body line 116, nesting depth: 1, estimated iterations: unknown
-	.loc	3	121	0
+$Lt_0_7682:
+ //<loop> Loop body line 117, nesting depth: 1, estimated iterations: unknown
+	.loc	3	122	0
 	mov.f32 	%f116, 0f3f000000;   	// 0.5
 	mov.f32 	%f117, 0f3f000000;   	// 0.5
-	mad.f32 	%f118, %f117, %f101, %f116;
-	mov.f32 	%f119, %f118;
+	mad.f32 	%f118, %f117, %f102, %f116;
+	mov.f32 	%f119, 0f3f000000;   	// 0.5
 	mov.f32 	%f120, 0f3f000000;   	// 0.5
-	mov.f32 	%f121, 0f3f000000;   	// 0.5
-	mad.f32 	%f122, %f121, %f102, %f120;
-	mov.f32 	%f123, %f122;
-	mov.f32 	%f124, 0f3f000000;   	// 0.5
-	mov.f32 	%f125, 0f3f000000;   	// 0.5
-	mad.f32 	%f126, %f125, %f103, %f124;
-	mov.f32 	%f127, %f126;
+	mad.f32 	%f121, %f120, %f103, %f119;
+	mov.f32 	%f122, 0f3f000000;   	// 0.5
+	mov.f32 	%f123, 0f3f000000;   	// 0.5
+	mad.f32 	%f124, %f123, %f101, %f122;
+	mov.f32 	%f125, %f124;
+	mov.f32 	%f126, %f118;
+	mov.f32 	%f127, %f121;
 	mov.f32 	%f128, 0f00000000;   	// 0
 	mov.f32 	%f129, %f128;
-	tex.3d.v4.u32.f32 {%r16,%r17,%r18,%r19},[tex,{%f119,%f123,%f127,%f129}];
-	mov.s32 	%r20, %r16;
-	.loc	3	123	0
-	mov.s32 	%r21, %r20;
-	mov.b32 	%f130, %r21;
-	.loc	3	116	0
+	tex.3d.v4.u32.f32 {%r18,%r19,%r20,%r21},[tex,{%f125,%f126,%f127,%f129}];
+	mov.s32 	%r22, %r18;
+	.loc	3	124	0
+	mov.s32 	%r23, %r22;
+	mov.b32 	%f130, %r23;
+	.loc	3	117	0
 	ld.param.f32 	%f110, [__cudaparm_render_kernel_volume_transferOffset];
-	.loc	3	123	0
+	.loc	3	124	0
 	sub.f32 	%f131, %f130, %f110;
 	mov.f32 	%f132, %f131;
 	mov.f32 	%f133, 0f00000000;   	// 0
@@ -269,87 +273,217 @@ $Lt_0_6146:
 	mov.f32 	%f144, %f140;
 	mov.f32 	%f145, %f141;
 	mov.f32 	%f146, %f142;
+	mov.f32 	%f147, %f143;
+	mov.f32 	%f148, %f144;
+	mov.f32 	%f149, %f145;
+	mov.f32 	%f150, %f146;
+	@!%p4 bra 	$Lt_0_7938;
+	.loc	3	135	0
+	cvt.f64.f32 	%fd1, %f105;
+	mov.f32 	%f151, 0f3f000000;   	// 0.5
+	mul.f32 	%f152, %f101, %f151;
+	cvt.f64.f32 	%fd2, %f152;
+	mov.f64 	%fd3, 0d3fe0000000000000;	// 0.5
+	add.f64 	%fd4, %fd2, %fd3;
+	mov.f64 	%fd5, 0d3fe0000000000000;	// 0.5
+	mad.rn.f64 	%fd6, %fd1, %fd5, %fd4;
+	cvt.rn.f32.f64 	%f153, %fd6;
+	mov.f32 	%f154, %f153;
+	mov.f32 	%f155, %f118;
+	mov.f32 	%f156, %f121;
+	mov.f32 	%f157, 0f00000000;   	// 0
+	mov.f32 	%f158, %f157;
+	tex.3d.v4.u32.f32 {%r24,%r25,%r26,%r27},[tex,{%f154,%f155,%f156,%f158}];
+	mov.s32 	%r28, %r24;
+	.loc	3	136	0
+	mov.f64 	%fd7, 0d3fe0000000000000;	// 0.5
+	mul.f64 	%fd8, %fd1, %fd7;
+	sub.f64 	%fd9, %fd4, %fd8;
+	cvt.rn.f32.f64 	%f159, %fd9;
+	mov.f32 	%f160, %f159;
+	mov.f32 	%f161, %f118;
+	mov.f32 	%f162, %f121;
+	mov.f32 	%f163, 0f00000000;   	// 0
+	mov.f32 	%f164, %f163;
+	tex.3d.v4.u32.f32 {%r29,%r30,%r31,%r32},[tex,{%f160,%f161,%f162,%f164}];
+	mov.s32 	%r33, %r29;
+	.loc	3	138	0
+	cvt.f64.f32 	%fd10, %f107;
+	cvt.f64.f32 	%fd11, %f118;
+	cvt.rn.f32.f64 	%f165, %fd4;
+	mov.f32 	%f166, %f165;
+	mov.f64 	%fd12, 0d3fe0000000000000;	// 0.5
+	mad.rn.f64 	%fd13, %fd10, %fd12, %fd11;
+	cvt.rn.f32.f64 	%f167, %fd13;
+	mov.f32 	%f168, %f167;
+	mov.f32 	%f169, %f121;
+	mov.f32 	%f170, 0f00000000;   	// 0
+	mov.f32 	%f171, %f170;
+	tex.3d.v4.u32.f32 {%r34,%r35,%r36,%r37},[tex,{%f166,%f168,%f169,%f171}];
+	mov.s32 	%r38, %r34;
+	.loc	3	139	0
+	mov.f32 	%f172, %f165;
+	mov.f64 	%fd14, 0d3fe0000000000000;	// 0.5
+	mul.f64 	%fd15, %fd10, %fd14;
+	sub.f64 	%fd16, %fd11, %fd15;
+	cvt.rn.f32.f64 	%f173, %fd16;
+	mov.f32 	%f174, %f173;
+	mov.f32 	%f175, %f121;
+	mov.f32 	%f176, 0f00000000;   	// 0
+	mov.f32 	%f177, %f176;
+	tex.3d.v4.u32.f32 {%r39,%r40,%r41,%r42},[tex,{%f172,%f174,%f175,%f177}];
+	mov.s32 	%r43, %r39;
+	.loc	3	141	0
+	cvt.f64.f32 	%fd17, %f109;
+	cvt.f64.f32 	%fd18, %f121;
+	mov.f32 	%f178, %f165;
+	mov.f32 	%f179, %f118;
+	mov.f64 	%fd19, 0d3fe0000000000000;	// 0.5
+	mad.rn.f64 	%fd20, %fd17, %fd19, %fd18;
+	cvt.rn.f32.f64 	%f180, %fd20;
+	mov.f32 	%f181, %f180;
+	mov.f32 	%f182, 0f00000000;   	// 0
+	mov.f32 	%f183, %f182;
+	tex.3d.v4.u32.f32 {%r44,%r45,%r46,%r47},[tex,{%f178,%f179,%f181,%f183}];
+	mov.s32 	%r48, %r44;
+	.loc	3	142	0
+	mov.f32 	%f184, %f165;
+	mov.f32 	%f185, %f118;
+	mov.f64 	%fd21, 0d3fe0000000000000;	// 0.5
+	mul.f64 	%fd22, %fd17, %fd21;
+	sub.f64 	%fd23, %fd18, %fd22;
+	cvt.rn.f32.f64 	%f186, %fd23;
+	mov.f32 	%f187, %f186;
+	mov.f32 	%f188, 0f00000000;   	// 0
+	mov.f32 	%f189, %f188;
+	tex.3d.v4.u32.f32 {%r49,%r50,%r51,%r52},[tex,{%f184,%f185,%f187,%f189}];
+	mov.s32 	%r53, %r49;
+	.loc	35	900	0
+	mov.s32 	%r54, %r38;
+	mov.b32 	%f190, %r54;
+	mov.s32 	%r55, %r43;
+	mov.b32 	%f191, %r55;
+	mov.s32 	%r56, %r28;
+	mov.b32 	%f192, %r56;
+	mov.s32 	%r57, %r33;
+	mov.b32 	%f193, %r57;
+	mov.s32 	%r58, %r48;
+	mov.b32 	%f194, %r58;
+	mov.s32 	%r59, %r53;
+	mov.b32 	%f195, %r59;
+	sub.f32 	%f196, %f190, %f191;
+	sub.f32 	%f197, %f192, %f193;
+	sub.f32 	%f198, %f194, %f195;
+	mov.f32 	%f199, 0f3f000000;   	// 0.5
+	mul.f32 	%f200, %f196, %f199;
+	mov.f32 	%f201, 0f3f000000;   	// 0.5
+	mul.f32 	%f202, %f197, %f201;
+	mov.f32 	%f203, 0f3f000000;   	// 0.5
+	mul.f32 	%f204, %f198, %f203;
+	mul.f32 	%f205, %f200, %f59;
+	mad.f32 	%f206, %f55, %f202, %f205;
+	mad.f32 	%f207, %f63, %f204, %f206;
+	mov.f32 	%f208, 0f00000000;   	// 0
+	setp.lt.f32 	%p5, %f207, %f208;
+	mov.f64 	%fd24, 0d3fc999999999999a;	// 0.2
+	mov.f32 	%f209, 0f00000000;   	// 0
+	selp.f32 	%f210, %f209, %f207, %p5;
+	cvt.f64.f32 	%fd25, %f210;
+	mov.f64 	%fd26, 0d3fe999999999999a;	// 0.8
+	mad.rn.f64 	%fd27, %fd25, %fd26, %fd24;
+	cvt.rn.f32.f64 	%f211, %fd27;
+	mul.f32 	%f147, %f211, %f143;
+	.loc	35	901	0
+	mul.f32 	%f148, %f211, %f144;
+	.loc	35	902	0
+	mul.f32 	%f149, %f211, %f145;
+	.loc	35	903	0
+	mul.f32 	%f150, %f211, %f146;
+$Lt_0_7938:
+	.loc	3	158	0
+	mul.f32 	%f147, %f147, %f150;
 	.loc	3	159	0
-	mov.f32 	%f147, 0f3f800000;   	// 1
-	sub.f32 	%f148, %f147, %f112;
-	mul.f32 	%f149, %f143, %f146;
-	mad.f32 	%f115, %f149, %f148, %f115;
-	mul.f32 	%f150, %f144, %f146;
-	mad.f32 	%f114, %f150, %f148, %f114;
-	mul.f32 	%f151, %f145, %f146;
-	mad.f32 	%f113, %f151, %f148, %f113;
-	mad.f32 	%f112, %f146, %f148, %f112;
+	mul.f32 	%f148, %f148, %f150;
+	.loc	3	160	0
+	mul.f32 	%f149, %f149, %f150;
 	.loc	3	162	0
-	mov.f32 	%f152, 0f3f733333;   	// 0.95
-	setp.gt.f32 	%p4, %f112, %f152;
-	@%p4 bra 	$Lt_0_6658;
-	.loc	3	164	0
-	cvt.f64.f32 	%fd1, %f100;
-	mov.f64 	%fd2, 0d3f747ae140000000;	// 0.005
-	add.f64 	%fd3, %fd1, %fd2;
-	cvt.rn.f32.f64 	%f100, %fd3;
-	.loc	3	166	0
-	setp.lt.f32 	%p5, %f96, %f100;
-	@%p5 bra 	$Lt_0_6658;
+	mov.f32 	%f212, 0f3f800000;   	// 1
+	sub.f32 	%f213, %f212, %f112;
+	mad.f32 	%f115, %f147, %f213, %f115;
+	mad.f32 	%f114, %f148, %f213, %f114;
+	mad.f32 	%f113, %f149, %f213, %f113;
+	mad.f32 	%f112, %f150, %f213, %f112;
+	.loc	3	165	0
+	mov.f32 	%f214, 0f3f733333;   	// 0.95
+	setp.gt.f32 	%p6, %f112, %f214;
+	@%p6 bra 	$Lt_0_8706;
+	.loc	3	167	0
+	cvt.f64.f32 	%fd28, %f100;
+	mov.f64 	%fd29, 0d3f747ae140000000;	// 0.005
+	add.f64 	%fd30, %fd28, %fd29;
+	cvt.rn.f32.f64 	%f100, %fd30;
+	.loc	3	169	0
+	setp.lt.f32 	%p7, %f96, %f100;
+	@%p7 bra 	$Lt_0_8706;
 	.loc	35	355	0
-	mov.f32 	%f153, 0f3f000000;   	// 0.5
-	mad.f32 	%f101, %f105, %f153, %f101;
+	mov.f32 	%f215, 0f3f000000;   	// 0.5
+	mad.f32 	%f101, %f105, %f215, %f101;
 	.loc	35	356	0
-	mov.f32 	%f154, 0f3f000000;   	// 0.5
-	mad.f32 	%f102, %f107, %f154, %f102;
+	mov.f32 	%f216, 0f3f000000;   	// 0.5
+	mad.f32 	%f102, %f107, %f216, %f102;
 	.loc	35	357	0
-	mov.f32 	%f155, 0f3f000000;   	// 0.5
-	mad.f32 	%f103, %f109, %f155, %f103;
-	.loc	3	119	0
-	mov.f32 	%f156, 0f3f800000;   	// 1
-	add.f32 	%f111, %f111, %f156;
-	mov.f32 	%f157, 0f43fa0000;   	// 500
-	setp.lt.f32 	%p6, %f111, %f157;
-	@%p6 bra 	$Lt_0_6146;
-$Lt_0_6658:
+	mov.f32 	%f217, 0f3f000000;   	// 0.5
+	mad.f32 	%f103, %f109, %f217, %f103;
+	.loc	3	120	0
+	mov.f32 	%f218, 0f3f800000;   	// 1
+	add.f32 	%f111, %f111, %f218;
+	mov.f32 	%f219, 0f43fa0000;   	// 500
+	setp.lt.f32 	%p8, %f111, %f219;
+	@%p8 bra 	$Lt_0_7682;
+$Lt_0_8706:
 $Lt_0_258:
 	.loc	35	900	0
-	ld.param.f32 	%f158, [__cudaparm_render_kernel_volume_brightness];
-	mul.f32 	%f115, %f158, %f115;
+	ld.param.f32 	%f220, [__cudaparm_render_kernel_volume_brightness];
+	mul.f32 	%f115, %f220, %f115;
 	.loc	35	901	0
-	mul.f32 	%f114, %f158, %f114;
+	mul.f32 	%f114, %f220, %f114;
 	.loc	35	902	0
-	mul.f32 	%f113, %f158, %f113;
-	.loc	3	173	0
-	cvt.sat.f32.f32 	%f159, %f115;
-	mov.f32 	%f160, 0f437f0000;   	// 255
-	mul.f32 	%f161, %f159, %f160;
-	cvt.rzi.u32.f32 	%r22, %f161;
-	cvt.sat.f32.f32 	%f162, %f114;
-	mov.f32 	%f163, 0f437f0000;   	// 255
-	mul.f32 	%f164, %f162, %f163;
-	cvt.rzi.u32.f32 	%r23, %f164;
-	shl.b32 	%r24, %r23, 8;
-	or.b32 	%r25, %r22, %r24;
-	cvt.sat.f32.f32 	%f165, %f113;
-	mov.f32 	%f166, 0f437f0000;   	// 255
-	mul.f32 	%f167, %f165, %f166;
-	cvt.rzi.u32.f32 	%r26, %f167;
-	shl.b32 	%r27, %r26, 16;
-	mov.f32 	%f168, 0f00000000;   	// 0
-	cvt.sat.f32.f32 	%f169, %f168;
-	mov.f32 	%f170, 0f437f0000;   	// 255
-	mul.f32 	%f171, %f169, %f170;
-	cvt.rzi.u32.f32 	%r28, %f171;
-	shl.b32 	%r29, %r28, 24;
-	or.b32 	%r30, %r27, %r29;
-	or.b32 	%r31, %r25, %r30;
-	ld.param.u32 	%r32, [__cudaparm_render_kernel_volume_d_output];
-	.loc	3	85	0
+	mul.f32 	%f113, %f220, %f113;
+	.loc	3	176	0
+	cvt.sat.f32.f32 	%f221, %f115;
+	mov.f32 	%f222, 0f437f0000;   	// 255
+	mul.f32 	%f223, %f221, %f222;
+	cvt.rzi.u32.f32 	%r60, %f223;
+	cvt.sat.f32.f32 	%f224, %f114;
+	mov.f32 	%f225, 0f437f0000;   	// 255
+	mul.f32 	%f226, %f224, %f225;
+	cvt.rzi.u32.f32 	%r61, %f226;
+	shl.b32 	%r62, %r61, 8;
+	or.b32 	%r63, %r60, %r62;
+	cvt.sat.f32.f32 	%f227, %f113;
+	mov.f32 	%f228, 0f437f0000;   	// 255
+	mul.f32 	%f229, %f227, %f228;
+	cvt.rzi.u32.f32 	%r64, %f229;
+	shl.b32 	%r65, %r64, 16;
+	mov.f32 	%f230, 0f00000000;   	// 0
+	cvt.sat.f32.f32 	%f231, %f230;
+	mov.f32 	%f232, 0f437f0000;   	// 255
+	mul.f32 	%f233, %f231, %f232;
+	cvt.rzi.u32.f32 	%r66, %f233;
+	shl.b32 	%r67, %r66, 24;
+	or.b32 	%r68, %r65, %r67;
+	or.b32 	%r69, %r63, %r68;
+	ld.param.u32 	%r70, [__cudaparm_render_kernel_volume_d_output];
+	.loc	3	86	0
 	ld.param.u32 	%r8, [__cudaparm_render_kernel_volume_imageW];
-	.loc	3	173	0
-	mul.lo.u32 	%r33, %r6, %r8;
-	add.u32 	%r34, %r4, %r33;
-	mul.lo.u32 	%r35, %r34, 4;
-	add.u32 	%r36, %r32, %r35;
-	st.global.u32 	[%r36+0], %r31;
-$LBB13_render_kernel_volume:
-	.loc	3	174	0
+	.loc	3	176	0
+	mul.lo.u32 	%r71, %r6, %r8;
+	add.u32 	%r72, %r4, %r71;
+	mul.lo.u32 	%r73, %r72, 4;
+	add.u32 	%r74, %r70, %r73;
+	st.global.u32 	[%r74+0], %r69;
+$LBB21_render_kernel_volume:
+	.loc	3	177	0
 	exit;
 $LDWend_render_kernel_volume:
 	} // render_kernel_volume
@@ -364,14 +498,15 @@ $LDWend_render_kernel_volume:
 		.param .f32 __cudaparm_render_kernel_MIP_transferOffset,
 		.param .f32 __cudaparm_render_kernel_MIP_transferScaleX,
 		.param .f32 __cudaparm_render_kernel_MIP_transferScaleY,
-		.param .f32 __cudaparm_render_kernel_MIP_transferScaleZ)
+		.param .f32 __cudaparm_render_kernel_MIP_transferScaleZ,
+		.param .u32 __cudaparm_render_kernel_MIP_quality)
 	{
 	.reg .u16 %rh<6>;
 	.reg .u32 %r<36>;
 	.reg .f32 %f<140>;
 	.reg .f64 %fd<5>;
 	.reg .pred %p<8>;
-	.loc	3	186	0
+	.loc	3	190	0
 $LDWbegin_render_kernel_MIP:
 	mov.u16 	%rh1, %ctaid.x;
 	mov.u16 	%rh2, %ntid.x;
@@ -429,11 +564,11 @@ $Lt_1_5122:
 	ld.global.f32 	%f28, [%r15+44];
 	mov.f32 	%f29, 0f3f800000;    	// 1
 	mad.f32 	%f30, %f28, %f29, %f27;
-	.loc	3	186	0
+	.loc	3	190	0
 	ld.param.u32 	%r7, [__cudaparm_render_kernel_MIP_imageH];
 	.loc	3	45	0
 	cvt.rn.f32.u32 	%f31, %r7;
-	.loc	3	186	0
+	.loc	3	190	0
 	ld.param.u32 	%r8, [__cudaparm_render_kernel_MIP_imageW];
 	.loc	3	45	0
 	cvt.rn.f32.u32 	%f32, %r8;
@@ -470,7 +605,7 @@ $Lt_1_5122:
 	mul.f32 	%f61, %f60, %f48;
 	mad.f32 	%f62, %f21, %f49, %f61;
 	mad.f32 	%f63, %f22, %f51, %f62;
-	.loc	3	208	0
+	.loc	3	212	0
 	rcp.approx.f32 	%f64, %f55;
 	mov.f32 	%f65, 0f3f800000;    	// 1
 	sub.f32 	%f66, %f65, %f10;
@@ -508,13 +643,13 @@ $Lt_1_5122:
 	@%p2 bra 	$Lt_1_5634;
 	bra.uni 	$LBB10_render_kernel_MIP;
 $Lt_1_5634:
-	.loc	3	215	0
+	.loc	3	219	0
 	mov.f32 	%f97, 0f00000000;    	// 0
 	setp.lt.f32 	%p3, %f95, %f97;
 	mov.f32 	%f98, 0f00000000;    	// 0
 	selp.f32 	%f99, %f98, %f95, %p3;
 	mov.f32 	%f100, %f99;
-	.loc	3	216	0
+	.loc	3	220	0
 	mad.f32 	%f101, %f55, %f99, %f10;
 	mad.f32 	%f102, %f59, %f99, %f20;
 	mad.f32 	%f103, %f63, %f99, %f30;
@@ -527,8 +662,8 @@ $Lt_1_5634:
 	mov.f32 	%f110, 0f00000000;   	// 0
 	mov.f32 	%f111, 0f00000000;   	// 0
 $Lt_1_6658:
- //<loop> Loop body line 216, nesting depth: 1, estimated iterations: unknown
-	.loc	3	221	0
+ //<loop> Loop body line 220, nesting depth: 1, estimated iterations: unknown
+	.loc	3	225	0
 	mov.f32 	%f112, 0f3f000000;   	// 0.5
 	mov.f32 	%f113, 0f3f000000;   	// 0.5
 	mad.f32 	%f114, %f113, %f101, %f112;
@@ -549,12 +684,12 @@ $Lt_1_6658:
 	mov.b32 	%f126, %r21;
 	setp.ge.f32 	%p4, %f126, %f111;
 	selp.f32 	%f111, %f126, %f111, %p4;
-	.loc	3	225	0
+	.loc	3	229	0
 	cvt.f64.f32 	%fd1, %f100;
 	mov.f64 	%fd2, 0d3f747ae140000000;	// 0.005
 	add.f64 	%fd3, %fd1, %fd2;
 	cvt.rn.f32.f64 	%f100, %fd3;
-	.loc	3	227	0
+	.loc	3	231	0
 	setp.lt.f32 	%p5, %f96, %f100;
 	@%p5 bra 	$Lt_1_258;
 	.loc	35	355	0
@@ -566,14 +701,14 @@ $Lt_1_6658:
 	.loc	35	357	0
 	mov.f32 	%f129, 0f3f000000;   	// 0.5
 	mad.f32 	%f103, %f109, %f129, %f103;
-	.loc	3	219	0
+	.loc	3	223	0
 	mov.f32 	%f130, 0f3f800000;   	// 1
 	add.f32 	%f110, %f110, %f130;
 	mov.f32 	%f131, 0f43fa0000;   	// 500
 	setp.lt.f32 	%p6, %f110, %f131;
 	@%p6 bra 	$Lt_1_6658;
 $Lt_1_258:
-	.loc	3	236	0
+	.loc	3	240	0
 	cvt.sat.f32.f32 	%f132, %f111;
 	mov.f32 	%f133, 0f437f0000;   	// 255
 	mul.f32 	%f134, %f132, %f133;
@@ -590,38 +725,39 @@ $Lt_1_258:
 	or.b32 	%r28, %r25, %r27;
 	or.b32 	%r29, %r24, %r28;
 	ld.param.u32 	%r30, [__cudaparm_render_kernel_MIP_d_output];
-	.loc	3	186	0
+	.loc	3	190	0
 	ld.param.u32 	%r8, [__cudaparm_render_kernel_MIP_imageW];
-	.loc	3	236	0
+	.loc	3	240	0
 	mul.lo.u32 	%r31, %r6, %r8;
 	add.u32 	%r32, %r4, %r31;
 	mul.lo.u32 	%r33, %r32, 4;
 	add.u32 	%r34, %r30, %r33;
 	st.global.u32 	[%r34+0], %r29;
 $LBB10_render_kernel_MIP:
-	.loc	3	237	0
+	.loc	3	241	0
 	exit;
 $LDWend_render_kernel_MIP:
 	} // render_kernel_MIP
 
-	.entry render_kernel_MRI (
-		.param .u32 __cudaparm_render_kernel_MRI_d_output,
-		.param .u32 __cudaparm_render_kernel_MRI_d_invViewMatrix,
-		.param .u32 __cudaparm_render_kernel_MRI_imageW,
-		.param .u32 __cudaparm_render_kernel_MRI_imageH,
-		.param .f32 __cudaparm_render_kernel_MRI_density,
-		.param .f32 __cudaparm_render_kernel_MRI_brightness,
-		.param .f32 __cudaparm_render_kernel_MRI_transferOffset,
-		.param .f32 __cudaparm_render_kernel_MRI_transferScaleX,
-		.param .f32 __cudaparm_render_kernel_MRI_transferScaleY,
-		.param .f32 __cudaparm_render_kernel_MRI_transferScaleZ)
+	.entry render_kernel_MPR (
+		.param .u32 __cudaparm_render_kernel_MPR_d_output,
+		.param .u32 __cudaparm_render_kernel_MPR_d_invViewMatrix,
+		.param .u32 __cudaparm_render_kernel_MPR_imageW,
+		.param .u32 __cudaparm_render_kernel_MPR_imageH,
+		.param .f32 __cudaparm_render_kernel_MPR_density,
+		.param .f32 __cudaparm_render_kernel_MPR_brightness,
+		.param .f32 __cudaparm_render_kernel_MPR_transferOffset,
+		.param .f32 __cudaparm_render_kernel_MPR_transferScaleX,
+		.param .f32 __cudaparm_render_kernel_MPR_transferScaleY,
+		.param .f32 __cudaparm_render_kernel_MPR_transferScaleZ,
+		.param .u32 __cudaparm_render_kernel_MPR_quality)
 	{
 	.reg .u16 %rh<6>;
 	.reg .u32 %r<36>;
 	.reg .f32 %f<132>;
 	.reg .pred %p<5>;
-	.loc	3	249	0
-$LDWbegin_render_kernel_MRI:
+	.loc	3	254	0
+$LDWbegin_render_kernel_MPR:
 	mov.u16 	%rh1, %ctaid.x;
 	mov.u16 	%rh2, %ntid.x;
 	mul.wide.u16 	%r1, %rh1, %rh2;
@@ -632,8 +768,8 @@ $LDWbegin_render_kernel_MRI:
 	add.u32 	%r4, %r3, %r1;
 	cvt.u32.u16 	%r5, %tid.y;
 	add.u32 	%r6, %r5, %r2;
-	ld.param.u32 	%r7, [__cudaparm_render_kernel_MRI_imageH];
-	ld.param.u32 	%r8, [__cudaparm_render_kernel_MRI_imageW];
+	ld.param.u32 	%r7, [__cudaparm_render_kernel_MPR_imageH];
+	ld.param.u32 	%r8, [__cudaparm_render_kernel_MPR_imageW];
 	set.ge.u32.u32 	%r9, %r4, %r8;
 	neg.s32 	%r10, %r9;
 	set.ge.u32.u32 	%r11, %r6, %r7;
@@ -642,10 +778,10 @@ $LDWbegin_render_kernel_MRI:
 	mov.u32 	%r14, 0;
 	setp.eq.s32 	%p1, %r13, %r14;
 	@%p1 bra 	$Lt_2_2818;
-	bra.uni 	$LBB7_render_kernel_MRI;
+	bra.uni 	$LBB7_render_kernel_MPR;
 $Lt_2_2818:
 	.loc	3	57	0
-	ld.param.u32 	%r15, [__cudaparm_render_kernel_MRI_d_invViewMatrix];
+	ld.param.u32 	%r15, [__cudaparm_render_kernel_MPR_d_invViewMatrix];
 	ld.global.f32 	%f1, [%r15+0];
 	ld.global.f32 	%f2, [%r15+8];
 	mov.f32 	%f3, 0f00000000;     	// 0
@@ -678,12 +814,12 @@ $Lt_2_2818:
 	ld.global.f32 	%f28, [%r15+44];
 	mov.f32 	%f29, 0f3f800000;    	// 1
 	mad.f32 	%f30, %f28, %f29, %f27;
-	.loc	3	249	0
-	ld.param.u32 	%r7, [__cudaparm_render_kernel_MRI_imageH];
+	.loc	3	254	0
+	ld.param.u32 	%r7, [__cudaparm_render_kernel_MPR_imageH];
 	.loc	3	45	0
 	cvt.rn.f32.u32 	%f31, %r7;
-	.loc	3	249	0
-	ld.param.u32 	%r8, [__cudaparm_render_kernel_MRI_imageW];
+	.loc	3	254	0
+	ld.param.u32 	%r8, [__cudaparm_render_kernel_MPR_imageW];
 	.loc	3	45	0
 	cvt.rn.f32.u32 	%f32, %r8;
 	cvt.rn.f32.u32 	%f33, %r4;
@@ -719,7 +855,7 @@ $Lt_2_2818:
 	mul.f32 	%f61, %f60, %f48;
 	mad.f32 	%f62, %f21, %f49, %f61;
 	mad.f32 	%f63, %f22, %f51, %f62;
-	.loc	3	273	0
+	.loc	3	278	0
 	rcp.approx.f32 	%f64, %f55;
 	mov.f32 	%f65, 0f3f800000;    	// 1
 	sub.f32 	%f66, %f65, %f10;
@@ -755,28 +891,28 @@ $Lt_2_2818:
 	min.f32 	%f96, %f93, %f95;
 	setp.lt.f32 	%p2, %f91, %f96;
 	@%p2 bra 	$Lt_2_3330;
-	bra.uni 	$LBB7_render_kernel_MRI;
+	bra.uni 	$LBB7_render_kernel_MPR;
 $Lt_2_3330:
-	.loc	3	288	0
+	.loc	3	293	0
 	mov.f32 	%f97, 0f00000000;    	// 0
 	setp.lt.f32 	%p3, %f91, %f97;
 	mov.f32 	%f98, 0f00000000;    	// 0
 	selp.f32 	%f99, %f98, %f91, %p3;
-	ld.param.f32 	%f100, [__cudaparm_render_kernel_MRI_transferScaleX];
+	ld.param.f32 	%f100, [__cudaparm_render_kernel_MPR_transferScaleX];
 	mov.f32 	%f101, 0f3f000000;   	// 0.5
 	mov.f32 	%f102, 0f3f000000;   	// 0.5
 	mad.f32 	%f103, %f55, %f99, %f10;
 	mad.f32 	%f104, %f102, %f103, %f101;
 	add.f32 	%f105, %f100, %f104;
 	mov.f32 	%f106, %f105;
-	ld.param.f32 	%f107, [__cudaparm_render_kernel_MRI_transferScaleY];
+	ld.param.f32 	%f107, [__cudaparm_render_kernel_MPR_transferScaleY];
 	mov.f32 	%f108, 0f3f000000;   	// 0.5
 	mov.f32 	%f109, 0f3f000000;   	// 0.5
 	mad.f32 	%f110, %f59, %f99, %f20;
 	mad.f32 	%f111, %f109, %f110, %f108;
 	add.f32 	%f112, %f107, %f111;
 	mov.f32 	%f113, %f112;
-	ld.param.f32 	%f114, [__cudaparm_render_kernel_MRI_transferScaleZ];
+	ld.param.f32 	%f114, [__cudaparm_render_kernel_MPR_transferScaleZ];
 	mov.f32 	%f115, 0f3f000000;   	// 0.5
 	mov.f32 	%f116, 0f3f000000;   	// 0.5
 	mad.f32 	%f117, %f63, %f99, %f30;
@@ -787,7 +923,7 @@ $Lt_2_3330:
 	mov.f32 	%f122, %f121;
 	tex.3d.v4.u32.f32 {%r16,%r17,%r18,%r19},[tex,{%f106,%f113,%f120,%f122}];
 	mov.s32 	%r20, %r16;
-	.loc	3	294	0
+	.loc	3	299	0
 	mov.s32 	%r21, %r20;
 	mov.b32 	%f123, %r21;
 	cvt.sat.f32.f32 	%f124, %f123;
@@ -805,18 +941,18 @@ $Lt_2_3330:
 	shl.b32 	%r27, %r26, 24;
 	or.b32 	%r28, %r25, %r27;
 	or.b32 	%r29, %r24, %r28;
-	ld.param.u32 	%r30, [__cudaparm_render_kernel_MRI_d_output];
-	.loc	3	249	0
-	ld.param.u32 	%r8, [__cudaparm_render_kernel_MRI_imageW];
-	.loc	3	294	0
+	ld.param.u32 	%r30, [__cudaparm_render_kernel_MPR_d_output];
+	.loc	3	254	0
+	ld.param.u32 	%r8, [__cudaparm_render_kernel_MPR_imageW];
+	.loc	3	299	0
 	mul.lo.u32 	%r31, %r6, %r8;
 	add.u32 	%r32, %r4, %r31;
 	mul.lo.u32 	%r33, %r32, 4;
 	add.u32 	%r34, %r30, %r33;
 	st.global.u32 	[%r34+0], %r29;
-$LBB7_render_kernel_MRI:
-	.loc	3	295	0
+$LBB7_render_kernel_MPR:
+	.loc	3	300	0
 	exit;
-$LDWend_render_kernel_MRI:
-	} // render_kernel_MRI
+$LDWend_render_kernel_MPR:
+	} // render_kernel_MPR
 

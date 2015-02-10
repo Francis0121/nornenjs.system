@@ -44,7 +44,7 @@ var vec3 = require('./mat/vec3');
         rotationX: 0,
         rotationY: 0,
         mprType:1,
-
+        quality:2,
 
         d_output : undefined,
         d_invViewMatrix : undefined,
@@ -144,7 +144,7 @@ var vec3 = require('./mat/vec3');
             }else if(this.type == ENUMS.RENDERING_TYPE.MIP){
                 cuFunction = _cuModule.getFunction('render_kernel_MIP');
             }else if(this.type == ENUMS.RENDERING_TYPE.MPR){
-                cuFunction = _cuModule.getFunction('render_kernel_MRI');
+                cuFunction = _cuModule.getFunction('render_kernel_MPR');
             }else{
                 logger.debug('type not exist');
                 // ~ do default
@@ -157,35 +157,38 @@ var vec3 = require('./mat/vec3');
                 cuFunction, [32, 32, 1], [16, 16, 1],
                 [
                     {
-                        type: "DevicePtr",
+                        type: 'DevicePtr',
                         value: this.d_output.devicePtr
                     },{
-                    type: "DevicePtr",
+                    type: 'DevicePtr',
                     value: this.d_invViewMatrix.devicePtr
                 },{
-                    type: "Uint32",
+                    type: 'Uint32',
                     value: this.imageWidth
                 },{
-                    type: "Uint32",
+                    type: 'Uint32',
                     value: this.imageHeight
                 },{
-                    type: "Float32",
+                    type: 'Float32',
                     value: this.density
                 },{
-                    type: "Float32",
+                    type: 'Float32',
                     value: this.brightness
                 },{
-                    type: "Float32",
+                    type: 'Float32',
                     value: this.transferOffset
                 },{
-                    type: "Float32",
+                    type: 'Float32',
                     value: this.transferScaleX
                 },{
-                    type: "Float32",
+                    type: 'Float32',
                     value: this.transferScaleY
                 },{
-                    type: "Float32",
+                    type: 'Float32',
                     value: this.transferScaleZ
+                },{
+                    type: 'Uint32',
+                    value: this.quality
                 }
                 ]
             );

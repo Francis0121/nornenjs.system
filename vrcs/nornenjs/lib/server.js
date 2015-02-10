@@ -410,6 +410,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     cudaRender.rotationX = param.rotationX;
                     cudaRender.rotationY = param.rotationY;
                     cudaRender.mprType = param.mprType;
+                    cudaRender.quality = param.quality;
 
                     if(status.cudaInterval == null){
                         if(param.isMobile){
