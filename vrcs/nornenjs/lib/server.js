@@ -71,7 +71,7 @@ NornenjsServer.prototype.socketIoEvent = function(){
                 clientId : clientId
             };
 
-            if(streamUserCount < 1){
+            if(streamUserCount < 10){
                 streamUserCount++;
                 message.success = true;
             }else{
@@ -103,8 +103,6 @@ NornenjsServer.prototype.socketIoEvent = function(){
         socket.on('disconnect', function () {
             if(socket_queue.indexOf(socket.id) == -1){
                 streamUserCount--;
-            }else{
-                return ;
             }
 
             var clientId = socket_queue.shift();
