@@ -43,7 +43,7 @@ var vec3 = require('./mat/vec3');
         positionZ: 3.0,
         rotationX: 0,
         rotationY: 0,
-        mriType:1,
+        mprType:1,
 
 
         d_output : undefined,
@@ -74,8 +74,8 @@ var vec3 = require('./mat/vec3');
         makeViewVector : function(){
             var vec;
             var model_matrix = mat4.create();
-            if(this.type == ENUMS.RENDERING_TYPE.MRI ) {
-                if (this.mriType == ENUMS.MRI_TYPE.X) {
+            if(this.type == ENUMS.RENDERING_TYPE.MPR ) {
+                if (this.mprType == ENUMS.MPR_TYPE.X) {
 
                     vec = vec3.fromValues(-1.0, 0.0, 0.0);
                     mat4.rotate(model_matrix, model_matrix, ( (270.0) * 3.14159265 / 180.0), vec);
@@ -85,7 +85,7 @@ var vec3 = require('./mat/vec3');
 
                     vec = vec3.fromValues(0.0, 0.0, this.positionZ);
                     mat4.translate(model_matrix, model_matrix, vec)
-                }else if(this.mriType == ENUMS.MRI_TYPE.Y){
+                }else if(this.mprType == ENUMS.MPR_TYPE.Y){
                     vec = vec3.fromValues(-1.0, 0.0, 0.0);
                     mat4.rotate(model_matrix, model_matrix, ( (270.0 ) * 3.14159265 / 180.0), vec);
 
@@ -94,7 +94,7 @@ var vec3 = require('./mat/vec3');
 
                     vec = vec3.fromValues(0.0, 0.0, this.positionZ);
                     mat4.translate(model_matrix, model_matrix, vec)
-                }else if(this.mriType == ENUMS.MRI_TYPE.Z) {
+                }else if(this.mprType == ENUMS.MPR_TYPE.Z) {
                     vec = vec3.fromValues(-1.0, 0.0, 0.0);
                     mat4.rotate(model_matrix, model_matrix, ( (180 ) * 3.14159265 / 180.0), vec);
 
@@ -143,7 +143,7 @@ var vec3 = require('./mat/vec3');
                 cuFunction = _cuModule.getFunction('render_kernel_volume');
             }else if(this.type == ENUMS.RENDERING_TYPE.MIP){
                 cuFunction = _cuModule.getFunction('render_kernel_MIP');
-            }else if(this.type == ENUMS.RENDERING_TYPE.MRI){
+            }else if(this.type == ENUMS.RENDERING_TYPE.MPR){
                 cuFunction = _cuModule.getFunction('render_kernel_MRI');
             }else{
                 logger.debug('type not exist');

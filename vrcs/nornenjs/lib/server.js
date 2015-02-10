@@ -265,9 +265,10 @@ NornenjsServer.prototype.streamEvent = function(){
                     transferScaleX : buffer.readFloatLE(32),
                     transferScaleY : buffer.readFloatLE(36),
                     transferScaleZ : buffer.readFloatLE(40),
-                    mriType : buffer.readFloatLE(44),
+                    mprType : buffer.readFloatLE(44),
                     isMobile : buffer.readFloatLE(48),
-                    uuid : buffer.toString('utf-8', 52)
+                    quality : buffer.readFloatLE(52),
+                    uuid : buffer.toString('utf-8', 56)
                 };
                 
                 logger.debug('Request parameter : ', parameter);
@@ -408,7 +409,7 @@ NornenjsServer.prototype.streamEvent = function(){
                     cudaRender.transferScaleZ = param.transferScaleZ;
                     cudaRender.rotationX = param.rotationX;
                     cudaRender.rotationY = param.rotationY;
-                    cudaRender.mriType = param.mriType;
+                    cudaRender.mprType = param.mprType;
 
                     if(status.cudaInterval == null){
                         if(param.isMobile){

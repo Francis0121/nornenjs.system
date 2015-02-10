@@ -6,10 +6,10 @@ var ENUMS = {
     RENDERING_TYPE : {
         VOLUME : 1,
         MIP : 2,
-        MRI : 3
+        MPR : 3
     },
     
-    MRI_TYPE : {
+    MPR_TYPE : {
         X : 1,
         Y : 2,
         Z : 3
