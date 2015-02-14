@@ -63,10 +63,6 @@ NornenjsServer.prototype.socketIoEvent = function(){
     
     this.io.sockets.on('connection', function(socket){
         
-        socket.on('isConnect', function(data){
-            socket.emit('isConnect', { isConnect : data.isConnect });
-        });
-        
         socket.on('join', function(param){
             var clientId = socket.id;
             var message = {
@@ -93,7 +89,7 @@ NornenjsServer.prototype.socketIoEvent = function(){
                 
                 if(debugOption == undefined){
                     debugOption = new DebugOption();
-                }
+                }socketIo
                 
                 debugOption.socketId = socket.id;
                 debugOption.uuid = param.uuid;
