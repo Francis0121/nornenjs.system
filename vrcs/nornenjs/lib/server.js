@@ -293,7 +293,7 @@ NornenjsServer.prototype.streamEvent = function(){
                         useMap.set(volumePn, use);
 
                         var cuModule = cu.moduleLoad(path.join(__dirname, '../src-cuda/volume.ptx'));
-                        var cudaRender = new CudaRender(1, path.join(__dirname, '../../public/upload/')+volume.save_name,
+                        var cudaRender = new CudaRender(1, path.join(__dirname, './data/')+volume.save_name,
                             volume.width, volume.height,volume.depth, cuCtx, cuModule);
 
                         cudaRender.init();
