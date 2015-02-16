@@ -19,20 +19,20 @@ $(function(){
         $('.option_rendering>ul>li').removeClass('option_select_wrap_active').addClass('option_select_wrap_none');
         $(this).removeClass('option_select_wrap_none').addClass('option_select_wrap_active');
 
-        if(type == ENUMS.RENDERING_TYPE.MRI){
+        if(type == NORNENJS_ENUMS.RENDERING_TYPE.MPR){
             $('.option_zoom').hide();
             $('.option_brightness').hide();
             $('.option_otf').hide();
             $('.option_axis').show();
-            nornenjs.sendOption.rotationX = STATIC.MRI_DEFAULT_OPTION.rotationX;
-            nornenjs.sendOption.rotationY = STATIC.MRI_DEFAULT_OPTION.rotationY;
-            nornenjs.sendOption.positionZ = STATIC.MRI_DEFAULT_OPTION.positionZ;
-        }else if(type == ENUMS.RENDERING_TYPE.VOLUME){
+            nornenjs.sendOption.rotationX = NORNENJS_STATIC.MRI_DEFAULT_OPTION.rotationX;
+            nornenjs.sendOption.rotationY = NORNENJS_STATIC.MRI_DEFAULT_OPTION.rotationY;
+            nornenjs.sendOption.positionZ = NORNENJS_STATIC.MRI_DEFAULT_OPTION.positionZ;
+        }else if(type == NORNENJS_ENUMS.RENDERING_TYPE.VOLUME){
             $('.option_zoom').show();
             $('.option_brightness').show();
             $('.option_otf').show();
             $('.option_axis').hide();
-        }else if(type == ENUMS.RENDERING_TYPE.MIP){
+        }else if(type == NORNENJS_ENUMS.RENDERING_TYPE.MIP){
             $('.option_zoom').show();
             $('.option_brightness').hide();
             $('.option_otf').hide();
